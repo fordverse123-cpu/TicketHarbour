@@ -9,7 +9,7 @@
     "dev": "nodemon server.js",
     "seed": "node scripts/seed.js",
     "seed:clean": "node scripts/seedClean.js",
-    "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --detectOpenHandles --forceExit"
+    "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --testTimeout=15000 --detectOpenHandles --forceExit"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

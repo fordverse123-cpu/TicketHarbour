@@ -70,6 +70,26 @@ app.use('/api/v1/reviews', reviewRoutes);
 app.use('/api/v1/wishlist', wishlistRoutes);
 app.use('/api/v1/admin', adminRoutes);
 
+// Root Welcome Route
+app.get('/', (req, res) => {
+  return successResponse(res, 200, 'Welcome to TicketHarbor API', {
+    app: 'TicketHarbor API Server',
+    status: 'healthy',
+    version: '1.0.0',
+    repository: 'https://github.com/fordverse123-cpu/TicketHarbour',
+    healthCheck: '/api/v1/health',
+    endpoints: {
+      auth: '/api/v1/auth',
+      categories: '/api/v1/categories',
+      listings: '/api/v1/listings',
+      schedules: '/api/v1/schedules',
+      bookings: '/api/v1/bookings',
+      payments: '/api/v1/payments',
+      admin: '/api/v1/admin',
+    },
+  });
+});
+
 // Health Check Route
 app.get('/api/v1/health', (req, res) => {
   return successResponse(res, 200, 'TicketHarbor API Server is running', {
