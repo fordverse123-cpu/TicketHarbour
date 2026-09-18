@@ -33,11 +33,11 @@ export const generateRefreshToken = async (user, ipAddress = '') => {
 export const setTokenCookies = (res, accessToken, refreshToken) => {
   const isProduction = process.env.NODE_ENV === 'production';
 
-  // Access Token Cookie (15 min)
+  // Access Token Cookie
   res.cookie('accessToken', accessToken, {
     httpOnly: true,
     secure: isProduction,
-    sameSite: isProduction ? 'strict' : 'lax',
+    sameSite: isProduction ? 'none' : 'lax',
     maxAge: 15 * 60 * 1000,
   });
 
@@ -46,7 +46,7 @@ export const setTokenCookies = (res, accessToken, refreshToken) => {
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       secure: isProduction,
-      sameSite: isProduction ? 'strict' : 'lax',
+      sameSite: isProduction ? 'none' : 'lax',
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
   }
@@ -56,10 +56,14 @@ export const setTokenCookies = (res, accessToken, refreshToken) => {
 export const clearTokenCookies = (res) => {
   res.cookie('accessToken', '', {
     httpOnly: true,
+    secure: true,
+    sameSite: 'none',
     expires: new Date(0),
   });
   res.cookie('refreshToken', '', {
     httpOnly: true,
+    secure: true,
+    sameSite: 'none',
     expires: new Date(0),
   });
 };

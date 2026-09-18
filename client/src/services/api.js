@@ -8,6 +8,18 @@ const API = axios.create({
   },
 });
 
+// Request interceptor to attach Bearer token from localStorage as fallback
+API.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('accessToken');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
 // Response interceptor to handle 401 & automatic token refresh
 API.interceptors.response.use(
   (response) => response,
@@ -24,9 +36,14 @@ API.interceptors.response.use(
     ) {
       originalRequest._retry = true;
       try {
-        await API.post('/auth/refresh');
+        const res = await API.post('/auth/refresh');
+        if (res.data?.data?.accessToken) {
+          localStorage.setItem('accessToken', res.data.data.accessToken);
+          originalRequest.headers.Authorization = `Bearer ${res.data.data.accessToken}`;
+        }
         return API(originalRequest);
       } catch (refreshError) {
+        localStorage.removeItem('accessToken');
         return Promise.reject(refreshError);
       }
     }

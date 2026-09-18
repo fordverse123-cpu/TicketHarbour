@@ -30,8 +30,12 @@ export const AuthProvider = ({ children }) => {
     try {
       const res = await API.post('/auth/login', { email, password });
       if (res.data.success) {
-        setUser(res.data.data.user);
-        toast.success(`Welcome back, ${res.data.data.user.name}!`);
+        const { user: userData, accessToken } = res.data.data;
+        setUser(userData);
+        if (accessToken) {
+          localStorage.setItem('accessToken', accessToken);
+        }
+        toast.success(`Welcome back, ${userData.name}!`);
         return { success: true };
       }
     } catch (err) {
@@ -45,8 +49,12 @@ export const AuthProvider = ({ children }) => {
     try {
       const res = await API.post('/auth/register', userData);
       if (res.data.success) {
-        setUser(res.data.data.user);
-        toast.success('Registration successful!');
+        const { user: newUser, accessToken } = res.data.data;
+        setUser(newUser);
+        if (accessToken) {
+          localStorage.setItem('accessToken', accessToken);
+        }
+        toast.success('Registration successful! Welcome to TicketHarbor.');
         return { success: true };
       }
     } catch (err) {
@@ -59,10 +67,12 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     try {
       await API.post('/auth/logout');
-      setUser(null);
-      toast.success('Logged out successfully');
     } catch (err) {
+      // Ignore error on logout
+    } finally {
       setUser(null);
+      localStorage.removeItem('accessToken');
+      toast.success('Logged out successfully');
     }
   };
 
