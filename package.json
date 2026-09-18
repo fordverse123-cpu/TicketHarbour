@@ -4,8 +4,8 @@
   "private": true,
   "description": "Root package for TicketHarbor multi-category ticket booking platform",
   "scripts": {
-    "start": "cd server && npm start",
-    "build": "cd server && npm install",
-    "seed": "cd server && npm run seed"
+    "build": "npm install --prefix server",
+    "start": "npm start --prefix server",
+    "seed": "npm run seed --prefix server"
   }
 }
