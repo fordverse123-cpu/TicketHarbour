@@ -230,19 +230,19 @@ export default function ListingDetail() {
             {isTransit && listing.transitInfo && (
               <div className="pt-4 border-t border-slate-100 dark:border-slate-700 grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
                 <div>
-                  <span className="text-slate-400 block">Operator</span>
+                  <span className="text-slate-400 dark:text-slate-400 block">Operator</span>
                   <span className="font-bold text-slate-900 dark:text-white">{listing.transitInfo.operator}</span>
                 </div>
                 <div>
-                  <span className="text-slate-400 block">Departure</span>
+                  <span className="text-slate-400 dark:text-slate-400 block">Departure</span>
                   <span className="font-bold text-teal-600 dark:text-teal-400">{listing.transitInfo.departureTime}</span>
                 </div>
                 <div>
-                  <span className="text-slate-400 block">Arrival</span>
+                  <span className="text-slate-400 dark:text-slate-400 block">Arrival</span>
                   <span className="font-bold text-slate-900 dark:text-white">{listing.transitInfo.arrivalTime}</span>
                 </div>
                 <div>
-                  <span className="text-slate-400 block">Duration</span>
+                  <span className="text-slate-400 dark:text-slate-400 block">Duration</span>
                   <span className="font-bold text-slate-900 dark:text-white">{listing.transitInfo.duration}</span>
                 </div>
               </div>
@@ -256,7 +256,7 @@ export default function ListingDetail() {
             </h2>
 
             {schedules.length === 0 ? (
-              <p className="text-xs text-slate-400">No upcoming schedules available for this listing.</p>
+              <p className="text-xs text-slate-400 dark:text-slate-400">No upcoming schedules available for this listing.</p>
             ) : (
               <div className="flex items-center gap-3 overflow-x-auto pb-2">
                 {schedules.map((sch) => {
@@ -280,7 +280,7 @@ export default function ListingDetail() {
                           : 'border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-slate-300'
                       }`}
                     >
-                      <span className="block text-slate-400">{schDate}</span>
+                      <span className="block text-slate-400 dark:text-slate-400">{schDate}</span>
                       <span className="block text-sm font-bold mt-0.5">{sch.startTime}</span>
                     </button>
                   );
@@ -304,7 +304,7 @@ export default function ListingDetail() {
                   <button
                     disabled={quantity <= 1}
                     onClick={() => setQuantity(quantity - 1)}
-                    className="h-10 w-10 rounded-xl bg-slate-100 dark:bg-slate-700 text-lg font-bold disabled:opacity-40"
+                    className="h-10 w-10 rounded-xl bg-slate-100 dark:bg-slate-700 text-lg font-bold disabled:opacity-40 text-slate-900 dark:text-white"
                   >
                     -
                   </button>
@@ -312,7 +312,7 @@ export default function ListingDetail() {
                   <button
                     disabled={quantity >= 10}
                     onClick={() => setQuantity(quantity + 1)}
-                    className="h-10 w-10 rounded-xl bg-slate-100 dark:bg-slate-700 text-lg font-bold"
+                    className="h-10 w-10 rounded-xl bg-slate-100 dark:bg-slate-700 text-lg font-bold text-slate-900 dark:text-white"
                   >
                     +
                   </button>
@@ -329,16 +329,16 @@ export default function ListingDetail() {
 
             {/* Add Review Form */}
             {user && (
-              <form onSubmit={handleAddReview} className="space-y-3 p-4 bg-slate-50 dark:bg-slate-750 rounded-xl border border-slate-200 dark:border-slate-700">
+              <form onSubmit={handleAddReview} className="space-y-3 p-4 bg-slate-50 dark:bg-slate-700 rounded-xl border border-slate-200 dark:border-slate-600">
                 <p className="text-xs font-bold text-slate-700 dark:text-slate-200">Leave a Review</p>
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-slate-500">Rating:</span>
+                  <span className="text-xs text-slate-500 dark:text-slate-400">Rating:</span>
                   {[1, 2, 3, 4, 5].map((star) => (
                     <button
                       key={star}
                       type="button"
                       onClick={() => setNewRating(star)}
-                      className={`p-1 ${star <= newRating ? 'text-amber-400' : 'text-slate-300'}`}
+                      className={`p-1 ${star <= newRating ? 'text-amber-400' : 'text-slate-300 dark:text-slate-600'}`}
                     >
                       <Star className="w-4 h-4 fill-current" />
                     </button>
@@ -349,7 +349,7 @@ export default function ListingDetail() {
                   placeholder="Share your experience..."
                   value={newComment}
                   onChange={(e) => setNewComment(e.target.value)}
-                  className="w-full p-3 text-xs bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none dark:text-white"
+                  className="w-full p-3 text-xs bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none text-slate-900 dark:text-white"
                 />
                 <button
                   type="submit"
@@ -386,7 +386,7 @@ export default function ListingDetail() {
 
             <div className="space-y-3 text-sm">
               <div className="flex items-center justify-between">
-                <span className="text-slate-500">Selected Seats/Qty</span>
+                <span className="text-slate-500 dark:text-slate-400">Selected Seats/Qty</span>
                 <span className="font-bold text-slate-900 dark:text-white">
                   {selectedSeats.length > 0
                     ? selectedSeats.map((s) => s.seatId).join(', ')
@@ -395,11 +395,11 @@ export default function ListingDetail() {
               </div>
 
               <div className="flex items-center justify-between">
-                <span className="text-slate-500">Price Subtotal</span>
+                <span className="text-slate-500 dark:text-slate-400">Price Subtotal</span>
                 <span className="font-bold text-slate-900 dark:text-white">₹{totalPrice}</span>
               </div>
 
-              <div className="flex items-center justify-between text-xs text-slate-400">
+              <div className="flex items-center justify-between text-xs text-slate-400 dark:text-slate-400">
                 <span>Estimated Tax (18%)</span>
                 <span>₹{Math.round(totalPrice * 0.18)}</span>
               </div>
@@ -419,7 +419,7 @@ export default function ListingDetail() {
               <Ticket className="w-5 h-5" /> Proceed to Checkout
             </button>
 
-            <div className="text-center text-xs text-slate-400 flex items-center justify-center gap-1">
+            <div className="text-center text-xs text-slate-400 dark:text-slate-400 flex items-center justify-center gap-1">
               <ShieldCheck className="w-4 h-4 text-teal-500" /> Instant Confirmation & PDF QR Ticket
             </div>
           </div>

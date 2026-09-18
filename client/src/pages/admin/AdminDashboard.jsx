@@ -143,7 +143,7 @@ export default function AdminDashboard() {
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           {categoryStats.map((cat) => (
-            <div key={cat._id} className="p-4 bg-slate-50 dark:bg-slate-750 rounded-xl border border-slate-100 dark:border-slate-700 space-y-1">
+            <div key={cat._id} className="p-4 bg-slate-50 dark:bg-slate-700 rounded-xl border border-slate-100 dark:border-slate-600 space-y-1">
               <span className="text-xs uppercase font-bold text-teal-600 dark:text-teal-400">{cat._id}</span>
               <p className="text-lg font-black text-slate-900 dark:text-white">₹{cat.revenue}</p>
               <p className="text-xs text-slate-400">{cat.count} ticket(s) sold</p>
@@ -158,7 +158,7 @@ export default function AdminDashboard() {
 
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs text-slate-600 dark:text-slate-300">
-            <thead className="bg-slate-50 dark:bg-slate-750 uppercase text-slate-400 font-bold border-b border-slate-100 dark:border-slate-700">
+            <thead className="bg-slate-50 dark:bg-slate-700 uppercase text-slate-400 font-bold border-b border-slate-100 dark:border-slate-600">
               <tr>
                 <th className="p-3">Ref</th>
                 <th className="p-3">Customer</th>
@@ -169,7 +169,7 @@ export default function AdminDashboard() {
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
               {recentBookings.map((b) => (
-                <tr key={b._id} className="hover:bg-slate-50 dark:hover:bg-slate-750/50">
+                <tr key={b._id} className="hover:bg-slate-50 dark:hover:bg-slate-700/50">
                   <td className="p-3 font-bold text-teal-600">{b.bookingReference}</td>
                   <td className="p-3">{b.user?.name} ({b.user?.email})</td>
                   <td className="p-3 font-semibold">{b.listing?.title}</td>
@@ -207,7 +207,7 @@ export default function AdminDashboard() {
                 placeholder="Scan QR string or enter TH-REF code..."
                 value={qrInput}
                 onChange={(e) => setQrInput(e.target.value)}
-                className="w-full p-3 bg-slate-50 dark:bg-slate-750 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white"
+                className="w-full p-3 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl dark:text-white"
               />
               <button
                 type="submit"

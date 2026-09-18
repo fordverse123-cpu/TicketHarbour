@@ -133,7 +133,7 @@ export default function Home() {
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Explore Categories</h2>
-            <p className="text-sm text-slate-500">Pick a category to filter upcoming shows & trips</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400">Pick a category to filter upcoming shows & trips</p>
           </div>
         </div>
 
@@ -148,7 +148,7 @@ export default function Home() {
                 className={`flex items-center gap-2.5 px-5 py-3 rounded-2xl text-sm font-bold whitespace-nowrap transition-all ${
                   isActive
                     ? 'bg-teal-500 text-white shadow-lg shadow-teal-500/30 scale-105'
-                    : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-750'
+                    : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700'
                 }`}
               >
                 <Icon className="w-4 h-4" />
@@ -164,7 +164,7 @@ export default function Home() {
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Trending & Featured</h2>
-            <p className="text-sm text-slate-500">Hand-picked top bookings across India</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400">Hand-picked top bookings across India</p>
           </div>
           <Link
             to="/listings"
@@ -178,7 +178,7 @@ export default function Home() {
           <SkeletonLoader count={6} />
         ) : featuredListings.length === 0 ? (
           <div className="text-center py-16 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700">
-            <p className="text-slate-500">No listings found in this category.</p>
+            <p className="text-slate-500 dark:text-slate-400">No listings found in this category.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -205,7 +205,7 @@ export default function Home() {
                   <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
-                        <span className="text-xs text-slate-500 flex items-center gap-1 font-medium">
+                        <span className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1 font-medium">
                           <MapPin className="w-3.5 h-3.5 text-teal-500" />
                           {item.transitInfo?.source
                             ? `${item.transitInfo.source} → ${item.transitInfo.destination}`
@@ -218,14 +218,14 @@ export default function Home() {
                         {item.title}
                       </h3>
                       
-                      <p className="text-xs text-slate-500 line-clamp-2">
+                      <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2">
                         {item.description}
                       </p>
                     </div>
 
                     <div className="pt-3 border-t border-slate-100 dark:border-slate-700 flex items-center justify-between">
                       <div>
-                        <span className="text-xs text-slate-400 block">Starting from</span>
+                        <span className="text-xs text-slate-400 dark:text-slate-500 block">Starting from</span>
                         <span className="text-lg font-black text-slate-900 dark:text-white">
                           ₹{startingPrice}
                         </span>

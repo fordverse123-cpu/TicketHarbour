@@ -49,7 +49,7 @@ export default function Profile() {
     <div className="max-w-4xl mx-auto space-y-8 pb-16">
       <div>
         <h1 className="text-3xl font-extrabold text-slate-900 dark:text-white">Profile Settings</h1>
-        <p className="text-sm text-slate-500">Manage your personal account details and security settings</p>
+        <p className="text-sm text-slate-500 dark:text-slate-400">Manage your personal account details and security settings</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -67,7 +67,7 @@ export default function Profile() {
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full p-2.5 bg-slate-50 dark:bg-slate-750 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white"
+                className="w-full p-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl dark:text-white"
               />
             </div>
 
@@ -77,7 +77,7 @@ export default function Profile() {
                 type="email"
                 disabled
                 value={user?.email || ''}
-                className="w-full p-2.5 bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-slate-500"
+                className="w-full p-2.5 bg-slate-100 dark:bg-slate-700/80 border border-slate-200 dark:border-slate-600 rounded-xl text-slate-500 dark:text-slate-300"
               />
             </div>
 
@@ -88,7 +88,7 @@ export default function Profile() {
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="+1 800 000 0000"
-                className="w-full p-2.5 bg-slate-50 dark:bg-slate-750 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white"
+                className="w-full p-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl dark:text-white"
               />
             </div>
 
@@ -115,7 +115,7 @@ export default function Profile() {
                 type="password"
                 value={currentPassword}
                 onChange={(e) => setCurrentPassword(e.target.value)}
-                className="w-full p-2.5 bg-slate-50 dark:bg-slate-750 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white"
+                className="w-full p-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl dark:text-white"
               />
             </div>
 
@@ -125,7 +125,7 @@ export default function Profile() {
                 type="password"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
-                className="w-full p-2.5 bg-slate-50 dark:bg-slate-750 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white"
+                className="w-full p-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl dark:text-white"
               />
             </div>
 

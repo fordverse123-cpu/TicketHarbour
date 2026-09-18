@@ -84,7 +84,7 @@ export default function MyBookings() {
       {/* Header */}
       <div>
         <h1 className="text-3xl font-extrabold text-slate-900 dark:text-white">My Bookings</h1>
-        <p className="text-sm text-slate-500">Manage your active reservations, tickets, and PDF downloads</p>
+        <p className="text-sm text-slate-500 dark:text-slate-400">Manage your active reservations, tickets, and PDF downloads</p>
       </div>
 
       {/* Tabs */}
@@ -114,7 +114,7 @@ export default function MyBookings() {
       {/* Bookings List */}
       {displayedBookings.length === 0 ? (
         <div className="text-center py-20 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-3">
-          <Ticket className="w-12 h-12 text-slate-300 mx-auto" />
+          <Ticket className="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto" />
           <p className="text-lg font-bold text-slate-700 dark:text-slate-200">No {activeTab} bookings found</p>
         </div>
       ) : (
@@ -153,8 +153,8 @@ export default function MyBookings() {
                     </div>
 
                     <h3 className="font-bold text-slate-900 dark:text-white text-base">{listing.title}</h3>
-                    <p className="text-xs text-slate-500">Ref: <strong>{b.bookingReference}</strong></p>
-                    <p className="text-xs text-slate-500 flex items-center gap-1">
+                    <p className="text-xs text-slate-500 dark:text-slate-400">Ref: <strong className="text-slate-700 dark:text-slate-200">{b.bookingReference}</strong></p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1">
                       <Calendar className="w-3.5 h-3.5 text-teal-500" />
                       {schedule.date ? new Date(schedule.date).toDateString() : ''} @ {schedule.startTime}
                     </p>
@@ -174,7 +174,7 @@ export default function MyBookings() {
                     <div className="flex flex-wrap items-center gap-2">
                       <button
                         onClick={() => setSelectedQRBooking(b)}
-                        className="px-3 py-1.5 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold rounded-xl flex items-center gap-1 hover:bg-slate-200"
+                        className="px-3 py-1.5 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold rounded-xl flex items-center gap-1 hover:bg-slate-200 dark:hover:bg-slate-600"
                       >
                         <QrCode className="w-4 h-4" /> View QR
                       </button>
@@ -189,7 +189,7 @@ export default function MyBookings() {
                       {activeTab === 'upcoming' && (
                         <button
                           onClick={() => handleCancelBooking(b._id)}
-                          className="px-3 py-1.5 bg-rose-50 text-rose-600 hover:bg-rose-100 text-xs font-bold rounded-xl"
+                          className="px-3 py-1.5 bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-900/60 text-xs font-bold rounded-xl"
                         >
                           Cancel
                         </button>
@@ -209,13 +209,13 @@ export default function MyBookings() {
           <div className="bg-white dark:bg-slate-800 rounded-3xl p-6 max-w-sm w-full text-center space-y-4 shadow-2xl relative">
             <button
               onClick={() => setSelectedQRBooking(null)}
-              className="absolute top-4 right-4 text-slate-400 hover:text-slate-600"
+              className="absolute top-4 right-4 text-slate-400 hover:text-slate-200"
             >
               ✕
             </button>
 
             <h3 className="font-bold text-lg text-slate-900 dark:text-white">Entry Gate QR Ticket</h3>
-            <p className="text-xs text-slate-500">Ref: {selectedQRBooking.bookingReference}</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400">Ref: {selectedQRBooking.bookingReference}</p>
 
             <div className="p-4 bg-white rounded-2xl border border-slate-200 inline-block mx-auto">
               <img
@@ -227,7 +227,7 @@ export default function MyBookings() {
               />
             </div>
 
-            <p className="text-xs text-slate-400">Scan this QR code at venue check-in terminal</p>
+            <p className="text-xs text-slate-400 dark:text-slate-400">Scan this QR code at venue check-in terminal</p>
           </div>
         </div>
       )}

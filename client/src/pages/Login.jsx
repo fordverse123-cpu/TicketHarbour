@@ -32,7 +32,7 @@ export default function Login() {
             TH
           </div>
           <h1 className="text-2xl font-black text-slate-900 dark:text-white">Welcome Back</h1>
-          <p className="text-xs text-slate-500">Log in to manage your TicketHarbor bookings</p>
+          <p className="text-xs text-slate-500 dark:text-slate-400">Log in to manage your TicketHarbor bookings</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4 text-xs">
@@ -45,7 +45,7 @@ export default function Login() {
                 placeholder="name@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-750 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white"
+                className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl dark:text-white"
               />
               <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
             </div>
@@ -65,7 +65,7 @@ export default function Login() {
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-750 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white"
+                className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl dark:text-white"
               />
               <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
             </div>
@@ -88,7 +88,7 @@ export default function Login() {
           <p className="text-teal-700 dark:text-teal-400">Admin: <code>admin@ticketharbor.com</code> / <code>admin123</code></p>
         </div>
 
-        <p className="text-center text-xs text-slate-500">
+        <p className="text-center text-xs text-slate-500 dark:text-slate-400">
           Don't have an account?{' '}
           <Link to="/register" className="font-bold text-teal-600 dark:text-teal-400 hover:underline">
             Register now

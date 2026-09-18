@@ -53,12 +53,12 @@ export default function WishlistPage() {
         <h1 className="text-3xl font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
           <Heart className="w-7 h-7 text-rose-500 fill-rose-500" /> Saved Favorites
         </h1>
-        <p className="text-sm text-slate-500">Bookings you have saved for later</p>
+        <p className="text-sm text-slate-500 dark:text-slate-400">Bookings you have saved for later</p>
       </div>
 
       {items.length === 0 ? (
         <div className="text-center py-20 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-3">
-          <Heart className="w-12 h-12 text-slate-300 mx-auto" />
+          <Heart className="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto" />
           <p className="text-lg font-bold text-slate-700 dark:text-slate-200">Your wishlist is empty</p>
           <Link to="/listings" className="inline-block px-4 py-2 bg-teal-600 text-white font-bold text-xs rounded-xl">
             Browse Ticket Listings
@@ -90,7 +90,7 @@ export default function WishlistPage() {
                 <div className="p-4 space-y-3 flex-1 flex flex-col justify-between">
                   <div>
                     <h3 className="font-bold text-slate-900 dark:text-white text-sm line-clamp-1">{listing.title}</h3>
-                    <p className="text-xs text-slate-500 flex items-center gap-1 mt-1">
+                    <p className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1 mt-1">
                       <MapPin className="w-3.5 h-3.5 text-teal-500" /> {listing.location?.city}
                     </p>
                   </div>

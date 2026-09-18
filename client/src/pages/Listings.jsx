@@ -68,14 +68,14 @@ export default function Listings() {
           <h1 className="text-3xl font-extrabold text-slate-900 dark:text-white">
             Explore All Ticket Listings
           </h1>
-          <p className="text-sm text-slate-500">
+          <p className="text-sm text-slate-500 dark:text-slate-400">
             Found {meta.total || 0} active shows, trips, and events
           </p>
         </div>
 
         {/* Sort Controls */}
         <div className="flex items-center gap-3">
-          <label className="text-xs font-semibold text-slate-500">Sort by:</label>
+          <label className="text-xs font-semibold text-slate-500 dark:text-slate-400">Sort by:</label>
           <select
             value={sort}
             onChange={(e) => {
@@ -127,7 +127,7 @@ export default function Listings() {
                   placeholder="Title, artist, location..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-slate-750 border border-slate-200 dark:border-slate-700 rounded-xl text-xs dark:text-white"
+                  className="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-xs dark:text-white"
                 />
                 <Search className="w-4 h-4 text-slate-400 absolute left-2.5 top-2.5" />
               </div>
@@ -139,7 +139,7 @@ export default function Listings() {
               <select
                 value={categoryType}
                 onChange={(e) => setCategoryType(e.target.value)}
-                className="w-full p-2 bg-slate-50 dark:bg-slate-750 border border-slate-200 dark:border-slate-700 rounded-xl text-xs dark:text-white"
+                className="w-full p-2 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-xs dark:text-white"
               >
                 <option value="">All Categories</option>
                 <option value="movie">Movies</option>
@@ -158,7 +158,7 @@ export default function Listings() {
               <select
                 value={city}
                 onChange={(e) => setCity(e.target.value)}
-                className="w-full p-2 bg-slate-50 dark:bg-slate-750 border border-slate-200 dark:border-slate-700 rounded-xl text-xs dark:text-white"
+                className="w-full p-2 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-xs dark:text-white"
               >
                 <option value="">All Cities</option>
                 <option value="Mumbai">Mumbai</option>
@@ -177,7 +177,7 @@ export default function Listings() {
                   placeholder="Min"
                   value={minPrice}
                   onChange={(e) => setMinPrice(e.target.value)}
-                  className="w-full p-2 bg-slate-50 dark:bg-slate-750 border border-slate-200 dark:border-slate-700 rounded-xl text-xs dark:text-white"
+                  className="w-full p-2 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-xs dark:text-white"
                 />
                 <span className="text-slate-400">-</span>
                 <input
@@ -185,7 +185,7 @@ export default function Listings() {
                   placeholder="Max"
                   value={maxPrice}
                   onChange={(e) => setMaxPrice(e.target.value)}
-                  className="w-full p-2 bg-slate-50 dark:bg-slate-750 border border-slate-200 dark:border-slate-700 rounded-xl text-xs dark:text-white"
+                  className="w-full p-2 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-xs dark:text-white"
                 />
               </div>
             </div>
@@ -206,7 +206,7 @@ export default function Listings() {
           ) : listings.length === 0 ? (
             <div className="text-center py-20 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-3">
               <p className="text-lg font-bold text-slate-700 dark:text-slate-200">No ticket listings found</p>
-              <p className="text-xs text-slate-400">Try adjusting your filters or search keywords.</p>
+              <p className="text-xs text-slate-400 dark:text-slate-500">Try adjusting your filters or search keywords.</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -233,7 +233,7 @@ export default function Listings() {
                     <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
                       <div className="space-y-2">
                         <div className="flex items-center justify-between">
-                          <span className="text-xs text-slate-500 flex items-center gap-1 font-medium">
+                          <span className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1 font-medium">
                             <MapPin className="w-3.5 h-3.5 text-teal-500" />
                             {item.transitInfo?.source
                               ? `${item.transitInfo.source} → ${item.transitInfo.destination}`
@@ -245,14 +245,14 @@ export default function Listings() {
                         <h3 className="font-bold text-slate-900 dark:text-white line-clamp-1 group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
                           {item.title}
                         </h3>
-                        <p className="text-xs text-slate-500 line-clamp-2">
+                        <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2">
                           {item.description}
                         </p>
                       </div>
 
                       <div className="pt-3 border-t border-slate-100 dark:border-slate-700 flex items-center justify-between">
                         <div>
-                          <span className="text-xs text-slate-400 block">From</span>
+                          <span className="text-xs text-slate-400 dark:text-slate-500 block">From</span>
                           <span className="text-lg font-black text-slate-900 dark:text-white">
                             ₹{startingPrice}
                           </span>

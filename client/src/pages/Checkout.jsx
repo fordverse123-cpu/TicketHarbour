@@ -135,12 +135,12 @@ export default function Checkout() {
 
           <div className="space-y-2">
             <h2 className="text-3xl font-black text-slate-900 dark:text-white">Booking Confirmed!</h2>
-            <p className="text-sm text-slate-500">
+            <p className="text-sm text-slate-500 dark:text-slate-400">
               Reference: <strong className="text-teal-600 dark:text-teal-400">{confirmedBooking.bookingReference}</strong>
             </p>
           </div>
 
-          <div className="p-4 bg-slate-50 dark:bg-slate-750 rounded-2xl border border-slate-200 dark:border-slate-700 max-w-md mx-auto text-left text-xs space-y-2">
+          <div className="p-4 bg-slate-50 dark:bg-slate-700 rounded-2xl border border-slate-200 dark:border-slate-600 max-w-md mx-auto text-left text-xs space-y-2 text-slate-700 dark:text-slate-200">
             <p><strong>Item:</strong> {listing.title}</p>
             <p><strong>Schedule:</strong> {new Date(schedule.date).toDateString()} at {schedule.startTime}</p>
             <p><strong>Seats/Qty:</strong> {seats.length > 0 ? seats.map((s) => s.seatId).join(', ') : quantity}</p>
@@ -178,7 +178,7 @@ export default function Checkout() {
                 />
                 <div>
                   <h3 className="font-bold text-slate-900 dark:text-white">{listing.title}</h3>
-                  <p className="text-xs text-slate-500">{listing.location?.city}</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">{listing.location?.city}</p>
                   <p className="text-xs text-teal-600 dark:text-teal-400 font-semibold mt-1">
                     {new Date(schedule.date).toDateString()} @ {schedule.startTime}
                   </p>
@@ -203,18 +203,18 @@ export default function Checkout() {
                   placeholder="Try HARBOR20"
                   value={couponInput}
                   onChange={(e) => setCouponInput(e.target.value)}
-                  className="flex-1 px-3 py-2 text-xs bg-slate-50 dark:bg-slate-750 border border-slate-200 dark:border-slate-700 rounded-xl uppercase font-bold dark:text-white"
+                  className="flex-1 px-3 py-2 text-xs bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl uppercase font-bold dark:text-white"
                 />
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-slate-900 text-white font-bold text-xs rounded-xl hover:bg-slate-800"
+                  className="px-4 py-2 bg-slate-900 dark:bg-slate-700 text-white font-bold text-xs rounded-xl hover:bg-slate-800 dark:hover:bg-slate-600"
                 >
                   Apply
                 </button>
               </form>
 
               {appliedCoupon && (
-                <p className="text-xs font-bold text-emerald-600">✓ Coupon '{appliedCoupon}' applied successfully!</p>
+                <p className="text-xs font-bold text-emerald-600 dark:text-emerald-400">✓ Coupon '{appliedCoupon}' applied successfully!</p>
               )}
             </div>
           </div>
@@ -228,19 +228,19 @@ export default function Checkout() {
 
               <div className="space-y-3 text-xs">
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-500">Subtotal</span>
+                  <span className="text-slate-500 dark:text-slate-400">Subtotal</span>
                   <span className="font-bold text-slate-900 dark:text-white">₹{baseAmount}</span>
                 </div>
 
                 {discountAmount > 0 && (
-                  <div className="flex items-center justify-between text-emerald-600 font-bold">
+                  <div className="flex items-center justify-between text-emerald-600 dark:text-emerald-400 font-bold">
                     <span>Coupon Discount</span>
                     <span>-₹{discountAmount}</span>
                   </div>
                 )}
 
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-500">Service Tax (18%)</span>
+                  <span className="text-slate-500 dark:text-slate-400">Service Tax (18%)</span>
                   <span className="font-bold text-slate-900 dark:text-white">₹{taxAmount}</span>
                 </div>
 

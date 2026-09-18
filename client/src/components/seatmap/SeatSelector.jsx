@@ -101,7 +101,7 @@ export default function SeatSelector({ schedule, listing, onSeatsSelected }) {
           <h3 className="text-lg font-bold text-slate-900 dark:text-white">
             {isTransit ? 'Vehicle Seat Layout' : 'Venue Seat Layout'}
           </h3>
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-slate-500 dark:text-slate-400">
             Click on available seats to reserve. Max 6 seats.
           </p>
         </div>
@@ -116,7 +116,7 @@ export default function SeatSelector({ schedule, listing, onSeatsSelected }) {
       </div>
 
       {/* Screen / Driver Direction Indicator */}
-      <div className="w-full py-2 bg-slate-100 dark:bg-slate-700/60 rounded-lg text-center text-xs font-bold text-slate-500 tracking-widest uppercase shadow-inner">
+      <div className="w-full py-2 bg-slate-100 dark:bg-slate-700/60 rounded-lg text-center text-xs font-bold text-slate-500 dark:text-slate-300 tracking-widest uppercase shadow-inner">
         {isTransit ? 'FRONT / DRIVER CABIN' : 'SCREEN / STAGE THIS WAY'}
       </div>
 
@@ -136,9 +136,9 @@ export default function SeatSelector({ schedule, listing, onSeatsSelected }) {
                   let seatStyle = 'bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:border-teal-500';
 
                   if (isBooked) {
-                    seatStyle = 'bg-slate-300 dark:bg-slate-700 text-slate-500 border-transparent cursor-not-allowed';
+                    seatStyle = 'bg-slate-300 dark:bg-slate-700 text-slate-500 dark:text-slate-400 border-transparent cursor-not-allowed';
                   } else if (isLocked) {
-                    seatStyle = 'bg-amber-200 dark:bg-amber-900/60 text-amber-700 border-amber-400 cursor-not-allowed';
+                    seatStyle = 'bg-amber-200 dark:bg-amber-900/60 text-amber-700 dark:text-amber-300 border-amber-400 cursor-not-allowed';
                   } else if (isSelected) {
                     seatStyle = 'bg-teal-500 text-white border-teal-600 shadow-md font-bold scale-105';
                   }

@@ -108,7 +108,7 @@ export default function AdminListings() {
       <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs text-slate-600 dark:text-slate-300">
-            <thead className="bg-slate-50 dark:bg-slate-750 uppercase text-slate-400 font-bold border-b border-slate-100 dark:border-slate-700">
+            <thead className="bg-slate-50 dark:bg-slate-700 uppercase text-slate-400 font-bold border-b border-slate-100 dark:border-slate-600">
               <tr>
                 <th className="p-3">Title</th>
                 <th className="p-3">Category</th>
@@ -119,7 +119,7 @@ export default function AdminListings() {
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
               {listings.map((l) => (
-                <tr key={l._id} className="hover:bg-slate-50 dark:hover:bg-slate-750">
+                <tr key={l._id} className="hover:bg-slate-50 dark:hover:bg-slate-700">
                   <td className="p-3 font-bold text-slate-900 dark:text-white">{l.title}</td>
                   <td className="p-3 font-bold uppercase text-teal-600">{l.categoryType}</td>
                   <td className="p-3">{l.location?.city}</td>
@@ -162,7 +162,7 @@ export default function AdminListings() {
                   placeholder="e.g. Avatar IMAX 3D"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  className="w-full p-2.5 bg-slate-50 dark:bg-slate-750 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white"
+                  className="w-full p-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl dark:text-white"
                 />
               </div>
 
@@ -172,7 +172,7 @@ export default function AdminListings() {
                   <select
                     value={categoryType}
                     onChange={(e) => setCategoryType(e.target.value)}
-                    className="w-full p-2.5 bg-slate-50 dark:bg-slate-750 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white"
+                    className="w-full p-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl dark:text-white"
                   >
                     <option value="movie">Movie</option>
                     <option value="event">Event</option>
@@ -191,7 +191,7 @@ export default function AdminListings() {
                     required
                     value={city}
                     onChange={(e) => setCity(e.target.value)}
-                    className="w-full p-2.5 bg-slate-50 dark:bg-slate-750 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white"
+                    className="w-full p-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl dark:text-white"
                   />
                 </div>
               </div>
@@ -204,7 +204,7 @@ export default function AdminListings() {
                     required
                     value={price}
                     onChange={(e) => setPrice(e.target.value)}
-                    className="w-full p-2.5 bg-slate-50 dark:bg-slate-750 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white"
+                    className="w-full p-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl dark:text-white"
                   />
                 </div>
 
@@ -215,7 +215,7 @@ export default function AdminListings() {
                     placeholder="https://images.unsplash.com/..."
                     value={image}
                     onChange={(e) => setImage(e.target.value)}
-                    className="w-full p-2.5 bg-slate-50 dark:bg-slate-750 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white"
+                    className="w-full p-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl dark:text-white"
                   />
                 </div>
               </div>
@@ -228,7 +228,7 @@ export default function AdminListings() {
                   placeholder="Provide details..."
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  className="w-full p-2.5 bg-slate-50 dark:bg-slate-750 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white"
+                  className="w-full p-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl dark:text-white"
                 />
               </div>
 

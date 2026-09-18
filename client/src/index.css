@@ -4,7 +4,24 @@
 
 @layer base {
   body {
-    @apply font-sans bg-slate-50 text-slate-900 dark:bg-slate-900 dark:text-slate-100 min-h-screen flex flex-col;
+    @apply font-sans bg-slate-50 text-slate-900 dark:bg-slate-900 dark:text-slate-100 min-h-screen flex flex-col transition-colors duration-200;
+  }
+
+  /* Ensure select option dropdowns, inputs and textareas have readable text in dark mode */
+  select option {
+    @apply bg-white text-slate-900 dark:bg-slate-800 dark:text-slate-100;
+  }
+
+  input, select, textarea {
+    @apply text-slate-900 dark:text-slate-100;
+  }
+
+  input::placeholder, textarea::placeholder {
+    @apply text-slate-400 dark:text-slate-400;
+  }
+
+  input:disabled, textarea:disabled {
+    @apply text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800/80;
   }
 }
 
