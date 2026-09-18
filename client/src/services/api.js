@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const API = axios.create({
-  baseURL: '/api/v1',
+  baseURL: import.meta.env.VITE_API_URL || 'https://ticketharbour-1.onrender.com/api/v1',
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
@@ -27,7 +27,6 @@ API.interceptors.response.use(
         await API.post('/auth/refresh');
         return API(originalRequest);
       } catch (refreshError) {
-        // Refresh failed -> redirect to login or clear auth state
         return Promise.reject(refreshError);
       }
     }
