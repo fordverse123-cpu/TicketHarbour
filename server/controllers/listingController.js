@@ -1,5 +1,6 @@
 import Listing from '../models/Listing.js';
 import Category from '../models/Category.js';
+import Schedule from '../models/Schedule.js';
 import { successResponse, errorResponse } from '../utils/apiResponse.js';
 
 // @desc    Get all listings with search, filter, sort, pagination
@@ -150,7 +151,31 @@ export const getListingByIdentifier = async (req, res, next) => {
 // @access  Private/Admin
 export const createListing = async (req, res, next) => {
   try {
-    const listing = await Listing.create(req.body);
+    const { scheduleDate, startTime, endTime, ...listingData } = req.body;
+
+    const listing = await Listing.create(listingData);
+
+    // If initial schedule parameters are provided, automatically create schedule
+    if (scheduleDate && startTime) {
+      await Schedule.create({
+        listing: listing._id,
+        venue: listing.venue || null,
+        date: new Date(scheduleDate),
+        startTime,
+        endTime: endTime || '',
+        pricing: listing.pricingTiers?.map((t) => ({
+          tierName: t.tierName,
+          price: t.price,
+          classType: t.classType || t.tierName,
+          availableSeats: t.totalCapacity || 50,
+        })) || [],
+        seatMap: {
+          bookedSeats: [],
+          lockedSeats: [],
+        },
+      });
+    }
+
     return successResponse(res, 201, 'Listing created successfully', { listing });
   } catch (error) {
     next(error);
