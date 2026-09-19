@@ -5,6 +5,7 @@ import TrainCard from '../components/train/TrainCard';
 import TrainFilters from '../components/train/TrainFilters';
 import SkeletonLoader from '../components/common/SkeletonLoader';
 import PageLoader from '../components/common/PageLoader';
+import AppLoader from '../components/AppLoader';
 import { Train, RefreshCw, Filter, AlertCircle, SearchX } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
