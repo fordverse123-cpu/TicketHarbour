@@ -110,6 +110,10 @@ function App() {
                 <Route path="/admin/super" element={<SuperAdminDashboard />} />
                 <Route path="/admin/super/admins" element={<SuperAdminDashboard />} />
                 <Route path="/admin/super/admins/create" element={<CreateAdmin />} />
+                <Route path="/super-admin" element={<SuperAdminDashboard />} />
+                <Route path="/super-admin/admins" element={<SuperAdminDashboard />} />
+                <Route path="/super-admin/admins/create" element={<CreateAdmin />} />
+                <Route path="/super-admin/create" element={<CreateAdmin />} />
               </Route>
             </Routes>
           </main>

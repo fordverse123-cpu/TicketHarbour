@@ -34,6 +34,16 @@ export default function SuperAdminDashboard() {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
 
+  // Create Admin Modal State
+  const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [createName, setCreateName] = useState('');
+  const [createEmail, setCreateEmail] = useState('');
+  const [createPhone, setCreatePhone] = useState('');
+  const [createPassword, setCreatePassword] = useState('');
+  const [createConfirmPassword, setCreateConfirmPassword] = useState('');
+  const [createPermissions, setCreatePermissions] = useState([...CATEGORIES]);
+  const [creatingAdmin, setCreatingAdmin] = useState(false);
+
   // Edit Modal State
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [selectedAdmin, setSelectedAdmin] = useState(null);
@@ -55,6 +65,70 @@ export default function SuperAdminDashboard() {
   useEffect(() => {
     fetchSuperAdminData();
   }, []);
+
+  const openCreateModal = () => {
+    setCreateName('');
+    setCreateEmail('');
+    setCreatePhone('');
+    setCreatePassword('');
+    setCreateConfirmPassword('');
+    setCreatePermissions([...CATEGORIES]);
+    setCreateModalOpen(true);
+  };
+
+  const toggleCreateCategoryPerm = (cat) => {
+    if (createPermissions.includes(cat)) {
+      setCreatePermissions(createPermissions.filter((p) => p !== cat));
+    } else {
+      setCreatePermissions([...createPermissions, cat]);
+    }
+  };
+
+  const handleSelectAllCreatePerms = () => {
+    if (createPermissions.length === CATEGORIES.length) {
+      setCreatePermissions([]);
+    } else {
+      setCreatePermissions([...CATEGORIES]);
+    }
+  };
+
+  const handleCreateAdminSubmit = async (e) => {
+    e.preventDefault();
+    if (createPassword !== createConfirmPassword) {
+      toast.error('Passwords do not match');
+      return;
+    }
+    if (createPassword.length < 8) {
+      toast.error('Password must be at least 8 characters long');
+      return;
+    }
+    if (createPermissions.length === 0) {
+      toast.error('Please assign at least one category permission.');
+      return;
+    }
+
+    setCreatingAdmin(true);
+    try {
+      const res = await API.post('/super-admin/admins', {
+        name: createName,
+        email: createEmail,
+        phone: createPhone,
+        password: createPassword,
+        permissions: createPermissions,
+      });
+
+      if (res.data.success) {
+        toast.success(`Admin account created successfully for ${createName}`);
+        setCreateModalOpen(false);
+        fetchSuperAdminData();
+      }
+    } catch (err) {
+      const msg = err.response?.data?.message || 'Failed to create Admin account.';
+      toast.error(msg);
+    } finally {
+      setCreatingAdmin(false);
+    }
+  };
 
   const fetchSuperAdminData = async () => {
     setLoading(true);
@@ -241,11 +315,16 @@ export default function SuperAdminDashboard() {
           </p>
         </div>
 
-        <Link to="/admin/super/admins/create">
-          <GlassButton variant="gradient" icon={PlusCircle}>
-            Create Admin
+        <div className="flex items-center gap-3">
+          <GlassButton variant="gradient" icon={PlusCircle} onClick={openCreateModal}>
+            + Create Admin
           </GlassButton>
-        </Link>
+          <Link to="/super-admin/admins/create">
+            <GlassButton variant="secondary" className="text-xs">
+              Full Page Form
+            </GlassButton>
+          </Link>
+        </div>
       </div>
 
       {/* Stats Cards */}
@@ -450,6 +529,103 @@ export default function SuperAdminDashboard() {
 
           <GlassButton type="submit" variant="gradient" loading={savingPerms} className="w-full">
             Save Permissions
+          </GlassButton>
+        </form>
+      </GlassModal>
+
+      {/* Create Admin Modal */}
+      <GlassModal
+        isOpen={createModalOpen}
+        onClose={() => setCreateModalOpen(false)}
+        title="Provision New Admin Account"
+        maxWidth="max-w-lg"
+      >
+        <form onSubmit={handleCreateAdminSubmit} className="space-y-4 text-xs">
+          <GlassInput
+            label="Full Name *"
+            placeholder="e.g. Jane Smith"
+            value={createName}
+            onChange={(e) => setCreateName(e.target.value)}
+            required
+          />
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <GlassInput
+              label="Email Address *"
+              type="email"
+              placeholder="admin@ticketharbour.com"
+              value={createEmail}
+              onChange={(e) => setCreateEmail(e.target.value)}
+              required
+            />
+            <GlassInput
+              label="Phone Number"
+              placeholder="+91 98765 43210"
+              value={createPhone}
+              onChange={(e) => setCreatePhone(e.target.value)}
+            />
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <GlassInput
+              label="Password (min 8 chars) *"
+              type="password"
+              placeholder="Min 8 characters..."
+              value={createPassword}
+              onChange={(e) => setCreatePassword(e.target.value)}
+              required
+            />
+            <GlassInput
+              label="Confirm Password *"
+              type="password"
+              placeholder="Re-enter password..."
+              value={createConfirmPassword}
+              onChange={(e) => setCreateConfirmPassword(e.target.value)}
+              required
+            />
+          </div>
+
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <label className="font-bold text-white uppercase tracking-wider">
+                Assign Category Permissions *
+              </label>
+              <button
+                type="button"
+                onClick={handleSelectAllCreatePerms}
+                className="text-[#03B3C3] hover:underline font-bold text-[11px]"
+              >
+                {createPermissions.length === CATEGORIES.length ? 'Deselect All' : 'Select All'}
+              </button>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 p-3 bg-[#111111] rounded-2xl border border-white/10">
+              {CATEGORIES.map((cat) => {
+                const checked = createPermissions.includes(cat);
+                return (
+                  <label
+                    key={cat}
+                    className={`flex items-center gap-2 p-2 rounded-xl border text-[11px] font-bold cursor-pointer transition-all ${
+                      checked
+                        ? 'bg-[#03B3C3]/20 border-[#03B3C3] text-white'
+                        : 'bg-white/5 border-white/10 text-[#777777]'
+                    }`}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={checked}
+                      onChange={() => toggleCreateCategoryPerm(cat)}
+                      className="hidden"
+                    />
+                    <CheckCircle className={`w-3.5 h-3.5 ${checked ? 'text-[#03B3C3]' : 'text-slate-600'}`} />
+                    <span>{cat}</span>
+                  </label>
+                );
+              })}
+            </div>
+          </div>
+
+          <GlassButton type="submit" variant="gradient" loading={creatingAdmin} className="w-full py-3">
+            Create Admin Account
           </GlassButton>
         </form>
       </GlassModal>
