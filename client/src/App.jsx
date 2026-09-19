@@ -41,7 +41,7 @@ function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
-        <div className="min-h-screen flex flex-col font-sans bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 transition-colors">
+        <div className="min-h-screen flex flex-col font-sans bg-[#050505] text-white transition-colors">
           <Toaster position="top-right" toastOptions={{ duration: 4000 }} />
           
           <Navbar />
@@ -51,7 +51,13 @@ function App() {
               {/* Public Routes */}
               <Route path="/" element={<Home />} />
               <Route path="/listings" element={<Listings />} />
+              <Route path="/movies" element={<Listings />} />
+              <Route path="/events" element={<Listings />} />
+              <Route path="/sports" element={<Listings />} />
+              <Route path="/attractions" element={<Listings />} />
+              <Route path="/train" element={<TrainBookingPage />} />
               <Route path="/trains" element={<TrainBookingPage />} />
+              <Route path="/bus" element={<BusBookingPage />} />
               <Route path="/buses" element={<BusBookingPage />} />
               <Route path="/flights" element={<FlightBookingPage />} />
               <Route path="/listings/:identifier" element={<ListingDetail />} />

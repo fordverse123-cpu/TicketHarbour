@@ -10,13 +10,13 @@ export default function MobileMenu({ isOpen, onClose }) {
   if (!isOpen) return null;
 
   const categories = [
-    { label: 'Movies', path: '/listings?category=movies', icon: Film },
-    { label: 'Events', path: '/listings?category=events', icon: Calendar },
-    { label: 'Sports', path: '/listings?category=sports', icon: Trophy },
-    { label: 'Bus', path: '/buses', icon: Bus },
-    { label: 'Train', path: '/trains', icon: Train },
+    { label: 'Movies', path: '/movies', icon: Film },
+    { label: 'Events', path: '/events', icon: Calendar },
+    { label: 'Sports', path: '/sports', icon: Trophy },
+    { label: 'Bus', path: '/bus', icon: Bus },
+    { label: 'Train', path: '/train', icon: Train },
     { label: 'Flights', path: '/flights', icon: Plane },
-    { label: 'Attractions', path: '/listings?category=attractions', icon: Ticket },
+    { label: 'Attractions', path: '/attractions', icon: Ticket },
   ];
 
   return (

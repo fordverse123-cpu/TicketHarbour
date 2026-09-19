@@ -33,13 +33,13 @@ const CATEGORY_TABS = [
 ];
 
 const CATEGORY_CARDS = [
-  { id: 'movies', title: 'Movies', icon: Film, emoji: '🎬', desc: 'Book latest blockbuster movies & IMAX seats', link: '/listings?category=movies' },
-  { id: 'events', title: 'Events', icon: Calendar, emoji: '🎵', desc: 'Live concerts, music festivals & standup comedy', link: '/listings?category=events' },
-  { id: 'sports', title: 'Sports', icon: Trophy, emoji: '🏆', desc: 'Cricket, football, IPL & stadium matches', link: '/listings?category=sports' },
-  { id: 'bus', title: 'Bus', icon: Bus, emoji: '🚌', desc: 'Intercity AC sleeper & Volvo bus tickets', link: '/buses' },
-  { id: 'train', title: 'Train', icon: Train, emoji: '🚆', desc: 'Indian Railways train schedule & seat reservation', link: '/trains' },
+  { id: 'movies', title: 'Movies', icon: Film, emoji: '🎬', desc: 'Book latest blockbuster movies & IMAX seats', link: '/movies' },
+  { id: 'events', title: 'Events', icon: Calendar, emoji: '🎵', desc: 'Live concerts, music festivals & standup comedy', link: '/events' },
+  { id: 'sports', title: 'Sports', icon: Trophy, emoji: '🏆', desc: 'Cricket, football, IPL & stadium matches', link: '/sports' },
+  { id: 'bus', title: 'Bus', icon: Bus, emoji: '🚌', desc: 'Intercity AC sleeper & Volvo bus tickets', link: '/bus' },
+  { id: 'train', title: 'Train', icon: Train, emoji: '🚆', desc: 'Indian Railways train schedule & seat reservation', link: '/train' },
   { id: 'flight', title: 'Flights', icon: Plane, emoji: '✈️', desc: 'Domestic & international cheap flight tickets', link: '/flights' },
-  { id: 'attractions', title: 'Attractions', icon: Ticket, emoji: '🎟️', desc: 'Amusement parks, water parks & city passes', link: '/listings?category=attractions' },
+  { id: 'attractions', title: 'Attractions', icon: Ticket, emoji: '🎟️', desc: 'Amusement parks, water parks & city passes', link: '/attractions' },
 ];
 
 export default function Home() {
