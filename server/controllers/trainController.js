@@ -1,5 +1,6 @@
 import Train from '../models/Train.js';
 import { searchTrains as searchTrainsService } from '../services/trainSearchService.js';
+import { recordSearchLog } from './searchLogController.js';
 import { successResponse, errorResponse } from '../utils/apiResponse.js';
 
 /**
@@ -21,6 +22,21 @@ export const searchTrains = async (req, res, next) => {
       date,
       class: reqClass,
       quota,
+    });
+
+    // Record search in background log for user history & analytics
+    recordSearchLog({
+      userId: req.user?._id || null,
+      categoryType: 'train',
+      from: from,
+      to: to,
+      fromCode: result.fromStation || from,
+      toCode: result.toStation || to,
+      travelDate: date || new Date().toISOString().split('T')[0],
+      searchParams: { class: reqClass, quota },
+      resultsCount: result.count || 0,
+      ipAddress: req.ip || req.headers['x-forwarded-for'] || '',
+      userAgent: req.headers['user-agent'] || '',
     });
 
     return res.status(200).json(result);

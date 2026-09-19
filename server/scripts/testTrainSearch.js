@@ -1,38 +1,48 @@
 import dotenv from 'dotenv';
 import { connectDB } from '../config/db.js';
 import { searchTrains } from '../services/trainSearchService.js';
+import { recordSearchLog } from '../controllers/searchLogController.js';
+import SearchLog from '../models/SearchLog.js';
 
 dotenv.config();
 
 const runTests = async () => {
   await connectDB();
   console.log('==================================================');
-  console.log('[TEST] Testing Train Search Service Algorithm');
+  console.log('[TEST] Testing Train Search & Search Analytics Log');
   console.log('==================================================\n');
 
-  const testCases = [
-    { from: 'BZA', to: 'SC', date: '2026-09-25', desc: 'Vijayawada -> Secunderabad' },
-    { from: 'SC', to: 'BZA', date: '2026-09-25', desc: 'Secunderabad -> Vijayawada' },
-    { from: 'NDLS', to: 'MMCT', date: '2026-09-25', desc: 'Delhi -> Mumbai' },
-    { from: 'MMCT', to: 'NDLS', date: '2026-09-25', desc: 'Mumbai -> Delhi' },
-    { from: 'MAS', to: 'SBC', date: '2026-09-25', desc: 'Chennai -> Bengaluru' },
-    { from: 'SBC', to: 'MAS', date: '2026-09-25', desc: 'Bengaluru -> Chennai' },
-  ];
+  // Perform sample search logs
+  await recordSearchLog({
+    categoryType: 'train',
+    from: 'Vijayawada',
+    to: 'Hyderabad',
+    fromCode: 'BZA',
+    toCode: 'SC',
+    travelDate: '2026-09-25',
+    resultsCount: 3,
+  });
 
-  for (const tc of testCases) {
-    console.log(`🔍 SEARCH: ${tc.desc} (${tc.from} -> ${tc.to} on ${tc.date})`);
-    try {
-      const res = await searchTrains({ from: tc.from, to: tc.to, date: tc.date });
-      console.log(`   Result: Found ${res.count} train(s)`);
-      res.trains.forEach((t) => {
-        console.log(`   - [${t.trainNumber}] ${t.trainName} (${t.from.stationCode} ${t.from.departure} -> ${t.to.stationCode} ${t.to.arrival}, Duration: ${t.duration})`);
-      });
-    } catch (err) {
-      console.error(`   Error:`, err.message);
-    }
-    console.log('--------------------------------------------------');
-  }
+  await recordSearchLog({
+    categoryType: 'train',
+    from: 'Mumbai',
+    to: 'Delhi',
+    fromCode: 'MMCT',
+    toCode: 'NDLS',
+    travelDate: '2026-09-25',
+    resultsCount: 1,
+  });
 
+  const totalLogs = await SearchLog.countDocuments();
+  console.log(`[SearchLog Status] Total Search Logs in DB: ${totalLogs}`);
+
+  const recent = await SearchLog.find({ categoryType: 'train' }).sort({ createdAt: -1 }).limit(5).lean();
+  console.log('\n📌 Recent Logged Train Searches:');
+  recent.forEach((r) => {
+    console.log(` - ${r.from} (${r.fromCode || '-'}) ➔ ${r.to} (${r.toCode || '-'}) | Travel Date: ${r.travelDate} | Results: ${r.resultsCount}`);
+  });
+
+  console.log('\n==================================================');
   process.exit(0);
 };
 

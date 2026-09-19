@@ -24,6 +24,7 @@ import adminRoutes from './routes/adminRoutes.js';
 import superAdminRoutes from './routes/superAdminRoutes.js';
 import trainRoutes from './routes/trainRoutes.js';
 import stationRoutes from './routes/stationRoutes.js';
+import searchLogRoutes from './routes/searchLogRoutes.js';
 import { seedSuperAdmin } from './scripts/seedSuperAdmin.js';
 
 dotenv.config();
@@ -102,6 +103,10 @@ app.use('/api/trains', trainRoutes); // Route alias for /api/trains/search
 app.use('/api/v1/stations', stationRoutes);
 app.use('/api/stations', stationRoutes); // Route alias for /api/stations
 
+// Search History, Recent Searches & Popular Routes Analytics Routes
+app.use('/api/v1/searches', searchLogRoutes);
+app.use('/api/searches', searchLogRoutes);
+
 // Root Welcome Route
 app.get('/', (req, res) => {
   return successResponse(res, 200, 'Welcome to TicketHarbor API', {
@@ -114,6 +119,7 @@ app.get('/', (req, res) => {
       auth: '/api/v1/auth',
       trains: '/api/trains/search',
       stations: '/api/stations/search',
+      searches: '/api/searches/recent',
       admin: '/api/admin',
     },
   });
