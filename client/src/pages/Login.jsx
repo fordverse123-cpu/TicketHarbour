@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Mail, Lock, LogIn } from 'lucide-react';
+import SpeederLoader from '../components/common/SpeederLoader';
 
 export default function Login() {
   const { login } = useAuth();
@@ -26,7 +27,14 @@ export default function Login() {
 
   return (
     <div className="max-w-md mx-auto py-12 space-y-6">
-      <div className="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 p-8 shadow-xl space-y-6">
+      <div className="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 p-8 shadow-xl space-y-6 relative overflow-hidden">
+        {/* Full Card Loading Overlay when logging in */}
+        {submitting && (
+          <div className="absolute inset-0 z-30 bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm flex items-center justify-center">
+            <SpeederLoader text="Authenticating & Signing In..." color="#0d9488" />
+          </div>
+        )}
+
         <div className="text-center space-y-2">
           <div className="h-12 w-12 rounded-2xl bg-gradient-to-tr from-teal-500 to-indigo-600 flex items-center justify-center text-white font-bold text-2xl mx-auto shadow-md">
             TH
@@ -45,7 +53,7 @@ export default function Login() {
                 placeholder="name@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl dark:text-white"
+                className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl dark:text-white focus:outline-none focus:ring-2 focus:ring-teal-500"
               />
               <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
             </div>
@@ -65,7 +73,7 @@ export default function Login() {
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl dark:text-white"
+                className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl dark:text-white focus:outline-none focus:ring-2 focus:ring-teal-500"
               />
               <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
             </div>
