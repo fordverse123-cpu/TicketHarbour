@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Bus, Star, ChevronDown, ChevronUp, ShieldCheck, Wifi, Power } from 'lucide-react';
 import BusSeatSelection from './BusSeatSelection';
-import BorderGlow from '../ui/BorderGlow';
+import SpotlightCard from '../SpotlightCard';
 
 export default function BusCard({ bus, onBookSeat }) {
   const [showSeatView, setShowSeatView] = useState(false);
@@ -28,13 +28,8 @@ export default function BusCard({ bus, onBookSeat }) {
   );
 
   return (
-    <BorderGlow
-      borderRadius={24}
-      className="w-full h-full"
-      backgroundColor="#111111"
-      glowIntensity={0.5}
-    >
-      <div className="bg-[#111111] border border-white/10 rounded-3xl overflow-hidden space-y-0">
+    <SpotlightCard className="w-full h-full rounded-3xl border border-white/10 bg-[#111111] overflow-hidden">
+      <div className="space-y-0">
         {/* Top Main Bus Info Card */}
         <div className="p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           {/* Left Operator & Spec Info */}
@@ -126,6 +121,6 @@ export default function BusCard({ bus, onBookSeat }) {
           </div>
         )}
       </div>
-    </BorderGlow>
+    </SpotlightCard>
   );
 }

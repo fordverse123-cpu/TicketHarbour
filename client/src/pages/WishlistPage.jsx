@@ -75,7 +75,7 @@ export default function WishlistPage() {
                 className="p-0 overflow-hidden flex flex-col justify-between group"
               >
                 <div className="relative h-44 bg-harbour-darker">
-                  <img src={image} alt={listing.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                  <img src={image} alt={listing.title} className="w-full h-full object-cover" />
                   <button
                     onClick={() => handleRemove(listing._id)}
                     className="absolute top-3 right-3 p-2 bg-black/80 text-rose-400 rounded-full hover:bg-black border border-white/10"

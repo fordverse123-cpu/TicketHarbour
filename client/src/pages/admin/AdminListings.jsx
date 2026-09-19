@@ -472,7 +472,7 @@ export default function AdminListings() {
                 onClick={() => openCreateModal(cfg.type)}
                 className="p-3 bg-slate-50 dark:bg-slate-700/60 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-2xl border border-slate-200/80 dark:border-slate-600/60 flex flex-col items-center gap-1.5 transition-all group text-center"
               >
-                <div className={`p-2 rounded-xl bg-gradient-to-br ${cfg.color} text-white shadow-md group-hover:scale-110 transition-transform`}>
+                <div className={`p-2 rounded-xl bg-gradient-to-br ${cfg.color} text-white shadow-md`}>
                   <IconComponent className="w-4 h-4" />
                 </div>
                 <span className="text-xs font-bold text-slate-700 dark:text-slate-200">

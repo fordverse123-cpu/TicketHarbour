@@ -211,7 +211,7 @@ export default function Listings() {
                       <img
                         src={image}
                         alt={item.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        className="w-full h-full object-cover"
                       />
                       <div className="absolute top-3 left-3 px-3 py-1 bg-black/75 backdrop-blur-md text-cyanAccent-400 text-[10px] font-black rounded-full uppercase tracking-wider border border-white/10">
                         {item.categoryType}

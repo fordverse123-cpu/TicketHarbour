@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Train, ArrowRight, Info, CheckCircle2 } from 'lucide-react';
 import TrainDetailsModal from './TrainDetailsModal';
-import BorderGlow from '../ui/BorderGlow';
+import SpotlightCard from '../SpotlightCard';
 
 export default function TrainCard({ train, onBookNow }) {
   const [showDetailsModal, setShowDetailsModal] = useState(false);
@@ -40,16 +40,8 @@ export default function TrainCard({ train, onBookNow }) {
   };
 
   return (
-    <BorderGlow
-      borderRadius={24}
-      className="w-full h-full"
-      backgroundColor="#111111"
-      colors={['#03B3C3', '#6750A2', '#D856BF']}
-      glowColor="185 80 65"
-      glowRadius={24}
-      glowIntensity={0.50}
-    >
-      <div className="glass-card flex flex-col md:flex-row border border-white/10 rounded-3xl overflow-hidden shadow-xl transition-all w-full bg-[#111111]">
+    <SpotlightCard className="w-full h-full rounded-3xl overflow-hidden border border-white/10 bg-[#111111]">
+      <div className="flex flex-col md:flex-row w-full bg-[#111111] h-full">
         {/* Left Main Information Panel */}
         <div className="p-6 flex-1 space-y-5 text-white">
           {/* Train Header */}
@@ -202,6 +194,6 @@ export default function TrainCard({ train, onBookNow }) {
           <TrainDetailsModal train={train} onClose={() => setShowDetailsModal(false)} />
         )}
       </div>
-    </BorderGlow>
+    </SpotlightCard>
   );
 }
