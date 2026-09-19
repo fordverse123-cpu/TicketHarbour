@@ -83,7 +83,7 @@ export default function TrainSearch({ onSearch, initialFrom = 'SBC', initialTo =
 
   return (
     <div className="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-xl overflow-hidden transition-all">
-      {/* Header bar inspired by Indian Railway Booking patterns */}
+      {/* Header bar for Indian Railway Booking */}
       <div className="bg-gradient-to-r from-blue-950 via-slate-900 to-indigo-950 text-white px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-blue-900/50">
         <div className="flex items-center gap-3">
           <div className="p-2.5 bg-red-600 rounded-2xl shadow-md">
@@ -91,7 +91,7 @@ export default function TrainSearch({ onSearch, initialFrom = 'SBC', initialTo =
           </div>
           <div>
             <h2 className="font-black text-lg tracking-wide flex items-center gap-2 text-white">
-              IRCTC-Inspired Train Reservation
+              Indian Railways Train Reservation
             </h2>
             <p className="text-xs text-blue-200">
               Smart Rail Booking • Tatkal & Premium Quota Supported • TicketHarbour

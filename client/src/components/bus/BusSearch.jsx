@@ -55,7 +55,7 @@ export default function BusSearch({ onSearch, initialFrom = 'Mumbai', initialTo 
 
   return (
     <div className="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-xl overflow-hidden transition-all">
-      {/* redBus-inspired Header Banner */}
+      {/* Bus Search Header Banner */}
       <div className="bg-gradient-to-r from-red-600 via-rose-600 to-orange-600 text-white px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-md">
         <div className="flex items-center gap-3">
           <div className="p-2.5 bg-white text-red-600 rounded-2xl shadow-sm">
@@ -66,7 +66,7 @@ export default function BusSearch({ onSearch, initialFrom = 'Mumbai', initialTo 
               Intercity Bus Ticket Booking
             </h2>
             <p className="text-xs text-red-100">
-              redBus-Inspired Smart Booking • Verified Primo Bus Operators • Instant Seat Lock
+              TicketHarbour Smart Bus Booking • Verified Primo Bus Operators • Instant Seat Lock
             </p>
           </div>
         </div>

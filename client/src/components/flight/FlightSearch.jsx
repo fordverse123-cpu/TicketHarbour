@@ -74,7 +74,7 @@ export default function FlightSearch({ onSearch, initialFrom = 'VGA', initialTo 
 
   return (
     <div className="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-xl overflow-hidden transition-all">
-      {/* IRCTC Air Inspired Header Bar */}
+      {/* Flight Search Header Bar */}
       <div className="bg-gradient-to-r from-sky-600 via-blue-600 to-cyan-600 text-white px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-md">
         <div className="flex items-center gap-3">
           <div className="p-2.5 bg-white text-sky-600 rounded-2xl shadow-sm">
@@ -82,7 +82,7 @@ export default function FlightSearch({ onSearch, initialFrom = 'VGA', initialTo 
           </div>
           <div>
             <h2 className="font-black text-lg tracking-wide flex items-center gap-2">
-              IRCTC Air-Inspired Flight Booking
+              TicketHarbour Flight Reservation
             </h2>
             <p className="text-xs text-sky-100">
               Low Convenience Fees • Instant Air Ticket Confirmation • TicketHarbour Price Lock
