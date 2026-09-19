@@ -35,13 +35,30 @@ export const AuthProvider = ({ children }) => {
         if (accessToken) {
           localStorage.setItem('accessToken', accessToken);
         }
-        toast.success(`Welcome back, ${userData.name}!`);
         return { success: true, user: userData };
       }
+      return { success: false, message: res.data.message || 'Login error occurred.' };
     } catch (err) {
-      const msg = err.response?.data?.message || 'Login failed. Check your credentials.';
-      toast.error(msg);
-      return { success: false, message: msg };
+      const status = err.response?.status;
+      let msg = err.response?.data?.message;
+
+      if (!msg) {
+        if (status === 401) {
+          msg = 'Invalid email or password.';
+        } else if (status === 403) {
+          msg = 'You are not authorized to access this portal.';
+        } else if (status === 422) {
+          msg = 'Validation error occurred.';
+        } else if (status === 500) {
+          msg = 'Server error. Please try again.';
+        } else if (err.code === 'ERR_NETWORK' || (typeof navigator !== 'undefined' && !navigator.onLine)) {
+          msg = 'Unable to reach the server. Please check your connection.';
+        } else {
+          msg = 'Login error occurred.';
+        }
+      }
+
+      return { success: false, message: msg, status };
     }
   };
 
@@ -54,12 +71,11 @@ export const AuthProvider = ({ children }) => {
         if (accessToken) {
           localStorage.setItem('accessToken', accessToken);
         }
-        toast.success('Registration successful! Welcome to TicketHarbor.');
-        return { success: true };
+        return { success: true, user: newUser };
       }
+      return { success: false, message: res.data.message || 'Registration failed.' };
     } catch (err) {
       const msg = err.response?.data?.message || 'Registration failed.';
-      toast.error(msg);
       return { success: false, message: msg };
     }
   };

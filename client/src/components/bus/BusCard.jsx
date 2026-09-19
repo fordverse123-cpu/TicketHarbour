@@ -1,18 +1,13 @@
 import React, { useState } from 'react';
-import { Bus, Star, MapPin, Clock, ChevronDown, ChevronUp, ShieldCheck, Sparkles } from 'lucide-react';
+import { Bus, Star, ChevronDown, ChevronUp, ShieldCheck, Wifi, Power } from 'lucide-react';
 import BusSeatSelection from './BusSeatSelection';
 import BorderGlow from '../ui/BorderGlow';
-import { useTheme } from '../../context/ThemeContext';
 
 export default function BusCard({ bus, onBookSeat }) {
-  const { theme } = useTheme();
-  const isDark = theme === 'dark';
   const [showSeatView, setShowSeatView] = useState(false);
 
   const {
-    _id,
     title = 'IntrCity SmartBus AC Sleeper',
-    slug,
     rating = 4.8,
     numReviews = 420,
     transitInfo = {},
@@ -36,97 +31,101 @@ export default function BusCard({ bus, onBookSeat }) {
     <BorderGlow
       borderRadius={24}
       className="w-full h-full"
-      backgroundColor={isDark ? '#111111' : '#FFFFFF'}
-      glowIntensity={isDark ? 0.65 : 0.45}
+      backgroundColor="#111111"
+      glowIntensity={0.5}
     >
-      <div className="glass-card rounded-3xl overflow-hidden space-y-0">
-      {/* Top Main Bus Info Card */}
-      <div className="p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-        {/* Left Operator & Spec Info */}
-        <div className="space-y-2 max-w-sm">
-          <div className="flex items-center gap-2 flex-wrap">
-            <h3 className="font-black text-slate-900 dark:text-white text-base sm:text-lg">
-              {operator}
-            </h3>
-            <span className="px-2 py-0.5 bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 font-bold text-xs rounded-md flex items-center gap-1 border border-amber-300/40">
-              <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500" /> {rating} ({numReviews})
-            </span>
-          </div>
-
-          <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">
-            {busType}
-          </p>
-
-          <div className="flex items-center gap-2 text-[11px] text-slate-400 flex-wrap">
-            <span className="px-2.5 py-0.5 bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-300 font-bold rounded-full border border-red-200 dark:border-red-800">
-              Primo Operator
-            </span>
-            <span className="px-2.5 py-0.5 bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 font-bold rounded-full">
-              Live GPS Tracking
-            </span>
-          </div>
-        </div>
-
-        {/* Center Route Timeline */}
-        <div className="flex-1 space-y-1 text-xs">
-          <div className="flex items-center justify-between font-bold text-slate-900 dark:text-white text-base">
-            <div>
-              <span className="text-xl font-black block">{departureTime}</span>
-              <p className="text-xs font-semibold text-slate-600 dark:text-slate-300">{source}</p>
-              <span className="text-[10px] text-slate-400 font-medium">Borivali Terminal</span>
+      <div className="bg-[#111111] border border-white/10 rounded-3xl overflow-hidden space-y-0">
+        {/* Top Main Bus Info Card */}
+        <div className="p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+          {/* Left Operator & Spec Info */}
+          <div className="space-y-2 max-w-sm">
+            <div className="flex items-center gap-2 flex-wrap">
+              <h3 className="font-black text-white text-base sm:text-lg">
+                {operator}
+              </h3>
+              <span className="px-2 py-0.5 bg-amber-500/15 text-amber-400 font-bold text-xs rounded-md flex items-center gap-1 border border-amber-500/30">
+                <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" /> {rating} ({numReviews})
+              </span>
             </div>
 
-            <div className="text-center px-4 space-y-1">
-              <span className="text-[11px] text-slate-400 font-medium">{duration}</span>
-              <div className="relative flex items-center justify-center w-28 sm:w-36">
-                <div className="h-0.5 w-full bg-red-200 dark:bg-slate-600 rounded"></div>
-                <Bus className="w-4 h-4 text-red-600 absolute bg-white dark:bg-slate-800 px-0.5" />
+            <p className="text-xs font-semibold text-[#A1A1AA]">
+              {busType}
+            </p>
+
+            {/* Amenities & Badges */}
+            <div className="flex items-center gap-2 text-[11px] text-[#A1A1AA] flex-wrap pt-1">
+              <span className="px-2.5 py-0.5 bg-[#03B3C3]/15 text-[#03B3C3] font-bold rounded-full border border-[#03B3C3]/30 flex items-center gap-1">
+                <ShieldCheck className="w-3 h-3" /> Primo Operator
+              </span>
+              <span className="px-2.5 py-0.5 bg-emerald-500/15 text-emerald-400 font-bold rounded-full border border-emerald-500/30 flex items-center gap-1">
+                <Wifi className="w-3 h-3" /> Free Wi-Fi
+              </span>
+              <span className="px-2.5 py-0.5 bg-purple-500/15 text-purple-400 font-bold rounded-full border border-purple-500/30 flex items-center gap-1">
+                <Power className="w-3 h-3" /> Charging Point
+              </span>
+            </div>
+          </div>
+
+          {/* Center Route Timeline */}
+          <div className="flex-1 space-y-1 text-xs">
+            <div className="flex items-center justify-between font-bold text-white text-base">
+              <div>
+                <span className="text-xl font-black block text-white">{departureTime}</span>
+                <p className="text-xs font-semibold text-[#D1D5DB]">{source}</p>
+                <span className="text-[10px] text-[#9CA3AF] font-medium">Boarding Terminal</span>
               </div>
-              <span className="text-[10px] text-emerald-600 font-bold block">14 Seats Left</span>
-            </div>
 
+              <div className="text-center px-4 space-y-1">
+                <span className="text-[11px] text-[#9CA3AF] font-medium">{duration}</span>
+                <div className="relative flex items-center justify-center w-28 sm:w-36">
+                  <div className="h-0.5 w-full bg-white/20 rounded"></div>
+                  <Bus className="w-4 h-4 text-[#03B3C3] absolute bg-[#111111] px-0.5" />
+                </div>
+                <span className="text-[10px] text-emerald-400 font-bold block">14 Seats Left</span>
+              </div>
+
+              <div className="text-right">
+                <span className="text-xl font-black block text-white">{arrivalTime}</span>
+                <p className="text-xs font-semibold text-[#D1D5DB]">{destination}</p>
+                <span className="text-[10px] text-[#9CA3AF] font-medium">Drop Terminal</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Right Fare & View Seats Toggle */}
+          <div className="flex md:flex-col items-center md:items-end justify-between w-full md:w-auto pt-4 md:pt-0 border-t md:border-t-0 border-white/10 gap-3">
             <div className="text-right">
-              <span className="text-xl font-black block">{arrivalTime}</span>
-              <p className="text-xs font-semibold text-slate-600 dark:text-slate-300">{destination}</p>
-              <span className="text-[10px] text-slate-400 font-medium">Mapusa Terminal</span>
+              <span className="text-[10px] text-[#9CA3AF] font-semibold block uppercase tracking-wider">Starts From</span>
+              <span className="text-2xl font-black text-white">
+                ₹{lowestPrice}
+              </span>
+              <span className="text-[10px] text-emerald-400 font-bold block">On-Time Guarantee</span>
             </div>
+
+            <button
+              type="button"
+              onClick={() => setShowSeatView(!showSeatView)}
+              className="px-6 py-3 bg-gradient-to-r from-[#03B3C3] to-[#6750A2] hover:opacity-90 text-white font-bold text-xs rounded-2xl shadow-lg flex items-center gap-2 transition-all"
+            >
+              {showSeatView ? 'Hide Seat Map' : 'Select Seats'}
+              {showSeatView ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+            </button>
           </div>
         </div>
 
-        {/* Right Fare & View Seats Toggle */}
-        <div className="flex md:flex-col items-center md:items-end justify-between w-full md:w-auto pt-4 md:pt-0 border-t md:border-t-0 border-slate-100 dark:border-slate-700 gap-3">
-          <div className="text-right">
-            <span className="text-[10px] text-slate-400 font-semibold block">Starts From</span>
-            <span className="text-2xl font-black text-slate-900 dark:text-white">
-              ₹{lowestPrice}
-            </span>
-            <span className="text-[10px] text-emerald-600 font-bold block">On-Time Guarantee</span>
+        {/* Expandable Seat Selection Grid */}
+        {showSeatView && (
+          <div className="p-6 bg-[#171717] border-t border-white/10">
+            <BusSeatSelection
+              pricingTiers={pricingTiers}
+              busTitle={title}
+              onConfirm={(selectedSeats, total) => {
+                if (onBookSeat) onBookSeat(selectedSeats, total);
+              }}
+            />
           </div>
-
-          <button
-            type="button"
-            onClick={() => setShowSeatView(!showSeatView)}
-            className="px-6 py-3 bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white font-bold text-xs rounded-2xl shadow-lg flex items-center gap-2 transition-all"
-          >
-            {showSeatView ? 'Hide Seat Map' : 'Select Seats'}
-            {showSeatView ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-          </button>
-        </div>
+        )}
       </div>
-
-      {/* Expandable Seat Selection Grid */}
-      {showSeatView && (
-        <div className="p-6 bg-slate-50 dark:bg-slate-900/60 border-t border-slate-200 dark:border-slate-700">
-          <BusSeatSelection
-            pricingTiers={pricingTiers}
-            busTitle={title}
-            onConfirm={(selectedSeats, total) => {
-              if (onBookSeat) onBookSeat(selectedSeats, total);
-            }}
-          />
-        </div>
-      )}
-    </div>
     </BorderGlow>
   );
 }

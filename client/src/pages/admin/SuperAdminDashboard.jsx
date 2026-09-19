@@ -19,6 +19,7 @@ import {
   ToggleRight,
   Shield,
   CheckCircle,
+  UserPlus,
 } from 'lucide-react';
 
 import PageLoader from '../../components/common/PageLoader';
@@ -325,6 +326,43 @@ export default function SuperAdminDashboard() {
             </GlassButton>
           </Link>
         </div>
+      </div>
+
+      {/* Two Prominent Action Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <GlassCard hover={true} className="p-6 space-y-4 border border-white/10 flex flex-col justify-between">
+          <div className="space-y-2">
+            <div className="p-3 bg-[#03B3C3]/15 text-[#03B3C3] rounded-2xl w-fit border border-[#03B3C3]/30">
+              <Shield className="w-6 h-6" />
+            </div>
+            <h2 className="text-xl font-black text-white">Admin Management</h2>
+            <p className="text-xs text-[#9CA3AF]">
+              Manage administrators, permissions, status and access.
+            </p>
+          </div>
+          <Link to="/admin/super/admins">
+            <GlassButton variant="gradient" className="w-full">
+              Manage Admins →
+            </GlassButton>
+          </Link>
+        </GlassCard>
+
+        <GlassCard hover={true} className="p-6 space-y-4 border border-white/10 flex flex-col justify-between">
+          <div className="space-y-2">
+            <div className="p-3 bg-[#6750A2]/20 text-[#03B3C3] rounded-2xl w-fit border border-[#6750A2]/30">
+              <UserPlus className="w-6 h-6" />
+            </div>
+            <h2 className="text-xl font-black text-white">Create Admin</h2>
+            <p className="text-xs text-[#9CA3AF]">
+              Create a new admin and assign management categories.
+            </p>
+          </div>
+          <Link to="/admin/super/admins/create">
+            <GlassButton variant="gradient" className="w-full">
+              Create Admin →
+            </GlassButton>
+          </Link>
+        </GlassCard>
       </div>
 
       {/* Stats Cards */}

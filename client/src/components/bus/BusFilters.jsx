@@ -1,5 +1,5 @@
 import React from 'react';
-import { SlidersHorizontal, Bus, Clock, Star, Sparkles, DollarSign } from 'lucide-react';
+import { SlidersHorizontal, Clock, Star } from 'lucide-react';
 
 export default function BusFilters({
   filters = {},
@@ -7,7 +7,6 @@ export default function BusFilters({
   resetFilters,
 }) {
   const typeList = ['AC Sleeper', 'Non-AC Sleeper', 'AC Seater', 'Volvo', 'Multi-Axle'];
-  const operatorsList = ['IntrCity SmartBus', 'VRL Travels', 'Zingbus', 'Orange Travels', 'SRS Travels'];
 
   const slots = [
     { key: 'ALL', label: 'All Departure Times' },
@@ -21,7 +20,6 @@ export default function BusFilters({
   const currentAC = filters.acType || 'ALL';
   const currentSlot = filters.timeSlot || 'ALL';
   const currentRating = filters.minRating || 0;
-  const currentOperator = filters.operator || 'ALL';
 
   const toggleBusType = (type) => {
     const updated = currentBusTypes.includes(type)
@@ -31,15 +29,15 @@ export default function BusFilters({
   };
 
   return (
-    <div className="bg-white dark:bg-slate-800 p-6 rounded-3xl border border-slate-200 dark:border-slate-700 space-y-6 shadow-sm">
-      <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-700">
-        <h3 className="font-bold text-slate-900 dark:text-white text-sm flex items-center gap-2">
-          <SlidersHorizontal className="w-4 h-4 text-red-600" /> Bus Filters
+    <div className="bg-[#111111] p-6 rounded-3xl border border-white/10 space-y-6 shadow-xl">
+      <div className="flex items-center justify-between pb-3 border-b border-white/10">
+        <h3 className="font-bold text-white text-sm flex items-center gap-2">
+          <SlidersHorizontal className="w-4 h-4 text-[#03B3C3]" /> Bus Filters
         </h3>
         {resetFilters && (
           <button
             onClick={resetFilters}
-            className="text-xs font-semibold text-red-600 hover:underline"
+            className="text-xs font-semibold text-[#03B3C3] hover:underline"
           >
             Reset
           </button>
@@ -48,7 +46,7 @@ export default function BusFilters({
 
       {/* Bus Types */}
       <div className="space-y-2">
-        <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider block">
+        <label className="text-xs font-bold text-[#9CA3AF] uppercase tracking-wider block">
           Bus Specification
         </label>
         <div className="flex flex-wrap gap-2">
@@ -61,8 +59,8 @@ export default function BusFilters({
                 onClick={() => toggleBusType(t)}
                 className={`py-2 px-3 rounded-xl text-xs font-bold border transition-all ${
                   isChecked
-                    ? 'bg-red-600 text-white border-red-600 shadow-md'
-                    : 'bg-slate-50 dark:bg-slate-700 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-600 hover:border-red-500'
+                    ? 'bg-gradient-to-r from-[#03B3C3] to-[#6750A2] text-white border-[#03B3C3] shadow-md'
+                    : 'bg-[#151515] text-[#D1D5DB] border-white/10 hover:border-[#03B3C3]'
                 }`}
               >
                 {t}
@@ -74,7 +72,7 @@ export default function BusFilters({
 
       {/* AC / Non-AC */}
       <div className="space-y-2">
-        <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider block">
+        <label className="text-xs font-bold text-[#9CA3AF] uppercase tracking-wider block">
           AC Category
         </label>
         <div className="grid grid-cols-3 gap-2">
@@ -89,8 +87,8 @@ export default function BusFilters({
               onClick={() => onFilterChange && onFilterChange({ ...filters, acType: opt.key })}
               className={`py-2 px-3 rounded-xl text-xs font-bold border transition-all ${
                 currentAC === opt.key
-                  ? 'bg-red-600 text-white border-red-600 shadow-md'
-                  : 'bg-slate-50 dark:bg-slate-700 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-600'
+                  ? 'bg-gradient-to-r from-[#03B3C3] to-[#6750A2] text-white border-[#03B3C3] shadow-md'
+                  : 'bg-[#151515] text-[#D1D5DB] border-white/10 hover:border-[#03B3C3]'
               }`}
             >
               {opt.label}
@@ -101,8 +99,8 @@ export default function BusFilters({
 
       {/* Departure Time */}
       <div className="space-y-2">
-        <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider block flex items-center gap-1">
-          <Clock className="w-3.5 h-3.5 text-red-600" /> Departure Time
+        <label className="text-xs font-bold text-[#9CA3AF] uppercase tracking-wider block flex items-center gap-1">
+          <Clock className="w-3.5 h-3.5 text-[#03B3C3]" /> Departure Time
         </label>
         <div className="space-y-1.5">
           {slots.map((s) => (
@@ -112,8 +110,8 @@ export default function BusFilters({
               onClick={() => onFilterChange && onFilterChange({ ...filters, timeSlot: s.key })}
               className={`w-full text-left p-2.5 rounded-xl text-xs font-medium border transition-colors ${
                 currentSlot === s.key
-                  ? 'bg-red-50 dark:bg-red-950 border-red-600 text-red-900 dark:text-red-200 font-bold'
-                  : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50'
+                  ? 'bg-[#03B3C3]/15 border-[#03B3C3] text-white font-bold'
+                  : 'bg-[#151515] border-white/10 text-[#D1D5DB] hover:border-white/20'
               }`}
             >
               {s.label}
@@ -124,8 +122,8 @@ export default function BusFilters({
 
       {/* Minimum Rating */}
       <div className="space-y-2">
-        <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider block flex items-center gap-1">
-          <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" /> Minimum Rating
+        <label className="text-xs font-bold text-[#9CA3AF] uppercase tracking-wider block flex items-center gap-1">
+          <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" /> Minimum Rating
         </label>
         <div className="grid grid-cols-4 gap-2 text-xs font-bold">
           {[0, 4.0, 4.5, 4.8].map((r) => (
@@ -135,8 +133,8 @@ export default function BusFilters({
               onClick={() => onFilterChange && onFilterChange({ ...filters, minRating: r })}
               className={`py-2 rounded-xl border text-center transition-all ${
                 currentRating === r
-                  ? 'bg-amber-500 text-white border-amber-500 shadow-md'
-                  : 'bg-slate-50 dark:bg-slate-700 border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-300'
+                  ? 'bg-[#03B3C3] text-white border-[#03B3C3] shadow-md'
+                  : 'bg-[#151515] border-white/10 text-[#D1D5DB] hover:border-white/20'
               }`}
             >
               {r === 0 ? 'Any' : `${r}★+`}

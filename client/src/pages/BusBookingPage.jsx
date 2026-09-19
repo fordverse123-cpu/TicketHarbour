@@ -3,8 +3,8 @@ import API from '../services/api';
 import BusSearch from '../components/bus/BusSearch';
 import BusCard from '../components/bus/BusCard';
 import BusFilters from '../components/bus/BusFilters';
-import SkeletonLoader from '../components/common/SkeletonLoader';
-import { Bus, RefreshCw, Filter, ArrowUpDown } from 'lucide-react';
+import PageLoader from '../components/common/PageLoader';
+import { Bus, Filter, ArrowUpDown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const MOCK_BUSES = [
@@ -99,7 +99,7 @@ export default function BusBookingPage() {
   const [buses, setBuses] = useState([]);
   const [filteredBuses, setFilteredBuses] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [sortBy, setSortBy] = useState('DEPARTURE'); // 'DEPARTURE', 'CHEAPEST', 'RATING'
+  const [sortBy, setSortBy] = useState('DEPARTURE');
   const [showMobileFilter, setShowMobileFilter] = useState(false);
   const [filters, setFilters] = useState({
     busTypes: [],
@@ -145,7 +145,7 @@ export default function BusBookingPage() {
       }
       setFilteredBuses(result.length > 0 ? result : MOCK_BUSES);
       setLoading(false);
-    }, 400);
+    }, 300);
   };
 
   const handleFilterChange = (newFilters) => {
@@ -180,10 +180,14 @@ export default function BusBookingPage() {
   };
 
   return (
-    <div className="space-y-8 pb-16">
+    <div className="space-y-8 pb-16 max-w-7xl mx-auto">
       <div className="border-b border-white/10 pb-4 space-y-1">
-        <h1 className="text-3xl font-black text-white tracking-tight">Book Bus Tickets</h1>
-        <p className="text-xs text-[#B5B5B5]">Search and book intercity AC sleeper & Volvo bus tickets.</p>
+        <h1 className="text-3xl font-black text-white tracking-tight flex items-center gap-3">
+          <Bus className="w-8 h-8 text-[#03B3C3]" /> Book Bus Tickets
+        </h1>
+        <p className="text-xs text-[#9CA3AF]">
+          Search and book intercity AC sleeper, Volvo, and Multi-Axle bus tickets.
+        </p>
       </div>
 
       {/* Top Search Hero */}
@@ -195,7 +199,7 @@ export default function BusBookingPage() {
       <div className="flex lg:hidden justify-end">
         <button
           onClick={() => setShowMobileFilter(!showMobileFilter)}
-          className="px-4 py-2 bg-red-600 text-white rounded-xl font-bold text-xs flex items-center gap-2"
+          className="px-4 py-2 bg-gradient-to-r from-[#03B3C3] to-[#6750A2] text-white rounded-xl font-bold text-xs flex items-center gap-2"
         >
           <Filter className="w-4 h-4" /> {showMobileFilter ? 'Hide Filters' : 'Show Filters'}
         </button>
@@ -216,9 +220,9 @@ export default function BusBookingPage() {
 
         {/* Right Bus Cards List */}
         <main className="lg:col-span-3 space-y-6">
-          <div className="flex flex-wrap items-center justify-between glass-card p-4 rounded-2xl gap-3">
+          <div className="flex flex-wrap items-center justify-between bg-[#111111] border border-white/10 p-4 rounded-2xl gap-3">
             <div className="flex items-center gap-2">
-              <Bus className="w-5 h-5 text-cyanAccent" />
+              <Bus className="w-5 h-5 text-[#03B3C3]" />
               <h2 className="font-bold text-white text-sm">
                 Available Buses ({filteredBuses.length})
               </h2>
@@ -226,14 +230,16 @@ export default function BusBookingPage() {
 
             {/* Sort options */}
             <div className="flex items-center gap-2 text-xs font-semibold">
-              <span className="text-slate-400 flex items-center gap-1">
+              <span className="text-[#9CA3AF] flex items-center gap-1">
                 <ArrowUpDown className="w-3.5 h-3.5" /> Sort:
               </span>
               <button
                 type="button"
                 onClick={() => handleSortChange('DEPARTURE')}
                 className={`px-2.5 py-1 rounded-lg transition-colors ${
-                  sortBy === 'DEPARTURE' ? 'bg-cyanAccent/20 text-cyanAccent font-bold border border-cyanAccent/30' : 'text-slate-300 hover:text-white'
+                  sortBy === 'DEPARTURE'
+                    ? 'bg-[#03B3C3]/20 text-[#03B3C3] font-bold border border-[#03B3C3]/30'
+                    : 'text-[#D1D5DB] hover:text-white'
                 }`}
               >
                 Departure
@@ -242,7 +248,9 @@ export default function BusBookingPage() {
                 type="button"
                 onClick={() => handleSortChange('CHEAPEST')}
                 className={`px-2.5 py-1 rounded-lg transition-colors ${
-                  sortBy === 'CHEAPEST' ? 'bg-cyanAccent/20 text-cyanAccent font-bold border border-cyanAccent/30' : 'text-slate-300 hover:text-white'
+                  sortBy === 'CHEAPEST'
+                    ? 'bg-[#03B3C3]/20 text-[#03B3C3] font-bold border border-[#03B3C3]/30'
+                    : 'text-[#D1D5DB] hover:text-white'
                 }`}
               >
                 Cheapest
@@ -251,7 +259,9 @@ export default function BusBookingPage() {
                 type="button"
                 onClick={() => handleSortChange('RATING')}
                 className={`px-2.5 py-1 rounded-lg transition-colors ${
-                  sortBy === 'RATING' ? 'bg-cyanAccent/20 text-cyanAccent font-bold border border-cyanAccent/30' : 'text-slate-300 hover:text-white'
+                  sortBy === 'RATING'
+                    ? 'bg-[#03B3C3]/20 text-[#03B3C3] font-bold border border-[#03B3C3]/30'
+                    : 'text-[#D1D5DB] hover:text-white'
                 }`}
               >
                 Highest Rated
@@ -260,13 +270,13 @@ export default function BusBookingPage() {
           </div>
 
           {loading ? (
-            <SkeletonLoader count={4} />
+            <PageLoader text="Searching intercity bus routes..." />
           ) : filteredBuses.length === 0 ? (
-            <div className="text-center py-16 glass-card rounded-3xl space-y-3 p-6">
+            <div className="text-center py-16 bg-[#111111] border border-white/10 rounded-3xl space-y-3 p-6">
               <p className="text-lg font-bold text-white">
                 No buses found matching your search.
               </p>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-[#9CA3AF]">
                 Try selecting a different date or clearing your filter criteria.
               </p>
             </div>
