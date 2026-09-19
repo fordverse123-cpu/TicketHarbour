@@ -92,7 +92,8 @@ export const login = async (req, res, next) => {
       return errorResponse(res, 400, 'Please provide email and password');
     }
 
-    const user = await User.findOne({ email }).select('+password');
+    const cleanEmail = email.trim().toLowerCase();
+    const user = await User.findOne({ email: cleanEmail }).select('+password');
     if (!user) {
       return errorResponse(res, 401, 'Invalid email or password');
     }
