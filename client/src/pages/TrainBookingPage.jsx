@@ -207,16 +207,16 @@ export default function TrainBookingPage() {
 
         {/* Right Train Cards List */}
         <main className="lg:col-span-3 space-y-6">
-          <div className="flex items-center justify-between bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
+          <div className="flex items-center justify-between glass-card p-4 rounded-2xl">
             <div className="flex items-center gap-2">
-              <Train className="w-5 h-5 text-blue-900 dark:text-blue-400" />
-              <h2 className="font-bold text-slate-900 dark:text-white text-sm">
+              <Train className="w-5 h-5 text-cyanAccent" />
+              <h2 className="font-bold text-white text-sm">
                 Available Trains ({filteredTrains.length})
               </h2>
             </div>
             <button
               onClick={() => handleSearch({ from: 'BZA', to: 'SC', date: new Date().toISOString().split('T')[0] })}
-              className="text-xs font-semibold text-blue-600 dark:text-blue-400 flex items-center gap-1 hover:underline"
+              className="text-xs font-semibold text-cyanAccent flex items-center gap-1 hover:underline"
             >
               <RefreshCw className="w-3.5 h-3.5" /> Refresh Schedule
             </button>
@@ -225,8 +225,8 @@ export default function TrainBookingPage() {
           {loading ? (
             <SkeletonLoader count={4} />
           ) : filteredTrains.length === 0 ? (
-            <div className="text-center py-16 bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 space-y-3 p-6">
-              <p className="text-lg font-bold text-slate-700 dark:text-slate-200">
+            <div className="text-center py-16 glass-card rounded-3xl space-y-3 p-6">
+              <p className="text-lg font-bold text-white">
                 {searchMessage || 'No trains found matching your search.'}
               </p>
               <p className="text-xs text-slate-400">

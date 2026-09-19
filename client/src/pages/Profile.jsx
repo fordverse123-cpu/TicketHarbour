@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import API from '../services/api';
+import GlassCard from '../components/ui/GlassCard';
+import GlassButton from '../components/ui/GlassButton';
+import GlassInput from '../components/ui/GlassInput';
 import toast from 'react-hot-toast';
-import { User, Lock, Mail, Phone, ShieldCheck } from 'lucide-react';
+import { User, Lock, Mail, Phone } from 'lucide-react';
 
 export default function Profile() {
   const { user, updateProfile } = useAuth();
@@ -48,98 +51,87 @@ export default function Profile() {
   return (
     <div className="max-w-4xl mx-auto space-y-8 pb-16">
       <div>
-        <h1 className="text-3xl font-extrabold text-slate-900 dark:text-white">Profile Settings</h1>
-        <p className="text-sm text-slate-500 dark:text-slate-400">Manage your personal account details and security settings</p>
+        <h1 className="text-3xl font-black text-white tracking-tight">Profile Settings</h1>
+        <p className="text-xs text-slate-400">Manage your personal account details and security settings</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         
         {/* Personal Info Form */}
-        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-6 space-y-4">
-          <h2 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
-            <User className="w-5 h-5 text-teal-500" /> Account Details
+        <GlassCard className="space-y-4">
+          <h2 className="text-lg font-black text-white flex items-center gap-2">
+            <User className="w-5 h-5 text-cyanAccent-400" /> Account Details
           </h2>
 
           <form onSubmit={handleProfileSubmit} className="space-y-4 text-xs">
-            <div className="space-y-1">
-              <label className="font-semibold text-slate-600 dark:text-slate-300">Full Name</label>
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="w-full p-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl dark:text-white"
-              />
-            </div>
+            <GlassInput
+              label="Full Name"
+              icon={User}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
 
-            <div className="space-y-1">
-              <label className="font-semibold text-slate-600 dark:text-slate-300">Email Address (Read only)</label>
-              <input
-                type="email"
-                disabled
-                value={user?.email || ''}
-                className="w-full p-2.5 bg-slate-100 dark:bg-slate-700/80 border border-slate-200 dark:border-slate-600 rounded-xl text-slate-500 dark:text-slate-300"
-              />
-            </div>
+            <GlassInput
+              label="Email Address (Read only)"
+              icon={Mail}
+              disabled
+              value={user?.email || ''}
+            />
 
-            <div className="space-y-1">
-              <label className="font-semibold text-slate-600 dark:text-slate-300">Phone Number</label>
-              <input
-                type="text"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="+1 800 000 0000"
-                className="w-full p-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl dark:text-white"
-              />
-            </div>
+            <GlassInput
+              label="Phone Number"
+              icon={Phone}
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="+91 98765 43210"
+            />
 
-            <button
+            <GlassButton
               type="submit"
-              disabled={updatingProfile}
-              className="w-full py-2.5 bg-teal-600 text-white font-bold rounded-xl shadow hover:bg-teal-700 transition-colors"
+              loading={updatingProfile}
+              className="w-full py-3"
             >
-              {updatingProfile ? 'Saving...' : 'Save Changes'}
-            </button>
+              Save Changes
+            </GlassButton>
           </form>
-        </div>
+        </GlassCard>
 
         {/* Change Password Form */}
-        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-6 space-y-4">
-          <h2 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
-            <Lock className="w-5 h-5 text-indigo-500" /> Change Password
+        <GlassCard className="space-y-4">
+          <h2 className="text-lg font-black text-white flex items-center gap-2">
+            <Lock className="w-5 h-5 text-indigoAccent-500" /> Change Password
           </h2>
 
           <form onSubmit={handlePasswordSubmit} className="space-y-4 text-xs">
-            <div className="space-y-1">
-              <label className="font-semibold text-slate-600 dark:text-slate-300">Current Password</label>
-              <input
-                type="password"
-                value={currentPassword}
-                onChange={(e) => setCurrentPassword(e.target.value)}
-                className="w-full p-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl dark:text-white"
-              />
-            </div>
+            <GlassInput
+              label="Current Password"
+              type="password"
+              icon={Lock}
+              value={currentPassword}
+              onChange={(e) => setCurrentPassword(e.target.value)}
+            />
 
-            <div className="space-y-1">
-              <label className="font-semibold text-slate-600 dark:text-slate-300">New Password (min 6 chars)</label>
-              <input
-                type="password"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                className="w-full p-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl dark:text-white"
-              />
-            </div>
+            <GlassInput
+              label="New Password (min 6 chars)"
+              type="password"
+              icon={Lock}
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+            />
 
-            <button
+            <GlassButton
               type="submit"
-              disabled={updatingPassword}
-              className="w-full py-2.5 bg-indigo-600 text-white font-bold rounded-xl shadow hover:bg-indigo-700 transition-colors"
+              variant="secondary"
+              loading={updatingPassword}
+              className="w-full py-3"
             >
-              {updatingPassword ? 'Updating...' : 'Update Password'}
-            </button>
+              Update Password
+            </GlassButton>
           </form>
-        </div>
+        </GlassCard>
 
       </div>
     </div>
   );
 }
+

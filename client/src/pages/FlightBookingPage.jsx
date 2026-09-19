@@ -197,10 +197,10 @@ export default function FlightBookingPage() {
 
         {/* Flight Cards List */}
         <main className="lg:col-span-3 space-y-6">
-          <div className="flex flex-wrap items-center justify-between bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm gap-3">
+          <div className="flex flex-wrap items-center justify-between glass-card p-4 rounded-2xl gap-3">
             <div className="flex items-center gap-2">
-              <Plane className="w-5 h-5 text-sky-600 rotate-45" />
-              <h2 className="font-bold text-slate-900 dark:text-white text-sm">
+              <Plane className="w-5 h-5 text-cyanAccent rotate-45" />
+              <h2 className="font-bold text-white text-sm">
                 Available Flights ({filteredFlights.length})
               </h2>
             </div>
@@ -213,8 +213,8 @@ export default function FlightBookingPage() {
               <button
                 type="button"
                 onClick={() => handleSortChange('CHEAPEST')}
-                className={`px-2.5 py-1 rounded-lg ${
-                  sortBy === 'CHEAPEST' ? 'bg-sky-100 text-sky-700 font-bold' : 'text-slate-600'
+                className={`px-2.5 py-1 rounded-lg transition-colors ${
+                  sortBy === 'CHEAPEST' ? 'bg-cyanAccent/20 text-cyanAccent font-bold border border-cyanAccent/30' : 'text-slate-300 hover:text-white'
                 }`}
               >
                 Cheapest
@@ -222,8 +222,8 @@ export default function FlightBookingPage() {
               <button
                 type="button"
                 onClick={() => handleSortChange('DEPARTURE')}
-                className={`px-2.5 py-1 rounded-lg ${
-                  sortBy === 'DEPARTURE' ? 'bg-sky-100 text-sky-700 font-bold' : 'text-slate-600'
+                className={`px-2.5 py-1 rounded-lg transition-colors ${
+                  sortBy === 'DEPARTURE' ? 'bg-cyanAccent/20 text-cyanAccent font-bold border border-cyanAccent/30' : 'text-slate-300 hover:text-white'
                 }`}
               >
                 Departure Time
@@ -234,8 +234,8 @@ export default function FlightBookingPage() {
           {loading ? (
             <SkeletonLoader count={4} />
           ) : filteredFlights.length === 0 ? (
-            <div className="text-center py-16 bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 space-y-3">
-              <p className="text-lg font-bold text-slate-700 dark:text-slate-200">
+            <div className="text-center py-16 glass-card rounded-3xl space-y-3 p-6">
+              <p className="text-lg font-bold text-white">
                 No flights found matching your search.
               </p>
               <p className="text-xs text-slate-400">

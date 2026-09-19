@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import API from '../services/api';
+import GlassCard from '../components/ui/GlassCard';
+import GlassButton from '../components/ui/GlassButton';
 import RatingStars from '../components/common/RatingStars';
-import SkeletonLoader from '../components/common/SkeletonLoader';
+import Skeleton from '../components/ui/Skeleton';
 import {
   Film,
-  Music,
+  Calendar,
   Trophy,
   Bus,
   Train,
@@ -13,29 +15,47 @@ import {
   Ticket,
   Search,
   MapPin,
-  Calendar,
-  ChevronRight,
   Sparkles,
+  ArrowRight,
+  ShieldCheck,
+  Zap,
 } from 'lucide-react';
 
 const CATEGORY_TABS = [
-  { key: 'all', label: 'All Categories', icon: Sparkles },
-  { key: 'movie', label: 'Movies', icon: Film },
-  { key: 'event', label: 'Concerts & Events', icon: Music },
-  { key: 'sports', label: 'Sports Matches', icon: Trophy },
-  { key: 'bus', label: 'Bus Sleepers', icon: Bus },
-  { key: 'train', label: 'Express Trains', icon: Train },
+  { key: 'all', label: 'All', icon: Sparkles },
+  { key: 'movies', label: 'Movies', icon: Film },
+  { key: 'events', label: 'Events', icon: Calendar },
+  { key: 'sports', label: 'Sports', icon: Trophy },
+  { key: 'bus', label: 'Bus', icon: Bus },
+  { key: 'train', label: 'Train', icon: Train },
   { key: 'flight', label: 'Flights', icon: Plane },
-  { key: 'attraction', label: 'Attractions', icon: Ticket },
+  { key: 'attractions', label: 'Attractions', icon: Ticket },
+];
+
+const CATEGORY_CARDS = [
+  { id: 'movies', title: 'Movies', icon: Film, emoji: '🎬', desc: 'Book latest blockbuster movies & IMAX seats', link: '/listings?category=movies' },
+  { id: 'events', title: 'Events', icon: Calendar, emoji: '🎵', desc: 'Live concerts, music festivals & standup comedy', link: '/listings?category=events' },
+  { id: 'sports', title: 'Sports', icon: Trophy, emoji: '🏆', desc: 'Cricket, football, IPL & stadium matches', link: '/listings?category=sports' },
+  { id: 'bus', title: 'Bus', icon: Bus, emoji: '🚌', desc: 'Intercity AC sleeper & Volvo bus tickets', link: '/buses' },
+  { id: 'train', title: 'Train', icon: Train, emoji: '🚆', desc: 'Indian Railways train schedule & seat reservation', link: '/trains' },
+  { id: 'flight', title: 'Flights', icon: Plane, emoji: '✈️', desc: 'Domestic & international cheap flight tickets', link: '/flights' },
+  { id: 'attractions', title: 'Attractions', icon: Ticket, emoji: '🎟️', desc: 'Amusement parks, water parks & city passes', link: '/listings?category=attractions' },
 ];
 
 export default function Home() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('all');
+  const [searchCategory, setSearchCategory] = useState('movies');
   const [featuredListings, setFeaturedListings] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCity, setSelectedCity] = useState('');
+
+  // Search Fields State
+  const [keyword, setKeyword] = useState('');
+  const [fromCity, setFromCity] = useState('');
+  const [toCity, setToCity] = useState('');
+  const [travelDate, setTravelDate] = useState('');
+  const [trainClass, setTrainClass] = useState('All');
+  const [travellers, setTravellers] = useState('1');
 
   useEffect(() => {
     fetchFeatured();
@@ -56,88 +76,318 @@ export default function Home() {
     }
   };
 
-  const handleHeroSearch = (e) => {
+  const handleUnifiedSearch = (e) => {
     e.preventDefault();
-    let url = '/listings?';
-    if (searchQuery) url += `search=${encodeURIComponent(searchQuery)}&`;
-    if (selectedCity) url += `city=${encodeURIComponent(selectedCity)}&`;
-    if (activeTab !== 'all') url += `categoryType=${activeTab}`;
-    navigate(url);
+    if (searchCategory === 'train') {
+      let url = `/trains?`;
+      if (fromCity) url += `from=${encodeURIComponent(fromCity)}&`;
+      if (toCity) url += `to=${encodeURIComponent(toCity)}&`;
+      if (travelDate) url += `date=${encodeURIComponent(travelDate)}&`;
+      if (trainClass) url += `journeyClass=${encodeURIComponent(trainClass)}`;
+      navigate(url);
+    } else if (searchCategory === 'bus') {
+      let url = `/buses?`;
+      if (fromCity) url += `from=${encodeURIComponent(fromCity)}&`;
+      if (toCity) url += `to=${encodeURIComponent(toCity)}&`;
+      if (travelDate) url += `date=${encodeURIComponent(travelDate)}`;
+      navigate(url);
+    } else if (searchCategory === 'flight') {
+      let url = `/flights?`;
+      if (fromCity) url += `from=${encodeURIComponent(fromCity)}&`;
+      if (toCity) url += `to=${encodeURIComponent(toCity)}&`;
+      if (travelDate) url += `date=${encodeURIComponent(travelDate)}&`;
+      if (travellers) url += `passengers=${encodeURIComponent(travellers)}`;
+      navigate(url);
+    } else {
+      let url = `/listings?category=${searchCategory}&`;
+      if (keyword) url += `search=${encodeURIComponent(keyword)}&`;
+      if (fromCity) url += `city=${encodeURIComponent(fromCity)}`;
+      navigate(url);
+    }
   };
 
   return (
-    <div className="space-y-16 pb-12">
+    <div className="space-y-16 pb-16">
       
-      {/* Hero Banner Section */}
-      <section className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-slate-900 via-navy-800 to-teal-950 text-white py-16 px-6 sm:px-12 shadow-2xl">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(20,184,166,0.15),transparent)] pointer-events-none" />
-        
+      {/* GLOSSY HERO SECTION */}
+      <section className="relative rounded-3xl overflow-hidden bg-harbour-card/90 border border-white/10 p-8 sm:p-14 shadow-2xl backdrop-blur-2xl">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-cyanAccent-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-indigoAccent-600/15 rounded-full blur-3xl pointer-events-none" />
+
         <div className="relative z-10 max-w-4xl mx-auto text-center space-y-6">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-teal-500/20 border border-teal-500/30 text-teal-300 text-xs font-semibold backdrop-blur-md">
-            <Sparkles className="w-4 h-4 text-teal-400" /> Multi-Category Booking Made Effortless
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyanAccent-500/10 border border-cyanAccent-500/30 text-cyanAccent-400 text-xs font-bold backdrop-blur-md">
+            <Zap className="w-4 h-4 text-cyanAccent-400" /> Unified Booking Platform
           </div>
-          
-          <h1 className="text-4xl sm:text-6xl font-black tracking-tight leading-tight">
-            Book Tickets For <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-400 via-emerald-300 to-indigo-300">Every Experience</span>
+
+          <h1 className="text-4xl sm:text-6xl font-black tracking-tight leading-tight text-white">
+            Your Tickets. Your Journey. <br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyanAccent-400 via-indigoAccent-400 to-indigoAccent-600">
+              One Harbour.
+            </span>
           </h1>
-          
-          <p className="text-slate-300 text-base sm:text-lg max-w-2xl mx-auto">
-            Movies, Stadium Matches, Live Concerts, Buses, Trains, Flights, and Amusement Parks — all reserved in seconds on <strong className="text-teal-400">TicketHarbor</strong>.
+
+          <p className="text-slate-300 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed">
+            Book movies, events, sports, buses, trains, flights and attractions — all in one place.
           </p>
 
-          {/* Hero Search Box */}
-          <form
-            onSubmit={handleHeroSearch}
-            className="bg-white dark:bg-slate-800 p-3 rounded-2xl sm:rounded-full shadow-2xl flex flex-col sm:flex-row items-center gap-3 text-slate-800 dark:text-white max-w-3xl mx-auto border border-slate-100 dark:border-slate-700"
-          >
-            <div className="flex items-center gap-2 flex-1 px-3 w-full">
-              <Search className="w-5 h-5 text-teal-500" />
-              <input
-                type="text"
-                placeholder="Movie, artist, match, or bus route..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full text-sm font-medium bg-transparent focus:outline-none dark:text-white placeholder:text-slate-400"
-              />
+          {/* LARGE GLOSSY SEARCH PANEL */}
+          <div className="pt-4 max-w-4xl mx-auto">
+            <div className="bg-harbour-dark/90 border border-white/15 rounded-3xl p-4 sm:p-6 shadow-2xl backdrop-blur-2xl space-y-4">
+              
+              {/* Category Search Tabs */}
+              <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none border-b border-white/10">
+                {CATEGORY_CARDS.map((cat) => {
+                  const Icon = cat.icon;
+                  const isSel = searchCategory === cat.id;
+                  return (
+                    <button
+                      key={cat.id}
+                      type="button"
+                      onClick={() => setSearchCategory(cat.id)}
+                      className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+                        isSel
+                          ? 'bg-gradient-to-r from-cyanAccent-500 to-indigoAccent-600 text-white shadow-lg'
+                          : 'text-slate-400 hover:text-white hover:bg-white/5'
+                      }`}
+                    >
+                      <Icon className="w-4 h-4" />
+                      <span>{cat.title}</span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Dynamic Inputs Form */}
+              <form onSubmit={handleUnifiedSearch} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-left pt-2">
+                {searchCategory === 'train' ? (
+                  <>
+                    <div className="space-y-1">
+                      <label className="text-[11px] font-bold uppercase text-slate-400">From Station</label>
+                      <input
+                        type="text"
+                        placeholder="e.g. Vijayawada (BZA)"
+                        value={fromCity}
+                        onChange={(e) => setFromCity(e.target.value)}
+                        className="w-full bg-harbour-darker border border-white/15 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyanAccent-500"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-[11px] font-bold uppercase text-slate-400">To Station</label>
+                      <input
+                        type="text"
+                        placeholder="e.g. Hyderabad (SC)"
+                        value={toCity}
+                        onChange={(e) => setToCity(e.target.value)}
+                        className="w-full bg-harbour-darker border border-white/15 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyanAccent-500"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-[11px] font-bold uppercase text-slate-400">Date</label>
+                      <input
+                        type="date"
+                        value={travelDate}
+                        onChange={(e) => setTravelDate(e.target.value)}
+                        className="w-full bg-harbour-darker border border-white/15 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-cyanAccent-500"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-[11px] font-bold uppercase text-slate-400">Class</label>
+                      <select
+                        value={trainClass}
+                        onChange={(e) => setTrainClass(e.target.value)}
+                        className="w-full bg-harbour-darker border border-white/15 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-cyanAccent-500"
+                      >
+                        <option value="All">All Classes</option>
+                        <option value="1A">First AC (1A)</option>
+                        <option value="2A">2 Tier AC (2A)</option>
+                        <option value="3A">3 Tier AC (3A)</option>
+                        <option value="SL">Sleeper (SL)</option>
+                      </select>
+                    </div>
+                  </>
+                ) : searchCategory === 'bus' ? (
+                  <>
+                    <div className="space-y-1">
+                      <label className="text-[11px] font-bold uppercase text-slate-400">From City</label>
+                      <input
+                        type="text"
+                        placeholder="e.g. Hyderabad"
+                        value={fromCity}
+                        onChange={(e) => setFromCity(e.target.value)}
+                        className="w-full bg-harbour-darker border border-white/15 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyanAccent-500"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-[11px] font-bold uppercase text-slate-400">To City</label>
+                      <input
+                        type="text"
+                        placeholder="e.g. Bengaluru"
+                        value={toCity}
+                        onChange={(e) => setToCity(e.target.value)}
+                        className="w-full bg-harbour-darker border border-white/15 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyanAccent-500"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-[11px] font-bold uppercase text-slate-400">Travel Date</label>
+                      <input
+                        type="date"
+                        value={travelDate}
+                        onChange={(e) => setTravelDate(e.target.value)}
+                        className="w-full bg-harbour-darker border border-white/15 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-cyanAccent-500"
+                      />
+                    </div>
+                    <div className="flex items-end">
+                      <GlassButton type="submit" className="w-full py-2.5" icon={Search}>
+                        Search Buses
+                      </GlassButton>
+                    </div>
+                  </>
+                ) : searchCategory === 'flight' ? (
+                  <>
+                    <div className="space-y-1">
+                      <label className="text-[11px] font-bold uppercase text-slate-400">Departure Airport</label>
+                      <input
+                        type="text"
+                        placeholder="e.g. DEL (Delhi)"
+                        value={fromCity}
+                        onChange={(e) => setFromCity(e.target.value)}
+                        className="w-full bg-harbour-darker border border-white/15 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyanAccent-500"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-[11px] font-bold uppercase text-slate-400">Arrival Airport</label>
+                      <input
+                        type="text"
+                        placeholder="e.g. BOM (Mumbai)"
+                        value={toCity}
+                        onChange={(e) => setToCity(e.target.value)}
+                        className="w-full bg-harbour-darker border border-white/15 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyanAccent-500"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-[11px] font-bold uppercase text-slate-400">Departure Date</label>
+                      <input
+                        type="date"
+                        value={travelDate}
+                        onChange={(e) => setTravelDate(e.target.value)}
+                        className="w-full bg-harbour-darker border border-white/15 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-cyanAccent-500"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-[11px] font-bold uppercase text-slate-400">Passengers</label>
+                      <select
+                        value={travellers}
+                        onChange={(e) => setTravellers(e.target.value)}
+                        className="w-full bg-harbour-darker border border-white/15 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-cyanAccent-500"
+                      >
+                        <option value="1">1 Passenger</option>
+                        <option value="2">2 Passengers</option>
+                        <option value="3">3 Passengers</option>
+                        <option value="4+">4+ Passengers</option>
+                      </select>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="space-y-1 lg:col-span-2">
+                      <label className="text-[11px] font-bold uppercase text-slate-400">Search Keywords</label>
+                      <input
+                        type="text"
+                        placeholder="Movie name, concert artist, match..."
+                        value={keyword}
+                        onChange={(e) => setKeyword(e.target.value)}
+                        className="w-full bg-harbour-darker border border-white/15 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyanAccent-500"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-[11px] font-bold uppercase text-slate-400">City</label>
+                      <input
+                        type="text"
+                        placeholder="e.g. Mumbai"
+                        value={fromCity}
+                        onChange={(e) => setFromCity(e.target.value)}
+                        className="w-full bg-harbour-darker border border-white/15 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyanAccent-500"
+                      />
+                    </div>
+                    <div className="flex items-end">
+                      <GlassButton type="submit" className="w-full py-2.5" icon={Search}>
+                        Search {searchCategory.toUpperCase()}
+                      </GlassButton>
+                    </div>
+                  </>
+                )}
+              </form>
+
+              {(searchCategory === 'train' || searchCategory === 'flight') && (
+                <div className="pt-2">
+                  <GlassButton type="submit" onClick={handleUnifiedSearch} className="w-full py-3" icon={Search}>
+                    Search {searchCategory.toUpperCase()}
+                  </GlassButton>
+                </div>
+              )}
             </div>
-
-            <div className="hidden sm:block h-6 w-px bg-slate-200 dark:bg-slate-700" />
-
-            <div className="flex items-center gap-2 px-3 w-full sm:w-44">
-              <MapPin className="w-5 h-5 text-indigo-500" />
-              <select
-                value={selectedCity}
-                onChange={(e) => setSelectedCity(e.target.value)}
-                className="w-full text-sm font-medium bg-transparent focus:outline-none dark:text-white dark:bg-slate-800"
-              >
-                <option value="">All Cities</option>
-                <option value="Mumbai">Mumbai</option>
-                <option value="Bengaluru">Bengaluru</option>
-                <option value="Delhi">Delhi</option>
-                <option value="Goa">Goa</option>
-              </select>
-            </div>
-
-            <button
-              type="submit"
-              className="w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-teal-500 to-indigo-600 hover:from-teal-600 hover:to-indigo-700 text-white font-bold rounded-xl sm:rounded-full shadow-lg transition-all flex items-center justify-center gap-2"
-            >
-              Search <ChevronRight className="w-4 h-4" />
-            </button>
-          </form>
+          </div>
         </div>
       </section>
 
-      {/* Category Selection Tabs */}
+      {/* CATEGORY CARDS SECTION */}
       <section className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Explore Categories</h2>
-            <p className="text-sm text-slate-500 dark:text-slate-400">Pick a category to filter upcoming shows & trips</p>
+            <h2 className="text-2xl font-black text-white tracking-tight">Explore Booking Categories</h2>
+            <p className="text-xs text-slate-400">Instant reservation for entertainment, transit & travel</p>
           </div>
         </div>
 
-        <div className="flex items-center gap-3 overflow-x-auto pb-2 no-scrollbar">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          {CATEGORY_CARDS.map((cat) => (
+            <GlassCard key={cat.id} hover={true} className="flex flex-col justify-between space-y-4 group">
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-3xl">{cat.emoji}</span>
+                  <div className="p-2 rounded-xl bg-white/5 border border-white/10 group-hover:border-cyanAccent-500/40 transition-colors">
+                    <cat.icon className="w-5 h-5 text-cyanAccent-400" />
+                  </div>
+                </div>
+
+                <h3 className="text-lg font-black text-white group-hover:text-cyanAccent-400 transition-colors">
+                  {cat.title}
+                </h3>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  {cat.desc}
+                </p>
+              </div>
+
+              <Link
+                to={cat.link}
+                className="flex items-center gap-2 text-xs font-bold text-cyanAccent-400 group-hover:translate-x-1 transition-transform"
+              >
+                <span>Book Now</span>
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </GlassCard>
+          ))}
+        </div>
+      </section>
+
+      {/* FEATURED / TRENDING SHOWCASE */}
+      <section className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-2xl font-black text-white tracking-tight">Featured & Trending Bookings</h2>
+            <p className="text-xs text-slate-400">Handpicked movies, events, sports matches & journeys</p>
+          </div>
+          <Link
+            to="/listings"
+            className="text-xs font-bold text-cyanAccent-400 hover:underline flex items-center gap-1"
+          >
+            <span>View All</span>
+            <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
+
+        {/* Category Filter Pills */}
+        <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
           {CATEGORY_TABS.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.key;
@@ -145,101 +395,81 @@ export default function Home() {
               <button
                 key={tab.key}
                 onClick={() => setActiveTab(tab.key)}
-                className={`flex items-center gap-2.5 px-5 py-3 rounded-2xl text-sm font-bold whitespace-nowrap transition-all ${
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
                   isActive
-                    ? 'bg-teal-500 text-white shadow-lg shadow-teal-500/30 scale-105'
-                    : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700'
+                    ? 'bg-gradient-to-r from-cyanAccent-500 to-indigoAccent-600 text-white shadow-md'
+                    : 'bg-white/5 text-slate-400 hover:text-white border border-white/10'
                 }`}
               >
-                <Icon className="w-4 h-4" />
-                {tab.label}
+                <Icon className="w-3.5 h-3.5" />
+                <span>{tab.label}</span>
               </button>
             );
           })}
         </div>
-      </section>
-
-      {/* Featured / Trending Listings Grid */}
-      <section className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Trending & Featured</h2>
-            <p className="text-sm text-slate-500 dark:text-slate-400">Hand-picked top bookings across India</p>
-          </div>
-          <Link
-            to="/listings"
-            className="text-sm font-bold text-teal-600 dark:text-teal-400 hover:underline flex items-center gap-1"
-          >
-            View All <ChevronRight className="w-4 h-4" />
-          </Link>
-        </div>
 
         {loading ? (
-          <SkeletonLoader count={6} />
-        ) : featuredListings.length === 0 ? (
-          <div className="text-center py-16 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700">
-            <p className="text-slate-500 dark:text-slate-400">No listings found in this category.</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <Skeleton className="h-64" count={6} />
           </div>
+        ) : featuredListings.length === 0 ? (
+          <GlassCard className="text-center py-16">
+            <p className="text-sm text-slate-400">No listings found in this category.</p>
+          </GlassCard>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {featuredListings.map((item) => {
               const image = item.bannerImage || item.images?.[0] || 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba';
-              const startingPrice = item.pricingTiers?.[0]?.price || 100;
+              const startingPrice = item.pricingTiers?.[0]?.price || 150;
 
               return (
-                <div
-                  key={item._id}
-                  className="group bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col"
-                >
-                  <div className="relative h-48 overflow-hidden bg-slate-100 dark:bg-slate-700">
+                <GlassCard key={item._id} className="p-0 overflow-hidden flex flex-col justify-between group">
+                  <div className="relative h-48 overflow-hidden bg-harbour-darker">
                     <img
                       src={image}
                       alt={item.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
-                    <div className="absolute top-3 left-3 px-3 py-1 bg-slate-900/80 backdrop-blur-md text-teal-400 text-xs font-bold rounded-full uppercase tracking-wider">
+                    <div className="absolute top-3 left-3 px-3 py-1 bg-black/75 backdrop-blur-md text-cyanAccent-400 text-[10px] font-black rounded-full uppercase tracking-wider border border-white/10">
                       {item.categoryType}
                     </div>
                   </div>
 
-                  <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
+                  <div className="p-5 space-y-4 flex-1 flex flex-col justify-between">
                     <div className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1 font-medium">
-                          <MapPin className="w-3.5 h-3.5 text-teal-500" />
-                          {item.transitInfo?.source
-                            ? `${item.transitInfo.source} → ${item.transitInfo.destination}`
-                            : item.location?.city}
+                      <div className="flex items-center justify-between text-xs text-slate-400">
+                        <span className="flex items-center gap-1 font-semibold">
+                          <MapPin className="w-3.5 h-3.5 text-cyanAccent-400" />
+                          {item.location?.city || 'All Cities'}
                         </span>
                         <RatingStars rating={item.rating} numReviews={item.numReviews} />
                       </div>
 
-                      <h3 className="font-bold text-slate-900 dark:text-white line-clamp-1 group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
+                      <h3 className="font-black text-white text-base line-clamp-1 group-hover:text-cyanAccent-400 transition-colors">
                         {item.title}
                       </h3>
                       
-                      <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2">
+                      <p className="text-xs text-slate-400 line-clamp-2 leading-relaxed">
                         {item.description}
                       </p>
                     </div>
 
-                    <div className="pt-3 border-t border-slate-100 dark:border-slate-700 flex items-center justify-between">
+                    <div className="pt-3 border-t border-white/10 flex items-center justify-between">
                       <div>
-                        <span className="text-xs text-slate-400 dark:text-slate-500 block">Starting from</span>
-                        <span className="text-lg font-black text-slate-900 dark:text-white">
+                        <span className="text-[10px] uppercase font-bold text-slate-400 block">Starting from</span>
+                        <span className="text-lg font-black text-white">
                           ₹{startingPrice}
                         </span>
                       </div>
 
-                      <Link
-                        to={`/listings/${item.slug || item._id}`}
-                        className="px-4 py-2 text-xs font-bold text-white bg-teal-600 hover:bg-teal-700 rounded-xl shadow transition-colors"
-                      >
-                        Book Now
+                      <Link to={`/listings/${item.slug || item._id}`}>
+                        <GlassButton size="sm" variant="gradient">
+                          Book Tickets
+                        </GlassButton>
                       </Link>
                     </div>
                   </div>
-                </div>
+                </GlassCard>
               );
             })}
           </div>
@@ -249,3 +479,4 @@ export default function Home() {
     </div>
   );
 }
+

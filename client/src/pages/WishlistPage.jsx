@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import API from '../services/api';
-import RatingStars from '../components/common/RatingStars';
+import GlassCard from '../components/ui/GlassCard';
+import GlassButton from '../components/ui/GlassButton';
+import Skeleton from '../components/ui/Skeleton';
 import toast from 'react-hot-toast';
 import { Heart, MapPin, Trash2 } from 'lucide-react';
 
@@ -39,31 +41,27 @@ export default function WishlistPage() {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center py-32">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600"></div>
-      </div>
-    );
-  }
-
   return (
     <div className="max-w-5xl mx-auto space-y-8 pb-16">
       <div>
-        <h1 className="text-3xl font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+        <h1 className="text-3xl font-black text-white flex items-center gap-2 tracking-tight">
           <Heart className="w-7 h-7 text-rose-500 fill-rose-500" /> Saved Favorites
         </h1>
-        <p className="text-sm text-slate-500 dark:text-slate-400">Bookings you have saved for later</p>
+        <p className="text-xs text-slate-400">Bookings you have saved for later</p>
       </div>
 
-      {items.length === 0 ? (
-        <div className="text-center py-20 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-3">
-          <Heart className="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto" />
-          <p className="text-lg font-bold text-slate-700 dark:text-slate-200">Your wishlist is empty</p>
-          <Link to="/listings" className="inline-block px-4 py-2 bg-teal-600 text-white font-bold text-xs rounded-xl">
-            Browse Ticket Listings
-          </Link>
+      {loading ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <Skeleton className="h-64" count={3} />
         </div>
+      ) : items.length === 0 ? (
+        <GlassCard className="text-center py-20 space-y-3">
+          <Heart className="w-12 h-12 text-slate-600 mx-auto" />
+          <p className="text-base font-black text-white">Your wishlist is empty</p>
+          <Link to="/listings">
+            <GlassButton size="sm">Browse Ticket Listings</GlassButton>
+          </Link>
+        </GlassCard>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {items.map((item) => {
@@ -72,15 +70,15 @@ export default function WishlistPage() {
             const image = listing.bannerImage || listing.images?.[0];
 
             return (
-              <div
+              <GlassCard
                 key={item._id}
-                className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm flex flex-col justify-between"
+                className="p-0 overflow-hidden flex flex-col justify-between group"
               >
-                <div className="relative h-44">
-                  <img src={image} alt={listing.title} className="w-full h-full object-cover" />
+                <div className="relative h-44 bg-harbour-darker">
+                  <img src={image} alt={listing.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
                   <button
                     onClick={() => handleRemove(listing._id)}
-                    className="absolute top-3 right-3 p-2 bg-slate-900/80 text-rose-400 rounded-full hover:bg-slate-900"
+                    className="absolute top-3 right-3 p-2 bg-black/80 text-rose-400 rounded-full hover:bg-black border border-white/10"
                     title="Remove"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -88,21 +86,20 @@ export default function WishlistPage() {
                 </div>
 
                 <div className="p-4 space-y-3 flex-1 flex flex-col justify-between">
-                  <div>
-                    <h3 className="font-bold text-slate-900 dark:text-white text-sm line-clamp-1">{listing.title}</h3>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1 mt-1">
-                      <MapPin className="w-3.5 h-3.5 text-teal-500" /> {listing.location?.city}
+                  <div className="space-y-1">
+                    <h3 className="font-black text-white text-sm line-clamp-1 group-hover:text-cyanAccent-400 transition-colors">{listing.title}</h3>
+                    <p className="text-xs text-slate-400 flex items-center gap-1">
+                      <MapPin className="w-3.5 h-3.5 text-cyanAccent-400" /> {listing.location?.city || 'All Cities'}
                     </p>
                   </div>
 
-                  <Link
-                    to={`/listings/${listing.slug || listing._id}`}
-                    className="w-full py-2 bg-teal-600 text-white font-bold text-xs rounded-xl text-center shadow"
-                  >
-                    Book Tickets
+                  <Link to={`/listings/${listing.slug || listing._id}`}>
+                    <GlassButton size="sm" className="w-full">
+                      Book Tickets
+                    </GlassButton>
                   </Link>
                 </div>
-              </div>
+              </GlassCard>
             );
           })}
         </div>
@@ -110,3 +107,4 @@ export default function WishlistPage() {
     </div>
   );
 }
+

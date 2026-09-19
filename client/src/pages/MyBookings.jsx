@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import API from '../services/api';
+import GlassCard from '../components/ui/GlassCard';
+import GlassButton from '../components/ui/GlassButton';
+import GlassModal from '../components/ui/GlassModal';
+import Skeleton from '../components/ui/Skeleton';
 import toast from 'react-hot-toast';
-import { Ticket, Download, XCircle, QrCode, MapPin, Calendar, CheckCircle, Clock } from 'lucide-react';
+import { Ticket, Download, QrCode, Calendar, Wallet, Heart, CheckCircle2, XCircle } from 'lucide-react';
 
 export default function MyBookings() {
   const [bookings, setBookings] = useState([]);
@@ -35,7 +39,7 @@ export default function MyBookings() {
       const url = window.URL.createObjectURL(new Blob([res.data]));
       const link = document.createElement('a');
       link.href = url;
-      link.setAttribute('download', `TicketHarbor_${booking.bookingReference}.pdf`);
+      link.setAttribute('download', `TicketHarbour_${booking.bookingReference}.pdf`);
       document.body.appendChild(link);
       link.click();
     } catch (err) {
@@ -69,42 +73,70 @@ export default function MyBookings() {
   );
 
   const displayedBookings = activeTab === 'upcoming' ? upcomingBookings : pastOrCancelledBookings;
-
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center py-32">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600"></div>
-      </div>
-    );
-  }
+  const totalAmountSpent = bookings.reduce((sum, b) => (b.status === 'confirmed' ? sum + b.totalAmount : sum), 0);
 
   return (
-    <div className="max-w-5xl mx-auto space-y-8 pb-16">
+    <div className="max-w-6xl mx-auto space-y-8 pb-16">
       
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-extrabold text-slate-900 dark:text-white">My Bookings</h1>
-        <p className="text-sm text-slate-500 dark:text-slate-400">Manage your active reservations, tickets, and PDF downloads</p>
+        <h1 className="text-3xl font-black text-white tracking-tight">User Dashboard</h1>
+        <p className="text-xs text-slate-400">Manage your active reservations, tickets, wallet, and PDF downloads</p>
+      </div>
+
+      {/* DASHBOARD STATS WIDGETS */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <GlassCard hover={false} className="space-y-2">
+          <div className="flex items-center justify-between text-cyanAccent-400">
+            <Ticket className="w-5 h-5" />
+            <span className="text-[10px] uppercase font-bold text-slate-400">Total Bookings</span>
+          </div>
+          <p className="text-2xl font-black text-white">{bookings.length}</p>
+        </GlassCard>
+
+        <GlassCard hover={false} className="space-y-2">
+          <div className="flex items-center justify-between text-indigoAccent-500">
+            <Calendar className="w-5 h-5" />
+            <span className="text-[10px] uppercase font-bold text-slate-400">Upcoming Trips</span>
+          </div>
+          <p className="text-2xl font-black text-white">{upcomingBookings.length}</p>
+        </GlassCard>
+
+        <GlassCard hover={false} className="space-y-2">
+          <div className="flex items-center justify-between text-emerald-400">
+            <Wallet className="w-5 h-5" />
+            <span className="text-[10px] uppercase font-bold text-slate-400">Total Spend</span>
+          </div>
+          <p className="text-2xl font-black text-white">₹{totalAmountSpent}</p>
+        </GlassCard>
+
+        <GlassCard hover={false} className="space-y-2">
+          <div className="flex items-center justify-between text-rose-400">
+            <Heart className="w-5 h-5" />
+            <span className="text-[10px] uppercase font-bold text-slate-400">Saved Items</span>
+          </div>
+          <p className="text-2xl font-black text-white">4</p>
+        </GlassCard>
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center gap-3 border-b border-slate-200 dark:border-slate-700">
+      <div className="flex items-center gap-3 border-b border-white/10 pb-2">
         <button
           onClick={() => setActiveTab('upcoming')}
-          className={`pb-3 text-sm font-bold border-b-2 transition-colors ${
+          className={`pb-2.5 text-xs font-bold border-b-2 transition-colors cursor-pointer ${
             activeTab === 'upcoming'
-              ? 'border-teal-500 text-teal-600 dark:text-teal-400'
-              : 'border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+              ? 'border-cyanAccent-400 text-cyanAccent-400'
+              : 'border-transparent text-slate-400 hover:text-white'
           }`}
         >
           Upcoming Bookings ({upcomingBookings.length})
         </button>
         <button
           onClick={() => setActiveTab('past')}
-          className={`pb-3 text-sm font-bold border-b-2 transition-colors ${
+          className={`pb-2.5 text-xs font-bold border-b-2 transition-colors cursor-pointer ${
             activeTab === 'past'
-              ? 'border-teal-500 text-teal-600 dark:text-teal-400'
-              : 'border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+              ? 'border-cyanAccent-400 text-cyanAccent-400'
+              : 'border-transparent text-slate-400 hover:text-white'
           }`}
         >
           Past & Cancelled ({pastOrCancelledBookings.length})
@@ -112,11 +144,15 @@ export default function MyBookings() {
       </div>
 
       {/* Bookings List */}
-      {displayedBookings.length === 0 ? (
-        <div className="text-center py-20 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-3">
-          <Ticket className="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto" />
-          <p className="text-lg font-bold text-slate-700 dark:text-slate-200">No {activeTab} bookings found</p>
+      {loading ? (
+        <div className="space-y-4">
+          <Skeleton className="h-32" count={3} />
         </div>
+      ) : displayedBookings.length === 0 ? (
+        <GlassCard className="text-center py-20 space-y-3">
+          <Ticket className="w-12 h-12 text-slate-600 mx-auto" />
+          <p className="text-base font-black text-white">No {activeTab} bookings found</p>
+        </GlassCard>
       ) : (
         <div className="space-y-4">
           {displayedBookings.map((b) => {
@@ -125,40 +161,41 @@ export default function MyBookings() {
             const schedule = b.schedule || {};
 
             return (
-              <div
+              <GlassCard
                 key={b._id}
-                className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-6 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-sm hover:shadow-md transition-shadow"
+                hover={false}
+                className="flex flex-col md:flex-row md:items-center justify-between gap-6"
               >
                 {/* Details Left */}
                 <div className="flex items-start gap-4">
                   <img
                     src={listing.bannerImage || listing.images?.[0] || 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba'}
                     alt={listing.title}
-                    className="w-20 h-20 rounded-xl object-cover"
+                    className="w-20 h-20 rounded-xl object-cover border border-white/10"
                   />
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
-                      <span className="text-xs font-bold text-teal-600 dark:text-teal-400 uppercase">
+                      <span className="text-[10px] font-black text-cyanAccent-400 uppercase tracking-wider">
                         {b.categoryType}
                       </span>
                       <span
-                        className={`text-xs px-2.5 py-0.5 rounded-full font-bold uppercase ${
+                        className={`text-[9px] px-2 py-0.5 rounded-full font-black uppercase ${
                           isCancelled
-                            ? 'bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-400'
-                            : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400'
+                            ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30'
+                            : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
                         }`}
                       >
                         {b.status}
                       </span>
                     </div>
 
-                    <h3 className="font-bold text-slate-900 dark:text-white text-base">{listing.title}</h3>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">Ref: <strong className="text-slate-700 dark:text-slate-200">{b.bookingReference}</strong></p>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1">
-                      <Calendar className="w-3.5 h-3.5 text-teal-500" />
+                    <h3 className="font-black text-white text-base">{listing.title}</h3>
+                    <p className="text-xs text-slate-400">Ref: <strong className="text-white font-mono">{b.bookingReference}</strong></p>
+                    <p className="text-xs text-slate-400 flex items-center gap-1">
+                      <Calendar className="w-3.5 h-3.5 text-cyanAccent-400" />
                       {schedule.date ? new Date(schedule.date).toDateString() : ''} @ {schedule.startTime}
                     </p>
-                    <p className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                    <p className="text-xs font-bold text-slate-300">
                       Seats: {b.seats && b.seats.length > 0 ? b.seats.map((s) => s.seatId).join(', ') : `${b.quantity} Ticket(s)`}
                     </p>
                   </div>
@@ -166,58 +203,60 @@ export default function MyBookings() {
 
                 {/* Right Action Column */}
                 <div className="flex flex-col sm:flex-row md:flex-col items-end justify-between gap-3 text-right">
-                  <span className="text-xl font-black text-slate-900 dark:text-white">
+                  <span className="text-2xl font-black text-white">
                     ₹{b.totalAmount}
                   </span>
 
                   {!isCancelled && (
                     <div className="flex flex-wrap items-center gap-2">
-                      <button
+                      <GlassButton
+                        size="sm"
+                        variant="secondary"
                         onClick={() => setSelectedQRBooking(b)}
-                        className="px-3 py-1.5 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold rounded-xl flex items-center gap-1 hover:bg-slate-200 dark:hover:bg-slate-600"
+                        icon={QrCode}
                       >
-                        <QrCode className="w-4 h-4" /> View QR
-                      </button>
+                        View QR
+                      </GlassButton>
 
-                      <button
+                      <GlassButton
+                        size="sm"
+                        variant="gradient"
                         onClick={() => handleDownloadPDF(b)}
-                        className="px-3 py-1.5 bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold rounded-xl flex items-center gap-1 shadow"
+                        icon={Download}
                       >
-                        <Download className="w-4 h-4" /> PDF Ticket
-                      </button>
+                        PDF Ticket
+                      </GlassButton>
 
                       {activeTab === 'upcoming' && (
-                        <button
+                        <GlassButton
+                          size="sm"
+                          variant="danger"
                           onClick={() => handleCancelBooking(b._id)}
-                          className="px-3 py-1.5 bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-900/60 text-xs font-bold rounded-xl"
                         >
                           Cancel
-                        </button>
+                        </GlassButton>
                       )}
                     </div>
                   )}
                 </div>
-              </div>
+              </GlassCard>
             );
           })}
         </div>
       )}
 
       {/* QR Code Popup Modal */}
-      {selectedQRBooking && (
-        <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-slate-800 rounded-3xl p-6 max-w-sm w-full text-center space-y-4 shadow-2xl relative">
-            <button
-              onClick={() => setSelectedQRBooking(null)}
-              className="absolute top-4 right-4 text-slate-400 hover:text-slate-200"
-            >
-              ✕
-            </button>
+      <GlassModal
+        isOpen={!!selectedQRBooking}
+        onClose={() => setSelectedQRBooking(null)}
+        title="Entry Gate QR Ticket"
+        maxWidth="max-w-sm"
+      >
+        {selectedQRBooking && (
+          <div className="text-center space-y-4">
+            <p className="text-xs text-slate-400">Ref: <span className="font-mono text-cyanAccent-400">{selectedQRBooking.bookingReference}</span></p>
 
-            <h3 className="font-bold text-lg text-slate-900 dark:text-white">Entry Gate QR Ticket</h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400">Ref: {selectedQRBooking.bookingReference}</p>
-
-            <div className="p-4 bg-white rounded-2xl border border-slate-200 inline-block mx-auto">
+            <div className="p-4 bg-white rounded-2xl border border-white/20 inline-block mx-auto shadow-xl">
               <img
                 src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(
                   selectedQRBooking.qrCodeData || selectedQRBooking.bookingReference
@@ -227,11 +266,12 @@ export default function MyBookings() {
               />
             </div>
 
-            <p className="text-xs text-slate-400 dark:text-slate-400">Scan this QR code at venue check-in terminal</p>
+            <p className="text-xs text-slate-400">Scan this QR code at entry gate terminal</p>
           </div>
-        </div>
-      )}
+        )}
+      </GlassModal>
 
     </div>
   );
 }
+
