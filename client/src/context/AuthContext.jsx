@@ -36,7 +36,7 @@ export const AuthProvider = ({ children }) => {
           localStorage.setItem('accessToken', accessToken);
         }
         toast.success(`Welcome back, ${userData.name}!`);
-        return { success: true };
+        return { success: true, user: userData };
       }
     } catch (err) {
       const msg = err.response?.data?.message || 'Login failed. Check your credentials.';

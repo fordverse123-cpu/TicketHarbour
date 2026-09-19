@@ -18,19 +18,22 @@ export default function SuperAdminLogin() {
 
     try {
       const res = await login(email, password);
-      const user = res.user;
+      if (!res || !res.success) {
+        setLoading(false);
+        return;
+      }
 
-      if (user?.role !== 'superadmin') {
+      const loggedUser = res.user;
+
+      if (loggedUser?.role !== 'superadmin') {
         toast.error('Access Denied: Super Admin privileges required.');
         setLoading(false);
         return;
       }
 
-      toast.success(`Welcome back, ${user.name || 'Super Admin'}!`);
       navigate('/admin/super');
     } catch (err) {
-      const msg = err.response?.data?.message || 'Invalid email or password.';
-      toast.error(msg);
+      toast.error('Login error occurred.');
     } finally {
       setLoading(false);
     }

@@ -18,19 +18,22 @@ export default function AdminLogin() {
 
     try {
       const res = await login(email, password);
-      const user = res.user;
+      if (!res || !res.success) {
+        setLoading(false);
+        return;
+      }
 
-      if (user?.role !== 'admin' && user?.role !== 'superadmin') {
+      const loggedUser = res.user;
+
+      if (loggedUser?.role !== 'admin' && loggedUser?.role !== 'superadmin') {
         toast.error('Access Denied: Admin privileges required.');
         setLoading(false);
         return;
       }
 
-      toast.success(`Welcome back, ${user.name}!`);
       navigate('/admin');
     } catch (err) {
-      const msg = err.response?.data?.message || 'Invalid email or password.';
-      toast.error(msg);
+      toast.error('Login error occurred.');
     } finally {
       setLoading(false);
     }
