@@ -81,13 +81,6 @@ export default function Login() {
           </button>
         </form>
 
-        {/* Demo Login Credentials Hint */}
-        <div className="p-3 bg-teal-50 dark:bg-teal-950/60 rounded-xl border border-teal-200 dark:border-teal-800 text-xs space-y-1">
-          <p className="font-bold text-teal-800 dark:text-teal-300">Demo Accounts:</p>
-          <p className="text-teal-700 dark:text-teal-400">User: <code>user@ticketharbor.com</code> / <code>user123</code></p>
-          <p className="text-teal-700 dark:text-teal-400">Admin: <code>admin@ticketharbor.com</code> / <code>admin123</code></p>
-        </div>
-
         <p className="text-center text-xs text-slate-500 dark:text-slate-400">
           Don't have an account?{' '}
           <Link to="/register" className="font-bold text-teal-600 dark:text-teal-400 hover:underline">
