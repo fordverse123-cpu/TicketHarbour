@@ -1,6 +1,4 @@
-import React, { useState } from 'react';
-import { Bus, Star, MapPin, Clock, ChevronDown, ChevronUp, ShieldCheck, Sparkles } from 'lucide-react';
-import BusSeatSelection from './BusSeatSelection';
+import PixelCardWrapper from '../ui/PixelCardWrapper';
 
 export default function BusCard({ bus, onBookSeat }) {
   const [showSeatView, setShowSeatView] = useState(false);
@@ -29,7 +27,8 @@ export default function BusCard({ bus, onBookSeat }) {
   );
 
   return (
-    <div className="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-xl transition-all overflow-hidden space-y-0">
+    <PixelCardWrapper category="bus" className="rounded-3xl">
+      <div className="glass-card rounded-3xl border border-white/10 overflow-hidden space-y-0">
       {/* Top Main Bus Info Card */}
       <div className="p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
         {/* Left Operator & Spec Info */}
@@ -117,5 +116,6 @@ export default function BusCard({ bus, onBookSeat }) {
         </div>
       )}
     </div>
+    </PixelCardWrapper>
   );
 }

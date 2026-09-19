@@ -1,7 +1,4 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Train, ArrowRight, Info, CheckCircle2, ShieldCheck } from 'lucide-react';
-import TrainDetailsModal from './TrainDetailsModal';
+import PixelCardWrapper from '../ui/PixelCardWrapper';
 
 export default function TrainCard({ train, onSelectClass }) {
   const [showDetailsModal, setShowDetailsModal] = useState(false);
@@ -34,7 +31,8 @@ export default function TrainCard({ train, onSelectClass }) {
   const activeTier = tiers.find((t) => t.classType === selectedClass) || tiers[0];
 
   return (
-    <div className="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-xl transition-all overflow-hidden flex flex-col md:flex-row">
+    <PixelCardWrapper category="train" className="rounded-3xl">
+      <div className="glass-card flex flex-col md:flex-row border border-white/10 rounded-3xl overflow-hidden shadow-xl transition-all">
       {/* Left Main Information Panel */}
       <div className="p-6 flex-1 space-y-5">
         {/* Train Header */}
@@ -184,5 +182,6 @@ export default function TrainCard({ train, onSelectClass }) {
         <TrainDetailsModal train={train} onClose={() => setShowDetailsModal(false)} />
       )}
     </div>
+    </PixelCardWrapper>
   );
 }
