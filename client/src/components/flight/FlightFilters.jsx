@@ -2,13 +2,25 @@ import React from 'react';
 import { SlidersHorizontal, Plane, Clock, ShieldCheck, Luggage } from 'lucide-react';
 
 export default function FlightFilters({
-  selectedAirlines = [],
-  onToggleAirline,
-  selectedStops = 'ALL',
-  onSelectStops,
+  filters = {},
+  onFilterChange,
   resetFilters,
 }) {
   const airlinesList = ['IndiGo', 'Air India', 'SpiceJet', 'Vistara', 'Akasa Air'];
+
+  const selectedStops = filters.stops || 'ALL';
+  const selectedAirlines = filters.airlines || [];
+
+  const toggleAirline = (al) => {
+    const updated = selectedAirlines.includes(al)
+      ? selectedAirlines.filter((a) => a !== al)
+      : [...selectedAirlines, al];
+    if (onFilterChange) onFilterChange({ ...filters, airlines: updated });
+  };
+
+  const handleStopsClick = (stopKey) => {
+    if (onFilterChange) onFilterChange({ ...filters, stops: stopKey });
+  };
 
   return (
     <div className="bg-white dark:bg-slate-800 p-6 rounded-3xl border border-slate-200 dark:border-slate-700 space-y-6 shadow-sm">
@@ -16,9 +28,12 @@ export default function FlightFilters({
         <h3 className="font-bold text-slate-900 dark:text-white text-sm flex items-center gap-2">
           <SlidersHorizontal className="w-4 h-4 text-sky-600" /> Flight Filters
         </h3>
-        {resetFilters && (
+        {(selectedStops !== 'ALL' || selectedAirlines.length > 0) && (
           <button
-            onClick={resetFilters}
+            onClick={() => {
+              if (onFilterChange) onFilterChange({ stops: 'ALL', airlines: [] });
+              if (resetFilters) resetFilters();
+            }}
             className="text-xs font-semibold text-sky-600 hover:underline"
           >
             Reset
@@ -29,7 +44,7 @@ export default function FlightFilters({
       {/* Stops Filter */}
       <div className="space-y-2">
         <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider block">
-          Stops
+          Flight Stops
         </label>
         <div className="grid grid-cols-3 gap-2">
           {[
@@ -40,11 +55,11 @@ export default function FlightFilters({
             <button
               type="button"
               key={st.key}
-              onClick={() => onSelectStops && onSelectStops(st.key)}
-              className={`py-2 px-3 rounded-xl text-xs font-bold border transition-all ${
+              onClick={() => handleStopsClick(st.key)}
+              className={`py-2 px-2.5 rounded-xl text-xs font-bold border transition-all ${
                 selectedStops === st.key
                   ? 'bg-sky-600 text-white border-sky-600 shadow-md'
-                  : 'bg-slate-50 dark:bg-slate-700 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-600'
+                  : 'bg-slate-50 dark:bg-slate-700 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-600 hover:border-sky-500'
               }`}
             >
               {st.label}
@@ -64,12 +79,12 @@ export default function FlightFilters({
             return (
               <label
                 key={al}
-                className="flex items-center gap-2 text-xs font-semibold text-slate-700 dark:text-slate-300 cursor-pointer"
+                className="flex items-center gap-2.5 text-xs font-semibold text-slate-700 dark:text-slate-300 cursor-pointer p-1.5 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-xl transition-colors"
               >
                 <input
                   type="checkbox"
                   checked={isChecked}
-                  onChange={() => onToggleAirline && onToggleAirline(al)}
+                  onChange={() => toggleAirline(al)}
                   className="w-4 h-4 accent-sky-600 rounded cursor-pointer"
                 />
                 <span>{al}</span>

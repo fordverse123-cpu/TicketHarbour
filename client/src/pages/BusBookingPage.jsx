@@ -4,7 +4,7 @@ import BusSearch from '../components/bus/BusSearch';
 import BusCard from '../components/bus/BusCard';
 import BusFilters from '../components/bus/BusFilters';
 import SkeletonLoader from '../components/common/SkeletonLoader';
-import { Bus, RefreshCw, Filter, Sparkles } from 'lucide-react';
+import { Bus, RefreshCw, Filter, ArrowUpDown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const MOCK_BUSES = [
@@ -27,6 +27,7 @@ const MOCK_BUSES = [
     pricingTiers: [
       { tierName: 'Single Sleeper', price: 1250, totalCapacity: 15 },
       { tierName: 'Double Sleeper', price: 2100, totalCapacity: 10 },
+      { tierName: 'Standard Seater', price: 850, totalCapacity: 20 },
     ],
   },
   {
@@ -98,8 +99,10 @@ export default function BusBookingPage() {
   const [buses, setBuses] = useState([]);
   const [filteredBuses, setFilteredBuses] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [sortBy, setSortBy] = useState('DEPARTURE'); // 'DEPARTURE', 'CHEAPEST', 'RATING'
+  const [showMobileFilter, setShowMobileFilter] = useState(false);
   const [filters, setFilters] = useState({
-    busType: 'ALL',
+    busTypes: [],
     acType: 'ALL',
     timeSlot: 'ALL',
     minRating: 0,
@@ -133,11 +136,11 @@ export default function BusBookingPage() {
     setLoading(true);
     setTimeout(() => {
       let result = [...buses];
-      if (searchParams.from && searchParams.to) {
+      if (searchParams.from?.city && searchParams.to?.city) {
         result = result.filter(
           (b) =>
-            b.transitInfo?.source?.toLowerCase().includes(searchParams.from.toLowerCase()) ||
-            b.transitInfo?.destination?.toLowerCase().includes(searchParams.to.toLowerCase())
+            b.transitInfo?.source?.toLowerCase().includes(searchParams.from.city.toLowerCase()) ||
+            b.transitInfo?.destination?.toLowerCase().includes(searchParams.to.city.toLowerCase())
         );
       }
       setFilteredBuses(result.length > 0 ? result : MOCK_BUSES);
@@ -148,19 +151,32 @@ export default function BusBookingPage() {
   const handleFilterChange = (newFilters) => {
     setFilters(newFilters);
     let result = [...buses];
-    if (newFilters.busType !== 'ALL') {
+    if (newFilters.busTypes && newFilters.busTypes.length > 0) {
       result = result.filter((b) =>
-        b.transitInfo?.busType?.toLowerCase().includes(newFilters.busType.toLowerCase())
+        newFilters.busTypes.some((t) =>
+          b.transitInfo?.busType?.toLowerCase().includes(t.toLowerCase())
+        )
       );
     }
     if (newFilters.minRating > 0) {
-      result = result.filter((b) => b.rating >= newFilters.minRating);
+      result = result.filter((b) => (b.rating || 4.5) >= newFilters.minRating);
     }
     setFilteredBuses(result);
   };
 
+  const handleSortChange = (type) => {
+    setSortBy(type);
+    let sorted = [...filteredBuses];
+    if (type === 'CHEAPEST') {
+      sorted.sort((a, b) => (a.pricingTiers?.[0]?.price || 0) - (b.pricingTiers?.[0]?.price || 0));
+    } else if (type === 'RATING') {
+      sorted.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+    }
+    setFilteredBuses(sorted);
+  };
+
   const handleBookSeat = (selectedSeats, totalAmount) => {
-    alert(`Booking ${selectedSeats.length} seats (${selectedSeats.join(', ')}) for ₹${totalAmount}`);
+    alert(`Seats Selected: ${selectedSeats.join(', ')} • Total Amount: ₹${totalAmount}`);
   };
 
   return (
@@ -170,28 +186,72 @@ export default function BusBookingPage() {
         <BusSearch onSearch={handleSearch} />
       </section>
 
+      {/* Mobile Filter Toggle Button */}
+      <div className="flex lg:hidden justify-end">
+        <button
+          onClick={() => setShowMobileFilter(!showMobileFilter)}
+          className="px-4 py-2 bg-red-600 text-white rounded-xl font-bold text-xs flex items-center gap-2"
+        >
+          <Filter className="w-4 h-4" /> {showMobileFilter ? 'Hide Filters' : 'Show Filters'}
+        </button>
+      </div>
+
       {/* Main Grid: Filters + Cards */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         {/* Left Sidebar Filters */}
-        <aside className="lg:col-span-1">
-          <BusFilters filters={filters} onFilterChange={handleFilterChange} />
+        <aside className={`lg:col-span-1 ${showMobileFilter ? 'block' : 'hidden lg:block'}`}>
+          <BusFilters
+            filters={filters}
+            onFilterChange={handleFilterChange}
+            resetFilters={() =>
+              setFilters({ busTypes: [], acType: 'ALL', timeSlot: 'ALL', minRating: 0 })
+            }
+          />
         </aside>
 
         {/* Right Bus Cards List */}
         <main className="lg:col-span-3 space-y-6">
-          <div className="flex items-center justify-between bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
+          <div className="flex flex-wrap items-center justify-between bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm gap-3">
             <div className="flex items-center gap-2">
               <Bus className="w-5 h-5 text-red-600" />
               <h2 className="font-bold text-slate-900 dark:text-white text-sm">
                 Available Buses ({filteredBuses.length})
               </h2>
             </div>
-            <button
-              onClick={fetchBuses}
-              className="text-xs font-semibold text-red-600 dark:text-red-400 flex items-center gap-1 hover:underline"
-            >
-              <RefreshCw className="w-3.5 h-3.5" /> Refresh List
-            </button>
+
+            {/* Sort options */}
+            <div className="flex items-center gap-2 text-xs font-semibold">
+              <span className="text-slate-400 flex items-center gap-1">
+                <ArrowUpDown className="w-3.5 h-3.5" /> Sort:
+              </span>
+              <button
+                type="button"
+                onClick={() => handleSortChange('DEPARTURE')}
+                className={`px-2.5 py-1 rounded-lg ${
+                  sortBy === 'DEPARTURE' ? 'bg-red-100 text-red-700 font-bold' : 'text-slate-600'
+                }`}
+              >
+                Departure
+              </button>
+              <button
+                type="button"
+                onClick={() => handleSortChange('CHEAPEST')}
+                className={`px-2.5 py-1 rounded-lg ${
+                  sortBy === 'CHEAPEST' ? 'bg-red-100 text-red-700 font-bold' : 'text-slate-600'
+                }`}
+              >
+                Cheapest
+              </button>
+              <button
+                type="button"
+                onClick={() => handleSortChange('RATING')}
+                className={`px-2.5 py-1 rounded-lg ${
+                  sortBy === 'RATING' ? 'bg-red-100 text-red-700 font-bold' : 'text-slate-600'
+                }`}
+              >
+                Highest Rated
+              </button>
+            </div>
           </div>
 
           {loading ? (

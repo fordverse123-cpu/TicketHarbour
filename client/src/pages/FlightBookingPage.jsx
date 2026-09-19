@@ -4,7 +4,8 @@ import FlightSearch from '../components/flight/FlightSearch';
 import FlightCard from '../components/flight/FlightCard';
 import FlightFilters from '../components/flight/FlightFilters';
 import SkeletonLoader from '../components/common/SkeletonLoader';
-import { Plane, RefreshCw } from 'lucide-react';
+import { Plane, RefreshCw, Filter, ArrowUpDown } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const MOCK_FLIGHTS = [
   {
@@ -93,9 +94,12 @@ const MOCK_FLIGHTS = [
 ];
 
 export default function FlightBookingPage() {
+  const navigate = useNavigate();
   const [flights, setFlights] = useState([]);
   const [filteredFlights, setFilteredFlights] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [sortBy, setSortBy] = useState('CHEAPEST');
+  const [showMobileFilter, setShowMobileFilter] = useState(false);
   const [filters, setFilters] = useState({
     stops: 'ALL',
     airlines: [],
@@ -134,7 +138,8 @@ export default function FlightBookingPage() {
         result = result.filter(
           (f) =>
             f.transitInfo?.source?.includes(searchParams.from.code) ||
-            f.transitInfo?.destination?.includes(searchParams.to.code)
+            f.transitInfo?.destination?.includes(searchParams.to.code) ||
+            f.transitInfo?.source?.toLowerCase().includes(searchParams.from.city.toLowerCase())
         );
       }
       setFilteredFlights(result.length > 0 ? result : MOCK_FLIGHTS);
@@ -145,10 +150,21 @@ export default function FlightBookingPage() {
   const handleFilterChange = (newFilters) => {
     setFilters(newFilters);
     let result = [...flights];
-    if (newFilters.airlines.length > 0) {
+    if (newFilters.airlines && newFilters.airlines.length > 0) {
       result = result.filter((f) => newFilters.airlines.includes(f.transitInfo?.operator));
     }
     setFilteredFlights(result);
+  };
+
+  const handleSortChange = (type) => {
+    setSortBy(type);
+    let sorted = [...filteredFlights];
+    if (type === 'CHEAPEST') {
+      sorted.sort((a, b) => (a.pricingTiers?.[0]?.price || 0) - (b.pricingTiers?.[0]?.price || 0));
+    } else if (type === 'DEPARTURE') {
+      sorted.sort((a, b) => (a.transitInfo?.departureTime || '').localeCompare(b.transitInfo?.departureTime || ''));
+    }
+    setFilteredFlights(sorted);
   };
 
   return (
@@ -158,28 +174,61 @@ export default function FlightBookingPage() {
         <FlightSearch onSearch={handleSearch} />
       </section>
 
+      {/* Mobile Filter Toggle */}
+      <div className="flex lg:hidden justify-end">
+        <button
+          onClick={() => setShowMobileFilter(!showMobileFilter)}
+          className="px-4 py-2 bg-sky-600 text-white rounded-xl font-bold text-xs flex items-center gap-2"
+        >
+          <Filter className="w-4 h-4" /> {showMobileFilter ? 'Hide Filters' : 'Show Filters'}
+        </button>
+      </div>
+
       {/* Main Grid Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         {/* Sidebar Filters */}
-        <aside className="lg:col-span-1">
-          <FlightFilters filters={filters} onFilterChange={handleFilterChange} />
+        <aside className={`lg:col-span-1 ${showMobileFilter ? 'block' : 'hidden lg:block'}`}>
+          <FlightFilters
+            filters={filters}
+            onFilterChange={handleFilterChange}
+            resetFilters={() => setFilters({ stops: 'ALL', airlines: [], cabinClass: 'ALL' })}
+          />
         </aside>
 
         {/* Flight Cards List */}
         <main className="lg:col-span-3 space-y-6">
-          <div className="flex items-center justify-between bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
+          <div className="flex flex-wrap items-center justify-between bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm gap-3">
             <div className="flex items-center gap-2">
-              <Plane className="w-5 h-5 text-sky-600" />
+              <Plane className="w-5 h-5 text-sky-600 rotate-45" />
               <h2 className="font-bold text-slate-900 dark:text-white text-sm">
                 Available Flights ({filteredFlights.length})
               </h2>
             </div>
-            <button
-              onClick={fetchFlights}
-              className="text-xs font-semibold text-sky-600 dark:text-sky-400 flex items-center gap-1 hover:underline"
-            >
-              <RefreshCw className="w-3.5 h-3.5" /> Refresh Fares
-            </button>
+
+            {/* Sort Options */}
+            <div className="flex items-center gap-2 text-xs font-semibold">
+              <span className="text-slate-400 flex items-center gap-1">
+                <ArrowUpDown className="w-3.5 h-3.5" /> Sort Fares:
+              </span>
+              <button
+                type="button"
+                onClick={() => handleSortChange('CHEAPEST')}
+                className={`px-2.5 py-1 rounded-lg ${
+                  sortBy === 'CHEAPEST' ? 'bg-sky-100 text-sky-700 font-bold' : 'text-slate-600'
+                }`}
+              >
+                Cheapest
+              </button>
+              <button
+                type="button"
+                onClick={() => handleSortChange('DEPARTURE')}
+                className={`px-2.5 py-1 rounded-lg ${
+                  sortBy === 'DEPARTURE' ? 'bg-sky-100 text-sky-700 font-bold' : 'text-slate-600'
+                }`}
+              >
+                Departure Time
+              </button>
+            </div>
           </div>
 
           {loading ? (

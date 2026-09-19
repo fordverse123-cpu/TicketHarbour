@@ -1,18 +1,6 @@
 import React, { useState } from 'react';
-import { ArrowLeftRight, Calendar, Search, Train, ShieldCheck, MapPin, Check } from 'lucide-react';
-
-const POPULAR_STATIONS = [
-  { city: 'Bengaluru', code: 'SBC', name: 'KSR Bengaluru City Junction' },
-  { city: 'New Delhi', code: 'NDLS', name: 'New Delhi Railway Station' },
-  { city: 'Mumbai', code: 'MMCT', name: 'Mumbai Central Railway Station' },
-  { city: 'Chennai', code: 'MAS', name: 'Chennai Central Railway Station' },
-  { city: 'Kolkata', code: 'HWH', name: 'Howrah Junction' },
-  { city: 'Hyderabad', code: 'SC', name: 'Secunderabad Junction' },
-  { city: 'Vijayawada', code: 'BZA', name: 'Vijayawada Junction' },
-  { city: 'Pune', code: 'PUNE', name: 'Pune Junction' },
-  { city: 'Ahmedabad', code: 'ADI', name: 'Ahmedabad Junction' },
-  { city: 'Jaipur', code: 'JP', name: 'Jaipur Junction' },
-];
+import { ArrowLeftRight, Calendar, Search, Train, ShieldCheck, MapPin, Check, Sparkles } from 'lucide-react';
+import { TRAIN_STATIONS } from '../../data/locationData';
 
 const TRAIN_CLASSES = [
   { code: 'ALL', label: 'All Classes' },
@@ -35,10 +23,10 @@ const QUOTAS = [
 
 export default function TrainSearch({ onSearch, initialFrom = 'SBC', initialTo = 'NDLS' }) {
   const [fromStation, setFromStation] = useState(
-    POPULAR_STATIONS.find((s) => s.code === initialFrom) || POPULAR_STATIONS[0]
+    TRAIN_STATIONS.find((s) => s.code === initialFrom) || TRAIN_STATIONS[0]
   );
   const [toStation, setToStation] = useState(
-    POPULAR_STATIONS.find((s) => s.code === initialTo) || POPULAR_STATIONS[1]
+    TRAIN_STATIONS.find((s) => s.code === initialTo) || TRAIN_STATIONS[1]
   );
   const [travelDate, setTravelDate] = useState(() => {
     const tomorrow = new Date();
@@ -48,7 +36,7 @@ export default function TrainSearch({ onSearch, initialFrom = 'SBC', initialTo =
   const [selectedClass, setSelectedClass] = useState('ALL');
   const [selectedQuota, setSelectedQuota] = useState('GN');
 
-  // Autocomplete dropdown toggles
+  // Autocomplete dropdown toggles & search text
   const [showFromDropdown, setShowFromDropdown] = useState(false);
   const [showToDropdown, setShowToDropdown] = useState(false);
   const [fromSearchText, setFromSearchText] = useState('');
@@ -58,6 +46,12 @@ export default function TrainSearch({ onSearch, initialFrom = 'SBC', initialTo =
     const temp = fromStation;
     setFromStation(toStation);
     setToStation(temp);
+  };
+
+  const setQuickDate = (daysFromToday) => {
+    const d = new Date();
+    d.setDate(d.getDate() + daysFromToday);
+    setTravelDate(d.toISOString().split('T')[0]);
   };
 
   const handleSearchSubmit = (e) => {
@@ -73,14 +67,14 @@ export default function TrainSearch({ onSearch, initialFrom = 'SBC', initialTo =
     }
   };
 
-  const filteredFromStations = POPULAR_STATIONS.filter(
+  const filteredFromStations = TRAIN_STATIONS.filter(
     (s) =>
       s.city.toLowerCase().includes(fromSearchText.toLowerCase()) ||
       s.code.toLowerCase().includes(fromSearchText.toLowerCase()) ||
       s.name.toLowerCase().includes(fromSearchText.toLowerCase())
   );
 
-  const filteredToStations = POPULAR_STATIONS.filter(
+  const filteredToStations = TRAIN_STATIONS.filter(
     (s) =>
       s.city.toLowerCase().includes(toSearchText.toLowerCase()) ||
       s.code.toLowerCase().includes(toSearchText.toLowerCase()) ||
@@ -88,31 +82,31 @@ export default function TrainSearch({ onSearch, initialFrom = 'SBC', initialTo =
   );
 
   return (
-    <div className="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-xl overflow-hidden">
+    <div className="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-xl overflow-hidden transition-all">
       {/* Header bar inspired by Indian Railway Booking patterns */}
-      <div className="bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 text-white px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-blue-800/50">
+      <div className="bg-gradient-to-r from-blue-950 via-slate-900 to-indigo-950 text-white px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-blue-900/50">
         <div className="flex items-center gap-3">
           <div className="p-2.5 bg-red-600 rounded-2xl shadow-md">
             <Train className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h2 className="font-black text-lg tracking-wide flex items-center gap-2">
-              Indian Railways Ticket Booking
+            <h2 className="font-black text-lg tracking-wide flex items-center gap-2 text-white">
+              IRCTC-Inspired Train Reservation
             </h2>
             <p className="text-xs text-blue-200">
-              IRCTC-Inspired Smart Train Reservation • TicketHarbour Guarantee
+              Smart Rail Booking • Tatkal & Premium Quota Supported • TicketHarbour
             </p>
           </div>
         </div>
 
         <div className="flex items-center gap-3 text-xs text-blue-200">
-          <span className="px-3 py-1 bg-white/10 rounded-full font-bold flex items-center gap-1 border border-white/10">
-            <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" /> Authorized Railway Booking
+          <span className="px-3 py-1 bg-white/10 rounded-full font-bold flex items-center gap-1 border border-white/10 text-emerald-300">
+            <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" /> Authorized Railway Partner
           </span>
         </div>
       </div>
 
-      {/* Main Search Panel Form */}
+      {/* Main Search Form */}
       <form onSubmit={handleSearchSubmit} className="p-6 space-y-6">
         {/* From & To Station Pickers with Swap */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
@@ -122,8 +116,11 @@ export default function TrainSearch({ onSearch, initialFrom = 'SBC', initialTo =
               From Station
             </label>
             <div
-              onClick={() => setShowFromDropdown(true)}
-              className="p-3.5 bg-slate-50 dark:bg-slate-700/60 border border-slate-200 dark:border-slate-600 rounded-2xl cursor-pointer hover:border-blue-600 transition-colors flex items-center gap-3"
+              onClick={() => {
+                setShowFromDropdown(true);
+                setShowToDropdown(false);
+              }}
+              className="p-3.5 bg-slate-50 dark:bg-slate-700/60 border border-slate-200 dark:border-slate-600 rounded-2xl cursor-pointer hover:border-blue-600 dark:hover:border-blue-500 transition-colors flex items-center gap-3"
             >
               <MapPin className="w-5 h-5 text-blue-600 shrink-0" />
               <div className="flex-1 min-w-0">
@@ -131,11 +128,11 @@ export default function TrainSearch({ onSearch, initialFrom = 'SBC', initialTo =
                   <span className="font-black text-slate-900 dark:text-white text-base">
                     {fromStation.city}
                   </span>
-                  <span className="px-2 py-0.5 bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 font-mono font-bold text-xs rounded-md">
+                  <span className="px-2 py-0.5 bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-300 font-mono font-bold text-xs rounded-md">
                     {fromStation.code}
                   </span>
                 </div>
-                <p className="text-xs text-slate-500 truncate">{fromStation.name}</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{fromStation.name}</p>
               </div>
             </div>
 
@@ -144,10 +141,10 @@ export default function TrainSearch({ onSearch, initialFrom = 'SBC', initialTo =
               <div className="absolute top-full left-0 right-0 mt-2 z-30 bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 p-3 max-h-72 overflow-y-auto">
                 <input
                   type="text"
-                  placeholder="Type city or station code..."
+                  placeholder="Type city or station code (e.g. SBC, NDLS)..."
                   value={fromSearchText}
                   onChange={(e) => setFromSearchText(e.target.value)}
-                  className="w-full p-2.5 mb-2 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-xs dark:text-white"
+                  className="w-full p-2.5 mb-2 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-xs dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-600"
                   autoFocus
                 />
                 <div className="space-y-1">
@@ -162,7 +159,9 @@ export default function TrainSearch({ onSearch, initialFrom = 'SBC', initialTo =
                       className="w-full p-2.5 text-left hover:bg-blue-50 dark:hover:bg-slate-700 rounded-xl flex items-center justify-between text-xs transition-colors"
                     >
                       <div>
-                        <span className="font-bold text-slate-900 dark:text-white">{st.city} ({st.code})</span>
+                        <span className="font-bold text-slate-900 dark:text-white">
+                          {st.city} ({st.code})
+                        </span>
                         <p className="text-[11px] text-slate-400">{st.name}</p>
                       </div>
                       {fromStation.code === st.code && <Check className="w-4 h-4 text-blue-600" />}
@@ -178,7 +177,7 @@ export default function TrainSearch({ onSearch, initialFrom = 'SBC', initialTo =
             <button
               type="button"
               onClick={handleSwap}
-              className="p-3 bg-blue-50 dark:bg-slate-700 hover:bg-blue-600 hover:text-white text-blue-600 dark:text-blue-400 rounded-full border border-blue-200 dark:border-slate-600 shadow-md transition-all group"
+              className="p-3.5 bg-blue-50 dark:bg-slate-700 hover:bg-blue-600 hover:text-white text-blue-700 dark:text-blue-300 rounded-full border border-blue-200 dark:border-slate-600 shadow-md transition-all group"
               title="Swap From and To stations"
             >
               <ArrowLeftRight className="w-5 h-5 group-hover:rotate-180 transition-transform duration-300" />
@@ -191,8 +190,11 @@ export default function TrainSearch({ onSearch, initialFrom = 'SBC', initialTo =
               To Station
             </label>
             <div
-              onClick={() => setShowToDropdown(true)}
-              className="p-3.5 bg-slate-50 dark:bg-slate-700/60 border border-slate-200 dark:border-slate-600 rounded-2xl cursor-pointer hover:border-blue-600 transition-colors flex items-center gap-3"
+              onClick={() => {
+                setShowToDropdown(true);
+                setShowFromDropdown(false);
+              }}
+              className="p-3.5 bg-slate-50 dark:bg-slate-700/60 border border-slate-200 dark:border-slate-600 rounded-2xl cursor-pointer hover:border-blue-600 dark:hover:border-blue-500 transition-colors flex items-center gap-3"
             >
               <MapPin className="w-5 h-5 text-red-600 shrink-0" />
               <div className="flex-1 min-w-0">
@@ -200,11 +202,11 @@ export default function TrainSearch({ onSearch, initialFrom = 'SBC', initialTo =
                   <span className="font-black text-slate-900 dark:text-white text-base">
                     {toStation.city}
                   </span>
-                  <span className="px-2 py-0.5 bg-red-100 dark:bg-red-950 text-red-700 dark:text-red-300 font-mono font-bold text-xs rounded-md">
+                  <span className="px-2 py-0.5 bg-red-100 dark:bg-red-950 text-red-800 dark:text-red-300 font-mono font-bold text-xs rounded-md">
                     {toStation.code}
                   </span>
                 </div>
-                <p className="text-xs text-slate-500 truncate">{toStation.name}</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{toStation.name}</p>
               </div>
             </div>
 
@@ -216,7 +218,7 @@ export default function TrainSearch({ onSearch, initialFrom = 'SBC', initialTo =
                   placeholder="Type city or station code..."
                   value={toSearchText}
                   onChange={(e) => setToSearchText(e.target.value)}
-                  className="w-full p-2.5 mb-2 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-xs dark:text-white"
+                  className="w-full p-2.5 mb-2 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-xs dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-600"
                   autoFocus
                 />
                 <div className="space-y-1">
@@ -231,7 +233,9 @@ export default function TrainSearch({ onSearch, initialFrom = 'SBC', initialTo =
                       className="w-full p-2.5 text-left hover:bg-blue-50 dark:hover:bg-slate-700 rounded-xl flex items-center justify-between text-xs transition-colors"
                     >
                       <div>
-                        <span className="font-bold text-slate-900 dark:text-white">{st.city} ({st.code})</span>
+                        <span className="font-bold text-slate-900 dark:text-white">
+                          {st.city} ({st.code})
+                        </span>
                         <p className="text-[11px] text-slate-400">{st.name}</p>
                       </div>
                       {toStation.code === st.code && <Check className="w-4 h-4 text-blue-600" />}
@@ -247,9 +251,28 @@ export default function TrainSearch({ onSearch, initialFrom = 'SBC', initialTo =
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {/* Journey Date */}
           <div className="space-y-1">
-            <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-              Journey Date
-            </label>
+            <div className="flex items-center justify-between">
+              <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                Journey Date
+              </label>
+              <div className="flex gap-1 text-[10px] font-bold">
+                <button
+                  type="button"
+                  onClick={() => setQuickDate(0)}
+                  className="text-blue-600 hover:underline px-1"
+                >
+                  Today
+                </button>
+                <span>•</span>
+                <button
+                  type="button"
+                  onClick={() => setQuickDate(1)}
+                  className="text-blue-600 hover:underline px-1"
+                >
+                  Tomorrow
+                </button>
+              </div>
+            </div>
             <div className="relative">
               <Calendar className="w-4 h-4 text-blue-600 absolute left-3.5 top-3.5 pointer-events-none" />
               <input
@@ -302,7 +325,7 @@ export default function TrainSearch({ onSearch, initialFrom = 'SBC', initialTo =
         {/* Submit Search Button */}
         <button
           type="submit"
-          className="w-full py-4 bg-gradient-to-r from-blue-900 via-indigo-900 to-blue-800 hover:from-blue-800 hover:to-indigo-800 text-white font-black text-sm rounded-2xl shadow-xl hover:shadow-blue-900/30 transition-all flex items-center justify-center gap-2"
+          className="w-full py-4 bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 hover:from-blue-800 hover:to-indigo-800 text-white font-black text-sm rounded-2xl shadow-xl hover:shadow-blue-900/30 transition-all flex items-center justify-center gap-2"
         >
           <Search className="w-5 h-5 text-red-400" /> Search Trains
         </button>

@@ -5,7 +5,8 @@ import TrainCard from '../components/train/TrainCard';
 import TrainFilters from '../components/train/TrainFilters';
 import TrainSeatSelection from '../components/train/TrainSeatSelection';
 import SkeletonLoader from '../components/common/SkeletonLoader';
-import { Train, ShieldCheck, Sparkles, RefreshCw } from 'lucide-react';
+import { Train, ShieldCheck, Sparkles, RefreshCw, Filter } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const MOCK_TRAINS = [
   {
@@ -106,11 +107,14 @@ const MOCK_TRAINS = [
 ];
 
 export default function TrainBookingPage() {
+  const navigate = useNavigate();
   const [trains, setTrains] = useState([]);
   const [filteredTrains, setFilteredTrains] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({ trainType: 'ALL', timeSlot: 'ALL', classType: 'ALL' });
   const [selectedSeatTrain, setSelectedSeatTrain] = useState(null);
+  const [selectedTier, setSelectedTier] = useState(null);
+  const [showMobileFilter, setShowMobileFilter] = useState(false);
 
   useEffect(() => {
     fetchTrains();
@@ -140,6 +144,14 @@ export default function TrainBookingPage() {
     setLoading(true);
     setTimeout(() => {
       let result = [...trains];
+      if (searchParams.from?.code && searchParams.to?.code) {
+        result = result.filter(
+          (t) =>
+            t.transitInfo?.source?.includes(searchParams.from.code) ||
+            t.transitInfo?.destination?.includes(searchParams.to.code) ||
+            t.transitInfo?.source?.toLowerCase().includes(searchParams.from.city.toLowerCase())
+        );
+      }
       if (searchParams.trainClass && searchParams.trainClass !== 'ALL') {
         result = result.filter((t) =>
           t.pricingTiers?.some((tier) => tier.classType === searchParams.trainClass)
@@ -153,25 +165,51 @@ export default function TrainBookingPage() {
   const handleFilterChange = (newFilters) => {
     setFilters(newFilters);
     let result = [...trains];
-    if (newFilters.classType !== 'ALL') {
+    if (newFilters.classType && newFilters.classType !== 'ALL') {
       result = result.filter((t) =>
         t.pricingTiers?.some((tier) => tier.classType === newFilters.classType)
+      );
+    }
+    if (newFilters.trainType && newFilters.trainType !== 'ALL') {
+      result = result.filter((t) =>
+        t.title?.toLowerCase().includes(newFilters.trainType.toLowerCase())
       );
     }
     setFilteredTrains(result);
   };
 
+  const handleOpenSeatSelection = (trainObj, tierObj) => {
+    setSelectedSeatTrain(trainObj);
+    setSelectedTier(tierObj || trainObj.pricingTiers?.[0]);
+  };
+
+  const handleConfirmBerths = (berths, totalPrice) => {
+    if (selectedSeatTrain) {
+      navigate(`/listings/${selectedSeatTrain.slug || selectedSeatTrain._id}?class=${selectedTier?.classType || '3A'}&berths=${berths.join(',')}`);
+    }
+  };
+
   return (
     <div className="space-y-8 pb-16">
-      {/* Top Search Hero */}
+      {/* Search Hero Panel */}
       <section>
         <TrainSearch onSearch={handleSearch} />
       </section>
 
+      {/* Mobile Filter Toggle */}
+      <div className="flex lg:hidden justify-end">
+        <button
+          onClick={() => setShowMobileFilter(!showMobileFilter)}
+          className="px-4 py-2 bg-blue-900 text-white rounded-xl font-bold text-xs flex items-center gap-2"
+        >
+          <Filter className="w-4 h-4" /> {showMobileFilter ? 'Hide Filters' : 'Show Filters'}
+        </button>
+      </div>
+
       {/* Main Grid: Filters + Cards */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         {/* Left Sidebar Filters */}
-        <aside className="lg:col-span-1">
+        <aside className={`lg:col-span-1 ${showMobileFilter ? 'block' : 'hidden lg:block'}`}>
           <TrainFilters filters={filters} onFilterChange={handleFilterChange} />
         </aside>
 
@@ -208,7 +246,7 @@ export default function TrainBookingPage() {
               <TrainCard
                 key={t._id}
                 train={t}
-                onSelectClass={() => setSelectedSeatTrain(t)}
+                onSelectClass={(tier) => handleOpenSeatSelection(t, tier)}
               />
             ))
           )}
@@ -219,11 +257,10 @@ export default function TrainBookingPage() {
       {selectedSeatTrain && (
         <TrainSeatSelection
           train={selectedSeatTrain}
+          selectedClass={selectedTier?.classType || '3A'}
+          price={selectedTier?.price || 1850}
           onClose={() => setSelectedSeatTrain(null)}
-          onConfirmBerths={(berths) => {
-            alert(`Selected Berths: ${berths.join(', ')}`);
-            setSelectedSeatTrain(null);
-          }}
+          onConfirmBerths={handleConfirmBerths}
         />
       )}
     </div>

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Plane, Clock, ArrowRight, Info, ShieldCheck, Luggage } from 'lucide-react';
+import { Plane, Clock, ArrowRight, Info, ShieldCheck, Luggage, CheckCircle2 } from 'lucide-react';
 import FlightDetails from './FlightDetails';
 
 export default function FlightCard({ flight, onSelect }) {
@@ -27,20 +27,30 @@ export default function FlightCard({ flight, onSelect }) {
     pricingTiers[0]?.price || 5499
   );
 
+  // Airline specific color badges
+  const getAirlineColor = (name) => {
+    if (name.includes('IndiGo')) return 'bg-indigo-600 text-white';
+    if (name.includes('Air India')) return 'bg-red-700 text-white';
+    if (name.includes('Akasa')) return 'bg-orange-600 text-white';
+    if (name.includes('SpiceJet')) return 'bg-amber-600 text-white';
+    if (name.includes('Vistara')) return 'bg-purple-900 text-white';
+    return 'bg-sky-600 text-white';
+  };
+
   return (
     <div className="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-xl transition-all overflow-hidden space-y-0">
       <div className="p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
         {/* Airline Logo & Name */}
         <div className="flex items-center gap-3.5 max-w-sm">
-          <div className="w-12 h-12 rounded-2xl bg-sky-500/10 border border-sky-500/20 text-sky-600 flex items-center justify-center font-black text-lg shrink-0">
+          <div className={`w-12 h-12 rounded-2xl ${getAirlineColor(airline)} shadow-md flex items-center justify-center font-black text-lg shrink-0`}>
             ✈️
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h3 className="font-black text-slate-900 dark:text-white text-base">
+              <h3 className="font-black text-slate-900 dark:text-white text-base sm:text-lg">
                 {airline}
               </h3>
-              <span className="px-2 py-0.5 bg-sky-100 dark:bg-sky-950 text-sky-700 dark:text-sky-300 font-mono font-bold text-[10px] rounded-md">
+              <span className="px-2 py-0.5 bg-sky-100 dark:bg-sky-950 text-sky-700 dark:text-sky-300 font-mono font-bold text-xs rounded-md">
                 {flightNumber}
               </span>
             </div>
@@ -54,8 +64,8 @@ export default function FlightCard({ flight, onSelect }) {
         <div className="flex-1 space-y-1 text-xs">
           <div className="flex items-center justify-between font-bold text-slate-900 dark:text-white text-base">
             <div>
-              <span>{departureTime}</span>
-              <p className="text-xs font-semibold text-slate-500">{source}</p>
+              <span className="text-xl font-black block">{departureTime}</span>
+              <p className="text-xs font-semibold text-slate-600 dark:text-slate-300">{source}</p>
             </div>
 
             <div className="text-center px-4 space-y-1">
@@ -68,8 +78,8 @@ export default function FlightCard({ flight, onSelect }) {
             </div>
 
             <div className="text-right">
-              <span>{arrivalTime}</span>
-              <p className="text-xs font-semibold text-slate-500">{destination}</p>
+              <span className="text-xl font-black block">{arrivalTime}</span>
+              <p className="text-xs font-semibold text-slate-600 dark:text-slate-300">{destination}</p>
             </div>
           </div>
         </div>
@@ -79,7 +89,7 @@ export default function FlightCard({ flight, onSelect }) {
           <span className="flex items-center gap-1 font-semibold text-slate-700 dark:text-slate-300">
             <Luggage className="w-3.5 h-3.5 text-sky-600" /> 15 kg Check-in / 7 kg Cabin
           </span>
-          <span className="px-2 py-0.5 bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 font-bold rounded-md w-fit">
+          <span className="px-2.5 py-0.5 bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 font-bold rounded-md w-fit border border-emerald-200 dark:border-emerald-800">
             Partially Refundable
           </span>
         </div>
@@ -97,10 +107,10 @@ export default function FlightCard({ flight, onSelect }) {
             <button
               type="button"
               onClick={() => setShowDetailsModal(true)}
-              className="p-2.5 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-xl text-xs font-bold hover:bg-slate-200"
-              title="Flight Details"
+              className="p-2.5 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-xl text-xs font-bold hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors"
+              title="Flight Details & Baggage Policy"
             >
-              <Info className="w-4 h-4" />
+              <Info className="w-4 h-4 text-sky-600" />
             </button>
 
             <Link
