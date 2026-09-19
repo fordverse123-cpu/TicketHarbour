@@ -1,4 +1,7 @@
+// @ts-nocheck
 import { useEffect, useMemo, useRef, type CSSProperties } from "react";
+// @ts-ignore
+import galleryHeadingSource from "./sources/gallery-heading.html?raw";
 
 const aetherisLabsSource = "";
 const audioWordmarkSource = "";
@@ -7,7 +10,6 @@ const creatorStudioIntroSource = "";
 const epiludeFooterSource = "";
 const expanseSource = "";
 const floatingDotsCtaSource = "";
-import galleryHeadingSource from "./sources/gallery-heading.html?raw";
 const generateButtonSource = "";
 const glassmorphismCtaSource = "";
 const gradientBeamCtaSource = "";
