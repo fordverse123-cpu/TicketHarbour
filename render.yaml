@@ -21,6 +21,12 @@ services:
         generateValue: true
       - key: CLIENT_URL
         sync: false
+      - key: SUPER_ADMIN_NAME
+        value: "TicketHarbour Super Admin"
+      - key: SUPER_ADMIN_EMAIL
+        sync: false
+      - key: SUPER_ADMIN_PASSWORD
+        sync: false
 
   # Frontend Static Site
   - type: web
