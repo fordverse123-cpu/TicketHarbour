@@ -27,6 +27,10 @@ export const protect = async (req, res, next) => {
       return errorResponse(res, 401, 'User associated with this token no longer exists.');
     }
 
+    if (user.status === 'inactive' || user.status === 'suspended') {
+      return errorResponse(res, 403, 'Your account is deactivated or suspended. Access denied.');
+    }
+
     req.user = user;
     next();
   } catch (error) {

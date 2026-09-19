@@ -4,7 +4,7 @@ import { protect, authorize } from '../middleware/auth.js';
 
 const router = express.Router();
 
-router.use(protect, authorize('admin'));
+router.use(protect, authorize('admin', 'superadmin'));
 
 router.get('/stats', getAdminStats);
 router.get('/bookings', getAllAdminBookings);

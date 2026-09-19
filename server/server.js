@@ -21,14 +21,18 @@ import couponRoutes from './routes/couponRoutes.js';
 import reviewRoutes from './routes/reviewRoutes.js';
 import wishlistRoutes from './routes/wishlistRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
+import superAdminRoutes from './routes/superAdminRoutes.js';
+import { seedSuperAdmin } from './scripts/seedSuperAdmin.js';
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Connect to MongoDB Database
-connectDB();
+// Connect to MongoDB Database & Seed initial Super Admin
+connectDB().then(async () => {
+  await seedSuperAdmin();
+});
 
 // Security Middleware
 app.use(helmet({
@@ -86,6 +90,8 @@ app.use('/api/v1/coupons', couponRoutes);
 app.use('/api/v1/reviews', reviewRoutes);
 app.use('/api/v1/wishlist', wishlistRoutes);
 app.use('/api/v1/admin', adminRoutes);
+app.use('/api/v1/super-admin', superAdminRoutes);
+app.use('/api/super-admin', superAdminRoutes); // Alias for flexible API calls
 
 // Root Welcome Route
 app.get('/', (req, res) => {

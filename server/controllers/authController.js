@@ -27,6 +27,8 @@ export const register = async (req, res, next) => {
       email,
       password,
       phone: phone || '',
+      role: 'user', // Explicitly force role to user (prevent privilege escalation)
+      status: 'active',
     });
 
     const verificationToken = user.getVerificationToken();
@@ -69,6 +71,7 @@ export const register = async (req, res, next) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        status: user.status,
         isVerified: user.isVerified,
       },
       accessToken,
@@ -94,10 +97,17 @@ export const login = async (req, res, next) => {
       return errorResponse(res, 401, 'Invalid email or password');
     }
 
+    if (user.status === 'inactive' || user.status === 'suspended') {
+      return errorResponse(res, 403, 'Your account has been deactivated or suspended. Please contact Super Admin.');
+    }
+
     const isMatch = await user.matchPassword(password);
     if (!isMatch) {
       return errorResponse(res, 401, 'Invalid email or password');
     }
+
+    user.lastLogin = new Date();
+    await user.save({ validateBeforeSave: false });
 
     const accessToken = generateAccessToken(user);
     const refreshToken = await generateRefreshToken(user, req.ip);
@@ -109,6 +119,7 @@ export const login = async (req, res, next) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        status: user.status,
         phone: user.phone,
         isVerified: user.isVerified,
       },

@@ -27,5 +27,27 @@ export const AdminRoute = () => {
     );
   }
 
-  return user && user.role === 'admin' ? <Outlet /> : <Navigate to="/" replace />;
+  return user && (user.role === 'admin' || user.role === 'superadmin') ? (
+    <Outlet />
+  ) : (
+    <Navigate to="/admin/login" replace />
+  );
+};
+
+export const SuperAdminRoute = () => {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center py-24">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+      </div>
+    );
+  }
+
+  return user && user.role === 'superadmin' ? (
+    <Outlet />
+  ) : (
+    <Navigate to="/super-admin/login" replace />
+  );
 };

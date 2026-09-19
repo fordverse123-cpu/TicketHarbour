@@ -6,7 +6,7 @@ import { AuthProvider } from './context/AuthContext';
 // Layout & Common Components
 import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
-import { PrivateRoute, AdminRoute } from './components/common/ProtectedRoute';
+import { PrivateRoute, AdminRoute, SuperAdminRoute } from './components/common/ProtectedRoute';
 
 // Public Pages
 import Home from './pages/Home';
@@ -18,15 +18,21 @@ import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import VerifyEmail from './pages/VerifyEmail';
 
+// Private Admin & Super Admin Logins
+import AdminLogin from './pages/admin/AdminLogin';
+import SuperAdminLogin from './pages/admin/SuperAdminLogin';
+
 // Protected User Pages
 import Checkout from './pages/Checkout';
 import MyBookings from './pages/MyBookings';
 import Profile from './pages/Profile';
 import WishlistPage from './pages/WishlistPage';
 
-// Admin Pages
+// Admin & Super Admin Pages
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminListings from './pages/admin/AdminListings';
+import SuperAdminDashboard from './pages/admin/SuperAdminDashboard';
+import CreateAdmin from './pages/admin/CreateAdmin';
 
 function App() {
   return (
@@ -49,6 +55,10 @@ function App() {
               <Route path="/reset-password/:resetToken" element={<ResetPassword />} />
               <Route path="/verify-email/:verifyToken" element={<VerifyEmail />} />
 
+              {/* Private Dedicated Logins */}
+              <Route path="/admin/login" element={<AdminLogin />} />
+              <Route path="/super-admin/login" element={<SuperAdminLogin />} />
+
               {/* Protected User Routes */}
               <Route element={<PrivateRoute />}>
                 <Route path="/checkout" element={<Checkout />} />
@@ -60,7 +70,15 @@ function App() {
               {/* Admin Protected Routes */}
               <Route element={<AdminRoute />}>
                 <Route path="/admin" element={<AdminDashboard />} />
+                <Route path="/admin/dashboard" element={<AdminDashboard />} />
                 <Route path="/admin/listings" element={<AdminListings />} />
+              </Route>
+
+              {/* Super Admin Protected Routes */}
+              <Route element={<SuperAdminRoute />}>
+                <Route path="/admin/super" element={<SuperAdminDashboard />} />
+                <Route path="/admin/super/admins" element={<SuperAdminDashboard />} />
+                <Route path="/admin/super/admins/create" element={<CreateAdmin />} />
               </Route>
             </Routes>
           </main>
