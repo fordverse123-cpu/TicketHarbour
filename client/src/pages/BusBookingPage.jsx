@@ -4,6 +4,7 @@ import BusSearch from '../components/bus/BusSearch';
 import BusCard from '../components/bus/BusCard';
 import BusFilters from '../components/bus/BusFilters';
 import PageLoader from '../components/common/PageLoader';
+import { CardSkeletonGrid, BusCardSkeleton } from '../components/loading';
 import { Bus, Filter, ArrowUpDown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -302,7 +303,12 @@ export default function BusBookingPage() {
           </div>
 
           {loading ? (
-            <PageLoader text="Searching intercity bus routes..." />
+            <CardSkeletonGrid
+              count={4}
+              CardSkeletonComponent={BusCardSkeleton}
+              gridClassName="space-y-6"
+              ariaLabel="Loading available bus routes..."
+            />
           ) : filteredBuses.length === 0 ? (
             <div className="text-center py-16 bg-[#111111] border border-white/10 rounded-3xl space-y-3 p-6">
               <p className="text-lg font-bold text-white">

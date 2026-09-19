@@ -4,6 +4,7 @@ import FlightSearch from '../components/flight/FlightSearch';
 import FlightCard from '../components/flight/FlightCard';
 import FlightFilters from '../components/flight/FlightFilters';
 import SkeletonLoader from '../components/common/SkeletonLoader';
+import { CardSkeletonGrid, FlightCardSkeleton } from '../components/loading';
 import { Plane, RefreshCw, Filter, ArrowUpDown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -263,7 +264,12 @@ export default function FlightBookingPage() {
           </div>
 
           {loading ? (
-            <SkeletonLoader count={4} />
+            <CardSkeletonGrid
+              count={4}
+              CardSkeletonComponent={FlightCardSkeleton}
+              gridClassName="space-y-6"
+              ariaLabel="Loading available flights..."
+            />
           ) : filteredFlights.length === 0 ? (
             <div className="text-center py-16 glass-card rounded-3xl space-y-3 p-6">
               <p className="text-lg font-bold text-white">

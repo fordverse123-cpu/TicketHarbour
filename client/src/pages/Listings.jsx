@@ -6,6 +6,7 @@ import GlassButton from '../components/ui/GlassButton';
 import GlassInput from '../components/ui/GlassInput';
 import RatingStars from '../components/common/RatingStars';
 import Skeleton from '../components/ui/Skeleton';
+import { CardSkeletonGrid, EventCardSkeleton } from '../components/loading';
 import { Search, MapPin, SlidersHorizontal, ChevronLeft, ChevronRight, Filter } from 'lucide-react';
 
 export default function Listings() {
@@ -191,9 +192,12 @@ export default function Listings() {
         {/* Listings Grid */}
         <main className="lg:col-span-3 space-y-6">
           {loading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              <Skeleton className="h-64" count={6} />
-            </div>
+            <CardSkeletonGrid
+              count={6}
+              CardSkeletonComponent={EventCardSkeleton}
+              gridClassName="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+              ariaLabel="Loading ticket listings..."
+            />
           ) : listings.length === 0 ? (
             <GlassCard className="text-center py-20 space-y-3">
               <p className="text-lg font-black text-white">No ticket listings found</p>

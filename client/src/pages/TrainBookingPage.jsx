@@ -6,6 +6,7 @@ import TrainFilters from '../components/train/TrainFilters';
 import SkeletonLoader from '../components/common/SkeletonLoader';
 import PageLoader from '../components/common/PageLoader';
 import AppLoader from '../components/AppLoader';
+import { CardSkeletonGrid, TrainCardSkeleton } from '../components/loading';
 import { Train, RefreshCw, Filter, AlertCircle, SearchX } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -273,7 +274,14 @@ export default function TrainBookingPage() {
           </div>
 
           {/* State Machine Rendering */}
-          <AppLoader visible={status === 'loading'} mode="contained" text="Searching available trains..." />
+          {status === 'loading' && (
+            <CardSkeletonGrid
+              count={4}
+              CardSkeletonComponent={TrainCardSkeleton}
+              gridClassName="space-y-6"
+              ariaLabel="Loading available trains..."
+            />
+          )}
 
           {status === 'error' && (
             <div className="text-center py-16 glass-card rounded-3xl space-y-4 p-8 border border-[var(--border)] bg-[var(--card)]">

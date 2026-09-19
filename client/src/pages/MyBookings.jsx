@@ -4,6 +4,7 @@ import GlassCard from '../components/ui/GlassCard';
 import GlassButton from '../components/ui/GlassButton';
 import GlassModal from '../components/ui/GlassModal';
 import Skeleton from '../components/ui/Skeleton';
+import { CardSkeletonGrid, BookingCardSkeleton } from '../components/loading';
 import toast from 'react-hot-toast';
 import { Ticket, Download, QrCode, Calendar, Wallet, Heart, CheckCircle2, XCircle } from 'lucide-react';
 
@@ -145,9 +146,12 @@ export default function MyBookings() {
 
       {/* Bookings List */}
       {loading ? (
-        <div className="space-y-4">
-          <Skeleton className="h-32" count={3} />
-        </div>
+        <CardSkeletonGrid
+          count={3}
+          CardSkeletonComponent={BookingCardSkeleton}
+          gridClassName="space-y-4"
+          ariaLabel="Loading user bookings..."
+        />
       ) : displayedBookings.length === 0 ? (
         <GlassCard className="text-center py-20 space-y-3">
           <Ticket className="w-12 h-12 text-slate-600 mx-auto" />

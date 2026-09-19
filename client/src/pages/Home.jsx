@@ -5,6 +5,7 @@ import GlassCard from '../components/ui/GlassCard';
 import GlassButton from '../components/ui/GlassButton';
 import RatingStars from '../components/common/RatingStars';
 import Skeleton from '../components/ui/Skeleton';
+import { CardSkeletonGrid, EventCardSkeleton } from '../components/loading';
 import {
   Film,
   Calendar,
@@ -409,9 +410,12 @@ export default function Home() {
         </div>
 
         {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            <Skeleton className="h-64" count={6} />
-          </div>
+          <CardSkeletonGrid
+            count={6}
+            CardSkeletonComponent={EventCardSkeleton}
+            gridClassName="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+            ariaLabel="Loading featured listings..."
+          />
         ) : featuredListings.length === 0 ? (
           <GlassCard className="text-center py-16 bg-[var(--card)]">
             <p className="text-sm text-[var(--muted-foreground)]">No listings found in this category.</p>

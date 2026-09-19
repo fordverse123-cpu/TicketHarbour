@@ -6,6 +6,7 @@ import GlassButton from '../components/ui/GlassButton';
 import GlassInput from '../components/ui/GlassInput';
 import RatingStars from '../components/common/RatingStars';
 import Skeleton from '../components/ui/Skeleton';
+import { CardSkeletonGrid, EventCardSkeleton } from '../components/loading';
 import { Search, MapPin, Ticket, Compass } from 'lucide-react';
 
 const MOCK_ATTRACTIONS = [
@@ -123,9 +124,12 @@ export default function AttractionsPage() {
 
       {/* Attractions Grid */}
       {loading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          <Skeleton className="h-72" count={6} />
-        </div>
+        <CardSkeletonGrid
+          count={6}
+          CardSkeletonComponent={EventCardSkeleton}
+          gridClassName="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+          ariaLabel="Loading attractions..."
+        />
       ) : filteredAttractions.length === 0 ? (
         <GlassCard className="text-center py-20 space-y-3 bg-[var(--card)]">
           <Compass className="w-12 h-12 text-[var(--primary)] mx-auto opacity-80" />
