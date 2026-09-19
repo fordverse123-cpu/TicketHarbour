@@ -2,12 +2,8 @@ import React, { useState } from 'react';
 import { Train, ArrowRight, Info, CheckCircle2 } from 'lucide-react';
 import TrainDetailsModal from './TrainDetailsModal';
 import BorderGlow from '../ui/BorderGlow';
-import { useTheme } from '../../context/ThemeContext';
 
 export default function TrainCard({ train, onBookNow }) {
-  const { theme } = useTheme();
-  const isDark = theme === 'dark';
-
   const [showDetailsModal, setShowDetailsModal] = useState(false);
 
   const {
@@ -47,31 +43,31 @@ export default function TrainCard({ train, onBookNow }) {
     <BorderGlow
       borderRadius={24}
       className="w-full h-full"
-      backgroundColor={isDark ? '#151515' : '#FFFFFF'}
-      colors={isDark ? ['#03B3C3', '#6750A2', '#D856BF'] : ['#0891B2', '#4F46E5', '#C026A3']}
-      glowColor={isDark ? '185 80 65' : '200 65 50'}
-      glowRadius={isDark ? 24 : 22}
-      glowIntensity={isDark ? 0.50 : 0.35}
+      backgroundColor="#111111"
+      colors={['#03B3C3', '#6750A2', '#D856BF']}
+      glowColor="185 80 65"
+      glowRadius={24}
+      glowIntensity={0.50}
     >
-      <div className="glass-card flex flex-col md:flex-row border border-[var(--border)] rounded-3xl overflow-hidden shadow-xl transition-all w-full bg-[var(--card)]">
+      <div className="glass-card flex flex-col md:flex-row border border-white/10 rounded-3xl overflow-hidden shadow-xl transition-all w-full bg-[#111111]">
         {/* Left Main Information Panel */}
-        <div className="p-6 flex-1 space-y-5 text-[var(--foreground)]">
+        <div className="p-6 flex-1 space-y-5 text-white">
           {/* Train Header */}
-          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[var(--border)] pb-3">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/10 pb-3">
             <div className="flex items-center gap-3">
-              <span className="px-3 py-1 bg-blue-100 dark:bg-blue-950 text-[#1D4ED8] dark:text-[#60A5FA] border border-blue-200 dark:border-blue-800 font-mono font-bold text-xs rounded-xl shadow-sm">
+              <span className="px-3 py-1 bg-blue-950/80 text-[#60A5FA] border border-blue-800/60 font-mono font-bold text-xs rounded-xl shadow-sm">
                 #{trainNo}
               </span>
-              <h3 className="font-black text-[#111827] dark:text-[#FFFFFF] text-xl sm:text-2xl tracking-tight">
+              <h3 className="font-black text-white text-xl sm:text-2xl tracking-tight">
                 {title}
               </h3>
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="text-[11px] font-bold text-[#4B5563] dark:text-[#A1A1AA] bg-[var(--muted)] px-2.5 py-1 rounded-lg border border-[var(--border)]">
+              <span className="text-[11px] font-bold text-[#9CA3AF] bg-white/5 px-2.5 py-1 rounded-lg border border-white/10">
                 Runs Daily
               </span>
-              <span className="text-[11px] font-bold text-[#059669] dark:text-[#22C55E] bg-emerald-50 dark:bg-emerald-950/60 px-2.5 py-1 rounded-lg border border-emerald-200 dark:border-emerald-800">
+              <span className="text-[11px] font-bold text-[#22C55E] bg-emerald-950/60 px-2.5 py-1 rounded-lg border border-emerald-800/60">
                 Pantry Car
               </span>
             </div>
@@ -81,41 +77,41 @@ export default function TrainCard({ train, onBookNow }) {
           <div className="grid grid-cols-12 gap-2 items-center py-2 text-xs">
             {/* Departure */}
             <div className="col-span-4 space-y-1">
-              <span className="text-2xl sm:text-4xl font-black text-[#111827] dark:text-[#FFFFFF] block tracking-tight">
+              <span className="text-2xl sm:text-4xl font-black text-white block tracking-tight">
                 {departureTime}
               </span>
-              <p className="font-bold text-sm text-[#374151] dark:text-[#D1D5DB] truncate">{source}</p>
+              <p className="font-bold text-sm text-[#D1D5DB] truncate">{source}</p>
             </div>
 
             {/* Duration Graphic */}
             <div className="col-span-4 text-center space-y-1.5">
-              <span className="text-xs text-[#6B7280] dark:text-[#9CA3AF] font-semibold block">{duration}</span>
+              <span className="text-xs text-[#9CA3AF] font-semibold block">{duration}</span>
               <div className="relative flex items-center justify-center">
-                <div className="h-0.5 w-full bg-[var(--border)] rounded"></div>
-                <Train className="w-5 h-5 text-[var(--primary)] absolute bg-[var(--card)] px-0.5" />
+                <div className="h-0.5 w-full bg-white/10 rounded"></div>
+                <Train className="w-5 h-5 text-[#03B3C3] absolute bg-[#111111] px-0.5" />
               </div>
-              <span className="text-[11px] font-bold text-[#6B7280] dark:text-[#9CA3AF] block">Superfast</span>
+              <span className="text-[11px] font-bold text-[#9CA3AF] block">Superfast</span>
             </div>
 
             {/* Arrival */}
             <div className="col-span-4 text-right space-y-1">
-              <span className="text-2xl sm:text-4xl font-black text-[#111827] dark:text-[#FFFFFF] block tracking-tight">
+              <span className="text-2xl sm:text-4xl font-black text-white block tracking-tight">
                 {arrivalTime}
               </span>
-              <p className="font-bold text-sm text-[#374151] dark:text-[#D1D5DB] truncate">{destination}</p>
+              <p className="font-bold text-sm text-[#D1D5DB] truncate">{destination}</p>
             </div>
           </div>
 
           {/* Class Selection Chips & Availability Status */}
-          <div className="space-y-2.5 pt-2 border-t border-[var(--border)]">
+          <div className="space-y-2.5 pt-2 border-t border-white/10">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-[#6B7280] dark:text-[#9CA3AF] uppercase tracking-wider block">
+              <span className="text-xs font-bold text-[#9CA3AF] uppercase tracking-wider block">
                 Select Class & Availability
               </span>
               <button
                 type="button"
                 onClick={() => setShowDetailsModal(true)}
-                className="text-xs font-bold text-[var(--primary)] flex items-center gap-1 hover:underline cursor-pointer"
+                className="text-xs font-bold text-[#03B3C3] flex items-center gap-1 hover:underline cursor-pointer"
               >
                 <Info className="w-4 h-4" /> Route Details
               </button>
@@ -129,10 +125,10 @@ export default function TrainCard({ train, onBookNow }) {
                 const isRAC = statusStr.includes('RAC');
                 const isWL = statusStr.includes('WL') || statusStr.includes('WAIT');
 
-                let statusColorClass = 'text-[#059669] dark:text-[#22C55E]';
-                if (isRAC) statusColorClass = 'text-[var(--primary)]';
-                else if (isWL) statusColorClass = 'text-[#D97706] dark:text-[#F59E0B]';
-                else if (!isAvailable) statusColorClass = 'text-[#DC2626] dark:text-[#EF4444]';
+                let statusColorClass = 'text-[#22C55E]';
+                if (isRAC) statusColorClass = 'text-[#03B3C3]';
+                else if (isWL) statusColorClass = 'text-[#F59E0B]';
+                else if (!isAvailable) statusColorClass = 'text-[#EF4444]';
 
                 return (
                   <button
@@ -143,15 +139,15 @@ export default function TrainCard({ train, onBookNow }) {
                     }}
                     className={`p-3 rounded-2xl border text-left transition-all min-w-[110px] cursor-pointer ${
                       isSelected
-                        ? 'border-[var(--primary)] bg-[var(--primary)]/10 ring-2 ring-[var(--primary)]/30 shadow-md'
-                        : 'border-[var(--border)] bg-[var(--muted)] hover:border-[var(--primary)]/50'
+                        ? 'border-[#03B3C3] bg-[#03B3C3]/15 ring-2 ring-[#03B3C3]/30 shadow-md'
+                        : 'border-white/10 bg-white/5 hover:border-[#03B3C3]/50'
                     }`}
                   >
                     <div className="flex items-center justify-between gap-2">
-                      <span className="font-black text-[#111827] dark:text-[#FFFFFF] text-sm">
+                      <span className="font-black text-white text-sm">
                         {t.classType || t.tierName}
                       </span>
-                      <span className="font-bold text-[#111827] dark:text-[#FFFFFF] text-xs">
+                      <span className="font-bold text-white text-xs">
                         ₹{t.price}
                       </span>
                     </div>
@@ -169,15 +165,15 @@ export default function TrainCard({ train, onBookNow }) {
         </div>
 
         {/* Right Pricing & Booking Panel */}
-        <div className="bg-[var(--muted)] p-6 md:w-72 border-t md:border-t-0 md:border-l border-[var(--border)] flex flex-col justify-between space-y-4">
+        <div className="bg-[#171717] p-6 md:w-72 border-t md:border-t-0 md:border-l border-white/10 flex flex-col justify-between space-y-4">
           <div className="space-y-1.5">
-            <span className="text-xs text-[#4B5563] dark:text-[#A1A1AA] font-semibold uppercase tracking-wider block">
+            <span className="text-xs text-[#9CA3AF] font-semibold uppercase tracking-wider block">
               Class Fare ({selectedClass})
             </span>
-            <div className="text-3xl sm:text-4xl font-black text-[#111827] dark:text-[#FFFFFF] tracking-tight">
+            <div className="text-3xl sm:text-4xl font-black text-white tracking-tight">
               ₹{activeTier?.price || 500}
             </div>
-            <span className="text-xs text-[#059669] dark:text-[#22C55E] font-bold block flex items-center gap-1">
+            <span className="text-xs text-[#22C55E] font-bold block flex items-center gap-1">
               <CheckCircle2 className="w-4 h-4" /> Free Cancellation Supported
             </span>
           </div>
@@ -186,7 +182,7 @@ export default function TrainCard({ train, onBookNow }) {
             <button
               type="button"
               onClick={handleBooking}
-              className="w-full h-14 bg-gradient-to-r from-[var(--primary)] to-[var(--secondary)] hover:opacity-95 text-white font-black text-sm rounded-2xl shadow-lg flex items-center justify-center gap-2 transition-all cursor-pointer"
+              className="w-full h-14 bg-gradient-to-r from-[#03B3C3] to-[#6750A2] hover:opacity-95 text-white font-black text-sm rounded-2xl shadow-lg flex items-center justify-center gap-2 transition-all cursor-pointer"
             >
               Book Now <ArrowRight className="w-4 h-4" />
             </button>
@@ -194,9 +190,9 @@ export default function TrainCard({ train, onBookNow }) {
             <button
               type="button"
               onClick={() => setShowDetailsModal(true)}
-              className="w-full py-2.5 bg-[var(--card)] hover:bg-[var(--muted)] border border-[var(--border)] text-[var(--foreground)] font-semibold text-xs rounded-xl flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+              className="w-full py-2.5 bg-[#111111] hover:bg-white/5 border border-white/10 text-white font-semibold text-xs rounded-xl flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
             >
-              <Info className="w-4 h-4 text-[var(--primary)]" /> Route Schedule
+              <Info className="w-4 h-4 text-[#03B3C3]" /> Route Schedule
             </button>
           </div>
         </div>

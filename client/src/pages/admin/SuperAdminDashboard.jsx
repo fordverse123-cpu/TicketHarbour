@@ -21,6 +21,8 @@ import {
   CheckCircle,
 } from 'lucide-react';
 
+import PageLoader from '../../components/common/PageLoader';
+
 const CATEGORIES = ['MOVIES', 'EVENTS', 'SPORTS', 'BUS', 'TRAIN', 'FLIGHTS', 'ATTRACTIONS'];
 
 export default function SuperAdminDashboard() {
@@ -135,6 +137,14 @@ export default function SuperAdminDashboard() {
     }
   };
 
+  const handleSelectAllPerms = () => {
+    if (adminPermissions.length === CATEGORIES.length) {
+      setAdminPermissions([]);
+    } else {
+      setAdminPermissions([...CATEGORIES]);
+    }
+  };
+
   const handleSavePermissions = async (e) => {
     e.preventDefault();
     setSavingPerms(true);
@@ -165,8 +175,8 @@ export default function SuperAdminDashboard() {
 
   const handleResetPassword = async (e) => {
     e.preventDefault();
-    if (!newPassword || newPassword.length < 6) {
-      toast.error('Password must be at least 6 characters long');
+    if (!newPassword || newPassword.length < 8) {
+      toast.error('Password must be at least 8 characters long');
       return;
     }
 
@@ -189,7 +199,7 @@ export default function SuperAdminDashboard() {
   };
 
   const handleDeleteAdmin = async (admin) => {
-    if (!window.confirm(`Are you sure you want to permanently delete Admin ${admin.name}? This action cannot be undone.`)) return;
+    if (!window.confirm('Delete Admin? Are you sure you want to permanently delete this admin?')) return;
 
     try {
       const res = await API.delete(`/super-admin/admins/${admin._id}`);
@@ -215,11 +225,7 @@ export default function SuperAdminDashboard() {
   });
 
   if (loading) {
-    return (
-      <div className="flex justify-center items-center py-32">
-        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#03B3C3]"></div>
-      </div>
-    );
+    return <PageLoader text="Loading Super Admin Governance Dashboard..." />;
   }
 
   return (
@@ -412,7 +418,16 @@ export default function SuperAdminDashboard() {
         maxWidth="max-w-md"
       >
         <form onSubmit={handleSavePermissions} className="space-y-4 text-xs">
-          <p className="text-[#B5B5B5]">Toggle assigned category management permissions for this Admin:</p>
+          <div className="flex items-center justify-between">
+            <p className="text-[#B5B5B5]">Toggle assigned category management permissions for this Admin:</p>
+            <button
+              type="button"
+              onClick={handleSelectAllPerms}
+              className="text-[#03B3C3] hover:underline font-bold text-[11px]"
+            >
+              {adminPermissions.length === CATEGORIES.length ? 'Deselect All' : 'Select All'}
+            </button>
+          </div>
           <div className="grid grid-cols-2 gap-2 p-3 bg-[#111111] rounded-2xl border border-white/10">
             {CATEGORIES.map((cat) => {
               const checked = adminPermissions.includes(cat);
@@ -464,7 +479,7 @@ export default function SuperAdminDashboard() {
         maxWidth="max-w-md"
       >
         <form onSubmit={handleResetPassword} className="space-y-3 text-xs">
-          <GlassInput label="New Password" type="password" placeholder="Min 6 characters..." value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required />
+          <GlassInput label="New Password" type="password" placeholder="Min 8 characters..." value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required />
           <GlassButton type="submit" variant="gradient" loading={resettingPassword} className="w-full">
             Reset Admin Password
           </GlassButton>

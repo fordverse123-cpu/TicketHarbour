@@ -6,9 +6,11 @@
   --background: #050505;
   --foreground: #FFFFFF;
   --card: #111111;
+  --card-elevated: #171717;
   --card-foreground: #FFFFFF;
-  --muted: #1A1A1A;
-  --muted-foreground: #A1A1AA;
+  --muted: #151515;
+  --muted-foreground: #9CA3AF;
+  --text-secondary: #D1D5DB;
   --border: rgba(255, 255, 255, 0.10);
   --input: #151515;
   --primary: #03B3C3;
@@ -21,13 +23,13 @@
   --warning: #F59E0B;
   --danger: #EF4444;
 
-  /* Legacy aliases for backwards compatibility */
+  /* Aliases for backwards compatibility */
   --th-page: var(--background);
   --th-card: var(--card);
   --th-surface-2: var(--muted);
   --th-border: var(--border);
   --th-text: var(--foreground);
-  --th-text-secondary: var(--muted-foreground);
+  --th-text-secondary: var(--text-secondary);
   --th-muted: var(--muted-foreground);
   --th-accent: var(--primary);
   --th-accent-2: var(--secondary);
@@ -38,43 +40,13 @@
   color-scheme: dark;
 }
 
-[data-theme="light"], .light {
-  --background: #F5F6F8;
-  --foreground: #111827;
-  --card: #FFFFFF;
-  --card-foreground: #111827;
-  --muted: #F1F3F5;
-  --muted-foreground: #4B5563;
-  --border: rgba(17, 24, 39, 0.12);
-  --input: #FFFFFF;
-  --primary: #0891B2;
-  --secondary: #4F46E5;
-  --accent: #03B3C3;
-  --primary-foreground: #FFFFFF;
-  --secondary-foreground: #FFFFFF;
-  --accent-foreground: #FFFFFF;
-  --success: #059669;
-  --warning: #D97706;
-  --danger: #DC2626;
-
-  /* Legacy aliases for backwards compatibility */
-  --th-page: var(--background);
-  --th-card: var(--card);
-  --th-surface-2: var(--muted);
-  --th-border: var(--border);
-  --th-text: var(--foreground);
-  --th-text-secondary: var(--muted-foreground);
-  --th-muted: var(--muted-foreground);
-  --th-accent: var(--primary);
-  --th-accent-2: var(--secondary);
-  --th-accent-3: var(--accent);
-  --th-success: var(--success);
-  --th-warning: var(--warning);
-  --th-danger: var(--danger);
-  color-scheme: light;
-}
-
 @layer base {
+  html {
+    background-color: #050505;
+    color: #FFFFFF;
+    color-scheme: dark;
+  }
+
   body {
     background-color: var(--background);
     color: var(--foreground);
@@ -84,8 +56,8 @@
   }
 
   select option {
-    background-color: var(--card);
-    color: var(--card-foreground);
+    background-color: #111111;
+    color: #FFFFFF;
   }
 
   input, select, textarea {
@@ -100,7 +72,7 @@
 
   input:focus, select:focus, textarea:focus {
     border-color: var(--primary) !important;
-    box-shadow: 0 0 12px var(--border) !important;
+    box-shadow: 0 0 12px rgba(3, 179, 195, 0.25) !important;
     outline: none;
   }
 }

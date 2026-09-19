@@ -19,3 +19,8 @@ npm-debug.log*
 # OS metadata
 .DS_Store
 Thumbs.db
+
+# Documentation / Internal generated files
+docs/
+docs/ROUTES.txt
+

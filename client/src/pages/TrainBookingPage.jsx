@@ -4,6 +4,7 @@ import TrainSearch from '../components/train/TrainSearch';
 import TrainCard from '../components/train/TrainCard';
 import TrainFilters from '../components/train/TrainFilters';
 import SkeletonLoader from '../components/common/SkeletonLoader';
+import PageLoader from '../components/common/PageLoader';
 import { Train, RefreshCw, Filter, AlertCircle, SearchX } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -273,9 +274,7 @@ export default function TrainBookingPage() {
           {/* State Machine Rendering */}
           {status === 'loading' && (
             <div className="space-y-4">
-              <div className="p-4 bg-[var(--card)] border border-[var(--border)] rounded-2xl flex items-center gap-3 text-xs font-bold text-[var(--primary)]">
-                <RefreshCw className="w-4 h-4 animate-spin text-[var(--primary)]" /> Searching for trains...
-              </div>
+              <PageLoader text="Searching available trains..." />
               <SkeletonLoader count={3} />
             </div>
           )}

@@ -67,9 +67,8 @@ export default function GooeyNav({ items, activeHref, onItemClick }) {
         }}
       >
         {/* Subtle internal particle accents: #03B3C3, #6750A2, #D856BF, #FFFFFF */}
-        <span className="absolute top-1 left-1/4 w-1.5 h-1.5 rounded-full bg-[#03B3C3] animate-pulse opacity-75"></span>
-        <span className="absolute bottom-1 right-1/3 w-1.5 h-1.5 rounded-full bg-[#D856BF] opacity-60"></span>
-        <span className="absolute top-1/2 right-2 w-1 h-1 rounded-full bg-white opacity-80"></span>
+        <span className="absolute top-1 left-1/4 w-1 h-1 rounded-full bg-[#03B3C3] opacity-40 pointer-events-none"></span>
+        <span className="absolute bottom-1 right-1/3 w-1 h-1 rounded-full bg-[#D856BF] opacity-30 pointer-events-none"></span>
       </div>
 
       {/* Nav List */}
@@ -86,8 +85,8 @@ export default function GooeyNav({ items, activeHref, onItemClick }) {
               tabIndex={0}
               className={`gooey-item relative px-3.5 sm:px-4 py-2 rounded-full text-xs sm:text-sm font-bold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#03B3C3]/40 whitespace-nowrap select-none ${
                 isActive
-                  ? 'text-white'
-                  : 'text-[#A0A0A0] hover:text-white hover:bg-white/5'
+                  ? 'text-white font-extrabold'
+                  : 'text-[#D1D5DB] hover:text-white hover:bg-white/5'
               }`}
             >
               {item.label}

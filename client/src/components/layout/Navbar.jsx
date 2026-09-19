@@ -1,14 +1,12 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { useTheme } from '../../context/ThemeContext';
-import { Search, User, Heart, LogOut, ShieldAlert, Menu, Ticket, Sun, Moon } from 'lucide-react';
+import { Search, User, Heart, LogOut, ShieldAlert, Menu, Ticket } from 'lucide-react';
 import MobileMenu from './MobileMenu';
 import CategoryNav from '../navigation/CategoryNav';
 
 export default function Navbar() {
   const { user, logout, isAdmin } = useAuth();
-  const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -23,7 +21,7 @@ export default function Navbar() {
 
   return (
     <>
-      <header className="sticky top-0 z-40 bg-[var(--th-card)]/90 backdrop-blur-xl border-b border-[var(--th-border)] shadow-2xl transition-colors duration-200">
+      <header className="sticky top-0 z-40 bg-[#050505]/95 backdrop-blur-xl border-b border-white/10 shadow-2xl transition-colors duration-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Top Row: Logo, Global Search, Auth Controls */}
           <div className="flex items-center justify-between h-16 sm:h-18 py-3 gap-3 md:gap-6">
@@ -33,8 +31,8 @@ export default function Navbar() {
               <div className="h-9 w-9 rounded-xl bg-gradient-to-tr from-[#03B3C3] to-[#6750A2] flex items-center justify-center text-white font-black text-lg shadow-lg group-hover:scale-105 transition-transform">
                 TH
               </div>
-              <span className="text-xl sm:text-2xl font-black tracking-tight text-[var(--th-text)]">
-                Ticket<span className="text-transparent bg-clip-text bg-gradient-to-r from-[#03B3C3] to-[#6750A2]">Harbour</span>
+              <span className="text-xl sm:text-2xl font-black tracking-tight text-white">
+                Ticket<span className="text-[#03B3C3]">Harbour</span>
               </span>
             </Link>
 
@@ -45,34 +43,20 @@ export default function Navbar() {
                 placeholder="Search movies, concerts, buses, flights..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 text-xs lg:text-sm bg-[var(--th-surface-2)] border border-[var(--th-border)] rounded-full text-[var(--th-text)] placeholder-[var(--th-muted)] focus:outline-none focus:border-[var(--th-accent)] focus:ring-2 focus:ring-[var(--th-accent)]/20 transition-all shadow-inner"
+                className="w-full pl-10 pr-4 py-2 text-xs lg:text-sm bg-[#111111] border border-white/10 rounded-full text-white placeholder-[#9CA3AF] focus:outline-none focus:border-[#03B3C3] focus:ring-2 focus:ring-[#03B3C3]/20 transition-all shadow-inner"
               />
-              <Search className="w-4 h-4 text-[var(--th-accent)] absolute left-3.5 top-2.5 pointer-events-none" />
+              <Search className="w-4 h-4 text-[#03B3C3] absolute left-3.5 top-2.5 pointer-events-none" />
             </form>
 
             {/* Right Side Actions */}
             <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-              {/* Sun / Moon Theme Toggle */}
-              <button
-                type="button"
-                onClick={toggleTheme}
-                aria-label="Toggle Light and Dark Theme"
-                title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Mode`}
-                className="p-2 rounded-xl bg-[var(--th-surface-2)] border border-[var(--th-border)] text-[var(--th-text)] hover:text-[var(--th-accent)] transition-all flex items-center justify-center cursor-pointer shadow-sm hover:scale-105"
-              >
-                {theme === 'dark' ? (
-                  <Sun className="w-4 h-4 text-amber-400 fill-amber-400/20" />
-                ) : (
-                  <Moon className="w-4 h-4 text-indigo-600 fill-indigo-600/20" />
-                )}
-              </button>
               {user ? (
                 <div className="relative">
                   <button
                     onClick={() => setDropdownOpen(!dropdownOpen)}
-                    className="flex items-center gap-2 p-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 transition-colors"
+                    className="flex items-center gap-2 p-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 transition-colors cursor-pointer"
                   >
-                    <div className="h-8 w-8 rounded-full bg-gradient-to-tr from-[#19D3D3] to-[#4F46E5] text-white flex items-center justify-center font-black text-sm shadow-md">
+                    <div className="h-8 w-8 rounded-full bg-gradient-to-tr from-[#03B3C3] to-[#6750A2] text-white flex items-center justify-center font-black text-sm shadow-md">
                       {user.name?.charAt(0).toUpperCase() || 'U'}
                     </div>
                     <span className="hidden sm:inline font-bold text-xs text-white pr-2">
@@ -143,13 +127,13 @@ export default function Navbar() {
                 <div className="flex items-center gap-2">
                   <Link
                     to="/login"
-                    className="px-3 py-1.5 text-xs font-bold text-[#B8B8B8] hover:text-white transition-colors"
+                    className="px-3.5 py-1.5 text-xs font-bold text-white hover:text-[#03B3C3] transition-colors"
                   >
                     Login
                   </Link>
                   <Link
                     to="/register"
-                    className="px-3.5 py-1.5 text-xs font-bold text-white bg-gradient-to-r from-[#19D3D3] to-[#4F46E5] rounded-xl shadow-lg hover:shadow-[#19D3D3]/20 hover:-translate-y-0.5 transition-all"
+                    className="px-4 py-1.5 text-xs font-bold text-white bg-gradient-to-r from-[#03B3C3] to-[#6750A2] rounded-xl shadow-lg hover:shadow-[#03B3C3]/25 hover:-translate-y-0.5 transition-all"
                   >
                     Register
                   </Link>

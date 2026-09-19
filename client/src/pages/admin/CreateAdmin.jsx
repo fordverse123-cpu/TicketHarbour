@@ -38,6 +38,14 @@ export default function CreateAdmin() {
     }
   };
 
+  const handleSelectAllPermissions = () => {
+    if (selectedPermissions.length === CATEGORIES.length) {
+      setSelectedPermissions([]);
+    } else {
+      setSelectedPermissions(CATEGORIES.map((c) => c.code));
+    }
+  };
+
   const handleCreateAdmin = async (e) => {
     e.preventDefault();
 
@@ -46,8 +54,8 @@ export default function CreateAdmin() {
       return;
     }
 
-    if (password.length < 6) {
-      toast.error('Password must be at least 6 characters long');
+    if (password.length < 8) {
+      toast.error('Password must be at least 8 characters long');
       return;
     }
 
@@ -88,15 +96,21 @@ export default function CreateAdmin() {
       </Link>
 
       <GlassCard className="p-8 space-y-6">
-        <div className="flex items-center gap-3 border-b border-white/10 pb-4">
-          <div className="p-3 bg-[#6750A2]/20 text-[#03B3C3] rounded-2xl border border-[#6750A2]/30">
-            <UserPlus className="w-7 h-7" />
+        <div className="flex items-center justify-between border-b border-white/10 pb-4">
+          <div className="flex items-center gap-3">
+            <div className="p-3 bg-[#6750A2]/20 text-[#03B3C3] rounded-2xl border border-[#6750A2]/30">
+              <UserPlus className="w-7 h-7" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-black text-white">Create New Admin Account</h1>
+              <p className="text-xs text-[#B5B5B5]">
+                Provision administrator credentials and assign category management permissions.
+              </p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-2xl font-black text-white">Create New Admin Account</h1>
-            <p className="text-xs text-[#B5B5B5]">
-              Provision new administrator credentials and assign category management permissions.
-            </p>
+
+          <div className="px-3 py-1.5 bg-[#03B3C3]/15 text-[#03B3C3] border border-[#03B3C3]/30 rounded-xl text-xs font-black uppercase tracking-wider">
+            Role: ADMIN
           </div>
         </div>
 
@@ -131,11 +145,11 @@ export default function CreateAdmin() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <GlassInput
-              label="Password *"
+              label="Password (min 8 characters) *"
               type="password"
               icon={Lock}
               required
-              placeholder="Min 6 characters..."
+              placeholder="Min 8 characters..."
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
@@ -152,9 +166,20 @@ export default function CreateAdmin() {
 
           {/* Assign Permissions Selector Checkboxes */}
           <div className="space-y-2 pt-2">
-            <label className="font-bold text-white uppercase tracking-wider block flex items-center gap-1.5">
-              <Shield className="w-4 h-4 text-[#03B3C3]" /> Assign Category Permissions *
-            </label>
+            <div className="flex items-center justify-between">
+              <label className="font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
+                <Shield className="w-4 h-4 text-[#03B3C3]" /> Assign Category Permissions *
+              </label>
+
+              <button
+                type="button"
+                onClick={handleSelectAllPermissions}
+                className="text-xs font-bold text-[#03B3C3] hover:underline cursor-pointer"
+              >
+                {selectedPermissions.length === CATEGORIES.length ? 'Deselect All' : 'Select All'}
+              </button>
+            </div>
+
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 p-4 bg-[#111111] rounded-2xl border border-white/10">
               {CATEGORIES.map((cat) => {
                 const checked = selectedPermissions.includes(cat.code);

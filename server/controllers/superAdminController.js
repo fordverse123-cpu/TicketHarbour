@@ -67,8 +67,8 @@ export const createAdmin = async (req, res, next) => {
       return errorResponse(res, 400, 'Please provide name, email, and password');
     }
 
-    if (password.length < 6) {
-      return errorResponse(res, 400, 'Password must be at least 6 characters long');
+    if (password.length < 8) {
+      return errorResponse(res, 400, 'Password must be at least 8 characters long');
     }
 
     // Check duplicate email
