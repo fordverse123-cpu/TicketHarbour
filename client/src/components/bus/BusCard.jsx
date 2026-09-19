@@ -1,3 +1,6 @@
+import React, { useState } from 'react';
+import { Bus, Star, MapPin, Clock, ChevronDown, ChevronUp, ShieldCheck, Sparkles } from 'lucide-react';
+import BusSeatSelection from './BusSeatSelection';
 import PixelCardWrapper from '../ui/PixelCardWrapper';
 
 export default function BusCard({ bus, onBookSeat }) {

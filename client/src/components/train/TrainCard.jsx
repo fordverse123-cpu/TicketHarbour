@@ -1,3 +1,7 @@
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { Train, ArrowRight, Info, CheckCircle2, ShieldCheck } from 'lucide-react';
+import TrainDetailsModal from './TrainDetailsModal';
 import PixelCardWrapper from '../ui/PixelCardWrapper';
 
 export default function TrainCard({ train, onSelectClass }) {
