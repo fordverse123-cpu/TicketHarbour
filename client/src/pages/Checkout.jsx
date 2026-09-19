@@ -190,7 +190,7 @@ export default function Checkout() {
           </div>
         </GlassCard>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
           
           {/* Order Details */}
           <div className="md:col-span-2 space-y-6">
@@ -217,70 +217,84 @@ export default function Checkout() {
                 <p><strong>Ticket Category:</strong> {listing.categoryType.toUpperCase()}</p>
               </div>
             </GlassCard>
-
-            {/* Coupon Promo Code Box */}
-            <GlassCard className="space-y-3">
-              <h3 className="text-xs font-black uppercase text-white flex items-center gap-2">
-                <Tag className="w-4 h-4 text-cyanAccent-400" /> Apply Coupon Code
-              </h3>
-
-              <form onSubmit={handleApplyCoupon} className="flex gap-2">
-                <input
-                  type="text"
-                  placeholder="Try HARBOR20"
-                  value={couponInput}
-                  onChange={(e) => setCouponInput(e.target.value)}
-                  className="flex-1 px-3.5 py-2.5 text-xs bg-harbour-darker border border-white/15 rounded-xl uppercase font-bold text-white focus:outline-none focus:border-cyanAccent-500"
-                />
-                <GlassButton type="submit" size="sm" variant="secondary">
-                  Apply
-                </GlassButton>
-              </form>
-
-              {appliedCoupon && (
-                <p className="text-xs font-bold text-emerald-400">✓ Coupon '{appliedCoupon}' applied successfully!</p>
-              )}
-            </GlassCard>
           </div>
 
-          {/* Payment Summary Box */}
+          {/* Payment Summary & Breakdown Box */}
           <div className="md:col-span-1">
-            <GlassCard className="space-y-6 sticky top-24">
-              <h3 className="text-lg font-black text-white border-b border-white/10 pb-3">
+            <GlassCard className="space-y-5 lg:sticky lg:top-24 self-start">
+              <h3 className="text-lg font-black text-white border-b border-white/10 pb-3 uppercase tracking-tight">
                 Payment Breakdown
               </h3>
 
-              <div className="space-y-3 text-xs">
-                <div className="flex items-center justify-between">
-                  <span className="text-slate-400">Subtotal</span>
+              {/* Fare Details */}
+              <div className="space-y-2.5 text-xs">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                  Fare Details
+                </span>
+                <div className="flex items-center justify-between text-slate-300">
+                  <span>Base Fare ({quantity} Ticket{quantity > 1 ? 's' : ''})</span>
                   <span className="font-bold text-white">₹{baseAmount}</span>
                 </div>
-
-                {discountAmount > 0 && (
-                  <div className="flex items-center justify-between text-emerald-400 font-bold">
-                    <span>Coupon Discount</span>
-                    <span>-₹{discountAmount}</span>
-                  </div>
-                )}
-
-                <div className="flex items-center justify-between text-slate-400">
-                  <span>Service Tax (18%)</span>
+                <div className="flex items-center justify-between text-slate-300">
+                  <span>Convenience Fee & Taxes (18%)</span>
                   <span className="font-bold text-white">₹{taxAmount}</span>
-                </div>
-
-                <div className="pt-3 border-t border-white/10 flex items-center justify-between text-base">
-                  <span className="font-black text-white">Total Pay</span>
-                  <span className="font-black text-cyanAccent-400">₹{finalAmount}</span>
                 </div>
               </div>
 
+              <div className="pt-3 border-t border-white/10 flex items-center justify-between text-xs font-bold text-slate-200">
+                <span>Total</span>
+                <span>₹{Math.round((baseAmount + taxAmount) * 100) / 100}</span>
+              </div>
+
+              {/* Subsection: APPLY COUPON CODE */}
+              <div className="pt-3 border-t border-white/10 space-y-2.5">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-white uppercase tracking-wide">
+                  <Tag className="w-3.5 h-3.5 text-cyanAccent-400" />
+                  <span>Apply Coupon Code</span>
+                </div>
+
+                <form onSubmit={handleApplyCoupon} className="flex gap-2 flex-wrap sm:flex-nowrap">
+                  <input
+                    type="text"
+                    placeholder="Try HARBOR20"
+                    value={couponInput}
+                    onChange={(e) => setCouponInput(e.target.value)}
+                    className="min-w-0 flex-1 px-3 py-2 text-xs bg-harbour-darker border border-white/15 rounded-xl uppercase font-bold text-white focus:outline-none focus:border-cyanAccent-500"
+                  />
+                  <GlassButton type="submit" size="sm" variant="secondary" className="shrink-0">
+                    Apply
+                  </GlassButton>
+                </form>
+
+                {discountAmount > 0 && (
+                  <div className="flex items-center justify-between text-xs font-bold text-emerald-400 pt-1">
+                    <span>Discount</span>
+                    <span>−₹{discountAmount}</span>
+                  </div>
+                )}
+
+                {appliedCoupon && (
+                  <p className="text-[11px] text-emerald-400 font-medium">
+                    ✓ Coupon '{appliedCoupon}' applied successfully!
+                  </p>
+                )}
+              </div>
+
+              {/* Total Payable */}
+              <div className="pt-3 border-t border-white/10 flex items-center justify-between">
+                <span className="text-sm font-black text-white">Total Payable</span>
+                <span className="text-xl font-black text-cyanAccent-400">₹{finalAmount}</span>
+              </div>
+
+              {/* Book Now Button */}
               <GlassButton
                 onClick={handlePayAndConfirm}
                 loading={processing}
-                className="w-full py-3.5"
+                className="w-full py-3.5 mt-5"
+                variant="gradient"
                 icon={ShieldCheck}
               >
-                {processing ? 'Processing Payment...' : `Pay ₹${finalAmount} & Confirm`}
+                {processing ? 'Processing Payment...' : 'Book Now →'}
               </GlassButton>
             </GlassCard>
           </div>
