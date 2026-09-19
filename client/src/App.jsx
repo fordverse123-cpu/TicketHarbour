@@ -38,7 +38,7 @@ import AdminListings from './pages/admin/AdminListings';
 import SuperAdminDashboard from './pages/admin/SuperAdminDashboard';
 import CreateAdmin from './pages/admin/CreateAdmin';
 
-import HyperspeedBackground from './components/layout/HyperspeedBackground';
+import AeroShardsBackground from './components/layout/AeroShardsBackground';
 
 // Dedicated Category Pages
 import MoviesPage from './pages/MoviesPage';
@@ -52,11 +52,8 @@ function App() {
       <AuthProvider>
         <BrowserRouter>
           <div className="relative min-h-screen font-sans bg-[var(--th-page)] text-[var(--th-text)] overflow-x-hidden transition-colors duration-200">
-            {/* Hyperspeed WebGL Background */}
-            <HyperspeedBackground />
-
-            {/* Dark/Light Overlay for UI legibility */}
-            <div className="fixed inset-0 bg-black/30 dark:bg-black/40 light:bg-white/70 pointer-events-none z-0" />
+            {/* AeroShards WebGL Background */}
+            <AeroShardsBackground />
 
             {/* Main App Canvas */}
             <div className="relative z-10 flex flex-col min-h-screen">
