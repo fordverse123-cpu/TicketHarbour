@@ -7,14 +7,36 @@ import GlassInput from '../components/ui/GlassInput';
 import toast from 'react-hot-toast';
 import { Ticket, ShieldCheck, Tag, CheckCircle2, Download, ArrowLeft, Search, Check, CreditCard, User, Layers } from 'lucide-react';
 
+import AppLoader from '../components/AppLoader';
+
 export default function Checkout() {
   const { state } = useLocation();
   const navigate = useNavigate();
 
-  const listing = state?.listing;
-  const schedule = state?.schedule;
-  const seats = state?.seats || [];
-  const quantity = state?.quantity || 1;
+  const [checkoutSession] = useState(() => {
+    if (state?.listing && state?.schedule) {
+      const data = {
+        listing: state.listing,
+        schedule: state.schedule,
+        seats: state.seats || [],
+        quantity: state.quantity || 1,
+      };
+      try {
+        sessionStorage.setItem('tixora_checkout_session', JSON.stringify(data));
+      } catch (e) {}
+      return data;
+    }
+    try {
+      const stored = sessionStorage.getItem('tixora_checkout_session');
+      if (stored) return JSON.parse(stored);
+    } catch (e) {}
+    return null;
+  });
+
+  const listing = checkoutSession?.listing;
+  const schedule = checkoutSession?.schedule;
+  const seats = checkoutSession?.seats || [];
+  const quantity = checkoutSession?.quantity || 1;
 
   const [couponInput, setCouponInput] = useState('');
   const [appliedCoupon, setAppliedCoupon] = useState(null);
@@ -25,7 +47,7 @@ export default function Checkout() {
   if (!listing || !schedule) {
     return (
       <GlassCard className="text-center py-20 space-y-4 max-w-lg mx-auto">
-        <p className="text-base font-bold text-white">No active checkout session</p>
+        <p className="text-base font-bold text-white">Please select a ticket before proceeding to checkout.</p>
         <Link to="/listings">
           <GlassButton variant="gradient">Browse Listings</GlassButton>
         </Link>
@@ -125,6 +147,7 @@ export default function Checkout() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-8 pb-16">
+      <AppLoader visible={processing} mode="fullscreen" text="Processing Payment & Confirming Ticket..." />
       
       {/* Back Button */}
       <button

@@ -255,7 +255,7 @@ export default function TrainBookingPage() {
         </aside>
 
         {/* Right Train Results Area */}
-        <main className="lg:col-span-3 space-y-6">
+        <main className="lg:col-span-3 space-y-6 relative min-h-[320px]">
           <div className="flex items-center justify-between glass-card p-4 rounded-2xl border border-[var(--border)] bg-[var(--card)]">
             <div className="flex items-center gap-2">
               <Train className="w-5 h-5 text-[var(--primary)]" />
@@ -272,12 +272,7 @@ export default function TrainBookingPage() {
           </div>
 
           {/* State Machine Rendering */}
-          {status === 'loading' && (
-            <div className="space-y-4">
-              <PageLoader text="Searching available trains..." />
-              <SkeletonLoader count={3} />
-            </div>
-          )}
+          <AppLoader visible={status === 'loading'} mode="contained" text="Searching available trains..." />
 
           {status === 'error' && (
             <div className="text-center py-16 glass-card rounded-3xl space-y-4 p-8 border border-[var(--border)] bg-[var(--card)]">

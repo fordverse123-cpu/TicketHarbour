@@ -40,10 +40,10 @@ export default function TrainCard({ train, onBookNow }) {
   };
 
   return (
-    <SpotlightCard className="w-full h-full rounded-3xl overflow-hidden border border-white/10 bg-[#111111]">
+    <SpotlightCard className="w-full h-auto rounded-3xl overflow-hidden border border-white/10 bg-[#111111]" contentClassName="w-full h-full">
       <div className="flex flex-col md:flex-row w-full bg-[#111111] h-full">
         {/* Left Main Information Panel */}
-        <div className="p-6 flex-1 space-y-5 text-white">
+        <div className="p-5 sm:p-6 flex-1 space-y-4 text-white">
           {/* Train Header */}
           <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/10 pb-3">
             <div className="flex items-center gap-3">

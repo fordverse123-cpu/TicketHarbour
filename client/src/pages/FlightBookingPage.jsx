@@ -6,6 +6,8 @@ import FlightFilters from '../components/flight/FlightFilters';
 import SkeletonLoader from '../components/common/SkeletonLoader';
 import { Plane, RefreshCw, Filter, ArrowUpDown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import toast from 'react-hot-toast';
 
 const MOCK_FLIGHTS = [
   {
@@ -167,6 +169,30 @@ export default function FlightBookingPage() {
     setFilteredFlights(sorted);
   };
 
+  const handleBookFlight = (flightObj, activeTier) => {
+    if (!user) {
+      toast.error('Please log in to proceed with flight booking.');
+      navigate('/login');
+      return;
+    }
+
+    const price = activeTier?.price || flightObj.pricingTiers?.[0]?.price || 5499;
+
+    navigate('/checkout', {
+      state: {
+        listing: flightObj,
+        schedule: {
+          _id: `sch-${flightObj._id}-flight`,
+          date: new Date().toISOString().split('T')[0],
+          startTime: flightObj.transitInfo?.departureTime || '10:30',
+          price,
+        },
+        seats: [],
+        quantity: 1,
+      },
+    });
+  };
+
   return (
     <div className="space-y-8 pb-16">
       <div className="border-b border-white/10 pb-4 space-y-1">
@@ -201,7 +227,7 @@ export default function FlightBookingPage() {
         </aside>
 
         {/* Flight Cards List */}
-        <main className="lg:col-span-3 space-y-6">
+        <main className="lg:col-span-3 space-y-6 relative min-h-[320px]">
           <div className="flex flex-wrap items-center justify-between glass-card p-4 rounded-2xl gap-3">
             <div className="flex items-center gap-2">
               <Plane className="w-5 h-5 text-cyanAccent rotate-45" />
@@ -248,7 +274,13 @@ export default function FlightBookingPage() {
               </p>
             </div>
           ) : (
-            filteredFlights.map((f) => <FlightCard key={f._id} flight={f} />)
+            filteredFlights.map((f) => (
+              <FlightCard
+                key={f._id}
+                flight={f}
+                onSelect={(flightObj, tier) => handleBookFlight(flightObj, tier)}
+              />
+            ))
           )}
         </main>
       </div>

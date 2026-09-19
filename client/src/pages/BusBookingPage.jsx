@@ -6,6 +6,8 @@ import BusFilters from '../components/bus/BusFilters';
 import PageLoader from '../components/common/PageLoader';
 import { Bus, Filter, ArrowUpDown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import toast from 'react-hot-toast';
 
 const MOCK_BUSES = [
   {
@@ -96,10 +98,12 @@ const MOCK_BUSES = [
 
 export default function BusBookingPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [buses, setBuses] = useState([]);
   const [filteredBuses, setFilteredBuses] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [sortBy, setSortBy] = useState('DEPARTURE');
+  const [lastSearchParams, setLastSearchParams] = useState(null);
   const [showMobileFilter, setShowMobileFilter] = useState(false);
   const [filters, setFilters] = useState({
     busTypes: [],
@@ -107,6 +111,38 @@ export default function BusBookingPage() {
     timeSlot: 'ALL',
     minRating: 0,
   });
+
+  const handleBookSeat = (busObj, selectedSeats, totalAmount) => {
+    if (!selectedSeats || selectedSeats.length === 0) {
+      toast.error('Please select a ticket before proceeding to checkout.');
+      return;
+    }
+    if (!user) {
+      toast.error('Please log in to proceed with bus booking.');
+      navigate('/login');
+      return;
+    }
+
+    const pricePerSeat = Math.round(totalAmount / selectedSeats.length);
+    const seatObjects = selectedSeats.map((seatId) => ({
+      seatId,
+      price: pricePerSeat,
+    }));
+
+    navigate('/checkout', {
+      state: {
+        listing: busObj,
+        schedule: {
+          _id: `sch-${busObj._id}-bus`,
+          date: lastSearchParams?.date || new Date().toISOString().split('T')[0],
+          startTime: busObj.transitInfo?.departureTime || '21:00',
+          price: pricePerSeat,
+        },
+        seats: seatObjects,
+        quantity: selectedSeats.length,
+      },
+    });
+  };
 
   useEffect(() => {
     fetchBuses();
@@ -175,10 +211,6 @@ export default function BusBookingPage() {
     setFilteredBuses(sorted);
   };
 
-  const handleBookSeat = (selectedSeats, totalAmount) => {
-    alert(`Seats Selected: ${selectedSeats.join(', ')} • Total Amount: ₹${totalAmount}`);
-  };
-
   return (
     <div className="space-y-8 pb-16 max-w-7xl mx-auto">
       <div className="border-b border-white/10 pb-4 space-y-1">
@@ -219,7 +251,7 @@ export default function BusBookingPage() {
         </aside>
 
         {/* Right Bus Cards List */}
-        <main className="lg:col-span-3 space-y-6">
+        <main className="lg:col-span-3 space-y-6 relative min-h-[320px]">
           <div className="flex flex-wrap items-center justify-between bg-[#111111] border border-white/10 p-4 rounded-2xl gap-3">
             <div className="flex items-center gap-2">
               <Bus className="w-5 h-5 text-[#03B3C3]" />
@@ -282,7 +314,11 @@ export default function BusBookingPage() {
             </div>
           ) : (
             filteredBuses.map((b) => (
-              <BusCard key={b._id} bus={b} onBookSeat={handleBookSeat} />
+              <BusCard
+                key={b._id}
+                bus={b}
+                onBookSeat={(selectedSeats, total) => handleBookSeat(b, selectedSeats, total)}
+              />
             ))
           )}
         </main>

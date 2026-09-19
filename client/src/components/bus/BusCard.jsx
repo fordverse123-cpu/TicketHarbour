@@ -28,7 +28,7 @@ export default function BusCard({ bus, onBookSeat }) {
   );
 
   return (
-    <SpotlightCard className="w-full h-full rounded-3xl border border-white/10 bg-[#111111] overflow-hidden">
+    <SpotlightCard className="w-full h-auto min-h-0 self-start rounded-3xl border border-white/10 bg-[#111111] overflow-hidden" contentClassName="h-auto min-h-0">
       <div className="space-y-0">
         {/* Top Main Bus Info Card */}
         <div className="p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
