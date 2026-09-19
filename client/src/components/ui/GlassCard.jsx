@@ -19,10 +19,10 @@ export default function GlassCard({
     backgroundColor: isDark ? '#111111' : '#FFFFFF',
     colors: isDark
       ? ['#03B3C3', '#6750A2', '#D856BF']
-      : ['#0891B2', '#5B4FD6', '#C026A3'],
+      : ['#0891B2', '#4F46E5', '#C026A3'],
     glowColor: isDark ? '185 80 65' : '200 65 50',
-    glowRadius: isDark ? 25 : 20,
-    glowIntensity: isDark ? 0.65 : 0.45,
+    glowRadius: isDark ? 24 : 22,
+    glowIntensity: isDark ? 0.55 : 0.40,
     edgeSensitivity: 30,
     coneSpread: 25,
     animated: false,

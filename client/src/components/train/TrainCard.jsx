@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Train, ArrowRight, Info, CheckCircle2, ShieldCheck } from 'lucide-react';
+import { Train, ArrowRight, Info, CheckCircle2 } from 'lucide-react';
 import TrainDetailsModal from './TrainDetailsModal';
 import BorderGlow from '../ui/BorderGlow';
 import { useTheme } from '../../context/ThemeContext';
 
-export default function TrainCard({ train, onSelectClass }) {
+export default function TrainCard({ train, onBookNow }) {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
 
@@ -38,32 +37,41 @@ export default function TrainCard({ train, onSelectClass }) {
 
   const activeTier = tiers.find((t) => t.classType === selectedClass) || tiers[0];
 
+  const handleBooking = () => {
+    if (onBookNow) {
+      onBookNow(train, activeTier);
+    }
+  };
+
   return (
     <BorderGlow
       borderRadius={24}
       className="w-full h-full"
       backgroundColor={isDark ? '#151515' : '#FFFFFF'}
+      colors={isDark ? ['#03B3C3', '#6750A2', '#D856BF'] : ['#0891B2', '#4F46E5', '#C026A3']}
+      glowColor={isDark ? '185 80 65' : '200 65 50'}
+      glowRadius={isDark ? 24 : 22}
       glowIntensity={isDark ? 0.50 : 0.35}
     >
-      <div className="glass-card flex flex-col md:flex-row border border-[var(--th-border)] rounded-3xl overflow-hidden shadow-xl transition-all w-full">
-        {/* Left Main Information Panel (~65-70%) */}
-        <div className="p-6 flex-1 space-y-5 bg-[var(--th-card)] text-[var(--th-text)]">
+      <div className="glass-card flex flex-col md:flex-row border border-[var(--border)] rounded-3xl overflow-hidden shadow-xl transition-all w-full bg-[var(--card)]">
+        {/* Left Main Information Panel */}
+        <div className="p-6 flex-1 space-y-5 text-[var(--foreground)]">
           {/* Train Header */}
-          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[var(--th-border)] pb-3">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[var(--border)] pb-3">
             <div className="flex items-center gap-3">
-              <span className="px-3 py-1 bg-[var(--th-accent)]/20 text-[var(--th-accent)] border border-[var(--th-accent)]/30 font-mono font-bold text-xs rounded-xl shadow-sm">
+              <span className="px-3 py-1 bg-blue-100 dark:bg-blue-950 text-[#1D4ED8] dark:text-[#60A5FA] border border-blue-200 dark:border-blue-800 font-mono font-bold text-xs rounded-xl shadow-sm">
                 #{trainNo}
               </span>
-              <h3 className="font-black text-[var(--th-text)] text-xl sm:text-2xl tracking-tight">
+              <h3 className="font-black text-[#111827] dark:text-[#FFFFFF] text-xl sm:text-2xl tracking-tight">
                 {title}
               </h3>
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="text-[11px] font-bold text-[var(--th-text-secondary)] bg-[var(--th-surface-2)] px-2.5 py-1 rounded-lg border border-[var(--th-border)]">
+              <span className="text-[11px] font-bold text-[#4B5563] dark:text-[#A1A1AA] bg-[var(--muted)] px-2.5 py-1 rounded-lg border border-[var(--border)]">
                 Runs Daily
               </span>
-              <span className="text-[11px] font-bold text-[var(--th-success)] bg-[var(--th-success)]/10 px-2.5 py-1 rounded-lg border border-[var(--th-success)]/20">
+              <span className="text-[11px] font-bold text-[#059669] dark:text-[#22C55E] bg-emerald-50 dark:bg-emerald-950/60 px-2.5 py-1 rounded-lg border border-emerald-200 dark:border-emerald-800">
                 Pantry Car
               </span>
             </div>
@@ -73,41 +81,41 @@ export default function TrainCard({ train, onSelectClass }) {
           <div className="grid grid-cols-12 gap-2 items-center py-2 text-xs">
             {/* Departure */}
             <div className="col-span-4 space-y-1">
-              <span className="text-2xl sm:text-4xl font-black text-[var(--th-text)] block tracking-tight">
+              <span className="text-2xl sm:text-4xl font-black text-[#111827] dark:text-[#FFFFFF] block tracking-tight">
                 {departureTime}
               </span>
-              <p className="font-bold text-sm text-[var(--th-text-secondary)] truncate">{source}</p>
+              <p className="font-bold text-sm text-[#374151] dark:text-[#D1D5DB] truncate">{source}</p>
             </div>
 
             {/* Duration Graphic */}
             <div className="col-span-4 text-center space-y-1.5">
-              <span className="text-xs text-[var(--th-muted)] font-semibold block">{duration}</span>
+              <span className="text-xs text-[#6B7280] dark:text-[#9CA3AF] font-semibold block">{duration}</span>
               <div className="relative flex items-center justify-center">
-                <div className="h-0.5 w-full bg-[var(--th-border)] rounded"></div>
-                <Train className="w-5 h-5 text-[var(--th-accent)] absolute bg-[var(--th-card)] px-0.5" />
+                <div className="h-0.5 w-full bg-[var(--border)] rounded"></div>
+                <Train className="w-5 h-5 text-[var(--primary)] absolute bg-[var(--card)] px-0.5" />
               </div>
-              <span className="text-[11px] font-bold text-[var(--th-muted)] block">Superfast</span>
+              <span className="text-[11px] font-bold text-[#6B7280] dark:text-[#9CA3AF] block">Superfast</span>
             </div>
 
             {/* Arrival */}
             <div className="col-span-4 text-right space-y-1">
-              <span className="text-2xl sm:text-4xl font-black text-[var(--th-text)] block tracking-tight">
+              <span className="text-2xl sm:text-4xl font-black text-[#111827] dark:text-[#FFFFFF] block tracking-tight">
                 {arrivalTime}
               </span>
-              <p className="font-bold text-sm text-[var(--th-text-secondary)] truncate">{destination}</p>
+              <p className="font-bold text-sm text-[#374151] dark:text-[#D1D5DB] truncate">{destination}</p>
             </div>
           </div>
 
           {/* Class Selection Chips & Availability Status */}
-          <div className="space-y-2.5 pt-2 border-t border-[var(--th-border)]">
+          <div className="space-y-2.5 pt-2 border-t border-[var(--border)]">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-[var(--th-muted)] uppercase tracking-wider block">
+              <span className="text-xs font-bold text-[#6B7280] dark:text-[#9CA3AF] uppercase tracking-wider block">
                 Select Class & Availability
               </span>
               <button
                 type="button"
                 onClick={() => setShowDetailsModal(true)}
-                className="text-xs font-bold text-[var(--th-accent)] flex items-center gap-1 hover:underline cursor-pointer"
+                className="text-xs font-bold text-[var(--primary)] flex items-center gap-1 hover:underline cursor-pointer"
               >
                 <Info className="w-4 h-4" /> Route Details
               </button>
@@ -121,10 +129,10 @@ export default function TrainCard({ train, onSelectClass }) {
                 const isRAC = statusStr.includes('RAC');
                 const isWL = statusStr.includes('WL') || statusStr.includes('WAIT');
 
-                let statusColorClass = 'text-[var(--th-success)]';
-                if (isRAC) statusColorClass = 'text-[var(--th-accent)]';
-                else if (isWL) statusColorClass = 'text-[var(--th-warning)]';
-                else if (!isAvailable) statusColorClass = 'text-[var(--th-danger)]';
+                let statusColorClass = 'text-[#059669] dark:text-[#22C55E]';
+                if (isRAC) statusColorClass = 'text-[var(--primary)]';
+                else if (isWL) statusColorClass = 'text-[#D97706] dark:text-[#F59E0B]';
+                else if (!isAvailable) statusColorClass = 'text-[#DC2626] dark:text-[#EF4444]';
 
                 return (
                   <button
@@ -132,19 +140,18 @@ export default function TrainCard({ train, onSelectClass }) {
                     key={t.tierName}
                     onClick={() => {
                       setSelectedClass(t.classType || t.tierName);
-                      if (onSelectClass) onSelectClass(t);
                     }}
                     className={`p-3 rounded-2xl border text-left transition-all min-w-[110px] cursor-pointer ${
                       isSelected
-                        ? 'border-[var(--th-accent)] bg-[var(--th-accent)]/15 ring-2 ring-[var(--th-accent)]/30 shadow-md'
-                        : 'border-[var(--th-border)] bg-[var(--th-surface-2)] hover:border-[var(--th-accent)]/50'
+                        ? 'border-[var(--primary)] bg-[var(--primary)]/10 ring-2 ring-[var(--primary)]/30 shadow-md'
+                        : 'border-[var(--border)] bg-[var(--muted)] hover:border-[var(--primary)]/50'
                     }`}
                   >
                     <div className="flex items-center justify-between gap-2">
-                      <span className="font-black text-[var(--th-text)] text-sm">
+                      <span className="font-black text-[#111827] dark:text-[#FFFFFF] text-sm">
                         {t.classType || t.tierName}
                       </span>
-                      <span className="font-bold text-[var(--th-text)] text-xs">
+                      <span className="font-bold text-[#111827] dark:text-[#FFFFFF] text-xs">
                         ₹{t.price}
                       </span>
                     </div>
@@ -161,16 +168,16 @@ export default function TrainCard({ train, onSelectClass }) {
           </div>
         </div>
 
-        {/* Right Pricing & Booking Panel (~30-35%) */}
-        <div className="bg-[var(--th-surface-2)] p-6 md:w-72 border-t md:border-t-0 md:border-l border-[var(--th-border)] flex flex-col justify-between space-y-4">
+        {/* Right Pricing & Booking Panel */}
+        <div className="bg-[var(--muted)] p-6 md:w-72 border-t md:border-t-0 md:border-l border-[var(--border)] flex flex-col justify-between space-y-4">
           <div className="space-y-1.5">
-            <span className="text-xs text-[var(--th-muted)] font-semibold uppercase tracking-wider block">
+            <span className="text-xs text-[#4B5563] dark:text-[#A1A1AA] font-semibold uppercase tracking-wider block">
               Class Fare ({selectedClass})
             </span>
-            <div className="text-3xl sm:text-4xl font-black text-[var(--th-text)] tracking-tight">
+            <div className="text-3xl sm:text-4xl font-black text-[#111827] dark:text-[#FFFFFF] tracking-tight">
               ₹{activeTier?.price || 500}
             </div>
-            <span className="text-xs text-[var(--th-success)] font-bold block flex items-center gap-1">
+            <span className="text-xs text-[#059669] dark:text-[#22C55E] font-bold block flex items-center gap-1">
               <CheckCircle2 className="w-4 h-4" /> Free Cancellation Supported
             </span>
           </div>
@@ -178,18 +185,18 @@ export default function TrainCard({ train, onSelectClass }) {
           <div className="space-y-2.5">
             <button
               type="button"
-              onClick={() => onSelectClass && onSelectClass(activeTier)}
-              className="w-full h-14 bg-gradient-to-r from-[var(--th-accent)] to-[var(--th-accent-2)] hover:opacity-95 text-white font-black text-sm rounded-2xl shadow-lg flex items-center justify-center gap-2 transition-all cursor-pointer"
+              onClick={handleBooking}
+              className="w-full h-14 bg-gradient-to-r from-[var(--primary)] to-[var(--secondary)] hover:opacity-95 text-white font-black text-sm rounded-2xl shadow-lg flex items-center justify-center gap-2 transition-all cursor-pointer"
             >
-              Select Berth / Book Now <ArrowRight className="w-4 h-4" />
+              Book Now <ArrowRight className="w-4 h-4" />
             </button>
 
             <button
               type="button"
               onClick={() => setShowDetailsModal(true)}
-              className="w-full py-2.5 bg-[var(--th-card)] hover:bg-[var(--th-surface-2)] border border-[var(--th-border)] text-[var(--th-text)] font-semibold text-xs rounded-xl flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+              className="w-full py-2.5 bg-[var(--card)] hover:bg-[var(--muted)] border border-[var(--border)] text-[var(--foreground)] font-semibold text-xs rounded-xl flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
             >
-              <Info className="w-4 h-4 text-[var(--th-accent)]" /> Route Schedule
+              <Info className="w-4 h-4 text-[var(--primary)]" /> Route Schedule
             </button>
           </div>
         </div>

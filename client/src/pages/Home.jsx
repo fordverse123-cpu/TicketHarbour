@@ -37,7 +37,7 @@ const CATEGORY_CARDS = [
   { id: 'events', title: 'Events', icon: Calendar, emoji: '🎵', desc: 'Live concerts, music festivals & standup comedy', link: '/events' },
   { id: 'sports', title: 'Sports', icon: Trophy, emoji: '🏆', desc: 'Cricket, football, IPL & stadium matches', link: '/sports' },
   { id: 'bus', title: 'Bus', icon: Bus, emoji: '🚌', desc: 'Intercity AC sleeper & Volvo bus tickets', link: '/bus' },
-  { id: 'train', title: 'Train', icon: Train, emoji: '🚆', desc: 'Indian Railways train schedule & seat reservation', link: '/train' },
+  { id: 'train', title: 'Train', icon: Train, emoji: '🚆', desc: 'Indian Railways train schedule & ticket reservation', link: '/train' },
   { id: 'flight', title: 'Flights', icon: Plane, emoji: '✈️', desc: 'Domestic & international cheap flight tickets', link: '/flights' },
   { id: 'attractions', title: 'Attractions', icon: Ticket, emoji: '🎟️', desc: 'Amusement parks, water parks & city passes', link: '/attractions' },
 ];
@@ -79,14 +79,14 @@ export default function Home() {
   const handleUnifiedSearch = (e) => {
     e.preventDefault();
     if (searchCategory === 'train') {
-      let url = `/trains?`;
+      let url = `/train?`;
       if (fromCity) url += `from=${encodeURIComponent(fromCity)}&`;
       if (toCity) url += `to=${encodeURIComponent(toCity)}&`;
       if (travelDate) url += `date=${encodeURIComponent(travelDate)}&`;
       if (trainClass) url += `journeyClass=${encodeURIComponent(trainClass)}`;
       navigate(url);
     } else if (searchCategory === 'bus') {
-      let url = `/buses?`;
+      let url = `/bus?`;
       if (fromCity) url += `from=${encodeURIComponent(fromCity)}&`;
       if (toCity) url += `to=${encodeURIComponent(toCity)}&`;
       if (travelDate) url += `date=${encodeURIComponent(travelDate)}`;
@@ -99,9 +99,9 @@ export default function Home() {
       if (travellers) url += `passengers=${encodeURIComponent(travellers)}`;
       navigate(url);
     } else {
-      let url = `/listings?category=${searchCategory}&`;
+      let url = `/listings?categoryType=${searchCategory}&`;
       if (keyword) url += `search=${encodeURIComponent(keyword)}&`;
-      if (fromCity) url += `city=${encodeURIComponent(fromCity)}`;
+      if (fromCity) url += `location=${encodeURIComponent(fromCity)}`;
       navigate(url);
     }
   };
@@ -110,32 +110,32 @@ export default function Home() {
     <div className="space-y-16 pb-16">
       
       {/* GLOSSY HERO SECTION */}
-      <section className="relative rounded-3xl overflow-hidden bg-harbour-card/90 border border-white/10 p-8 sm:p-14 shadow-2xl backdrop-blur-2xl">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-cyanAccent-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-indigoAccent-600/15 rounded-full blur-3xl pointer-events-none" />
+      <section className="relative rounded-3xl overflow-hidden bg-[var(--card)] border border-[var(--border)] p-8 sm:p-14 shadow-2xl backdrop-blur-2xl">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-[var(--primary)]/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-[var(--secondary)]/15 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative z-10 max-w-4xl mx-auto text-center space-y-6">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyanAccent-500/10 border border-cyanAccent-500/30 text-cyanAccent-400 text-xs font-bold backdrop-blur-md">
-            <Zap className="w-4 h-4 text-cyanAccent-400" /> Unified Booking Platform
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[var(--primary)]/10 border border-[var(--primary)]/30 text-[var(--primary)] text-xs font-bold backdrop-blur-md">
+            <Zap className="w-4 h-4 text-[var(--primary)]" /> Unified Booking Platform
           </div>
 
-          <h1 className="text-4xl sm:text-6xl font-black tracking-tight leading-tight text-white">
+          <h1 className="text-4xl sm:text-6xl font-black tracking-tight leading-tight text-[var(--foreground)]">
             Your Tickets. Your Journey. <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyanAccent-400 via-indigoAccent-400 to-indigoAccent-600">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--primary)] via-[var(--secondary)] to-[var(--accent)]">
               One Harbour.
             </span>
           </h1>
 
-          <p className="text-slate-300 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed">
+          <p className="text-[var(--muted-foreground)] text-sm sm:text-base max-w-2xl mx-auto leading-relaxed">
             Book movies, events, sports, buses, trains, flights and attractions — all in one place.
           </p>
 
           {/* LARGE GLOSSY SEARCH PANEL */}
           <div className="pt-4 max-w-4xl mx-auto">
-            <div className="bg-harbour-dark/90 border border-white/15 rounded-3xl p-4 sm:p-6 shadow-2xl backdrop-blur-2xl space-y-4">
+            <div className="bg-[var(--card)] border border-[var(--border)] rounded-3xl p-4 sm:p-6 shadow-2xl backdrop-blur-2xl space-y-4">
               
               {/* Category Search Tabs */}
-              <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none border-b border-white/10">
+              <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none border-b border-[var(--border)]">
                 {CATEGORY_CARDS.map((cat) => {
                   const Icon = cat.icon;
                   const isSel = searchCategory === cat.id;
@@ -146,8 +146,8 @@ export default function Home() {
                       onClick={() => setSearchCategory(cat.id)}
                       className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
                         isSel
-                          ? 'bg-gradient-to-r from-cyanAccent-500 to-indigoAccent-600 text-white shadow-lg'
-                          : 'text-slate-400 hover:text-white hover:bg-white/5'
+                          ? 'bg-gradient-to-r from-[var(--primary)] to-[var(--secondary)] text-white shadow-lg'
+                          : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--muted)]'
                       }`}
                     >
                       <Icon className="w-4 h-4" />
@@ -162,78 +162,78 @@ export default function Home() {
                 {searchCategory === 'train' ? (
                   <>
                     <div className="space-y-1">
-                      <label className="text-[11px] font-bold uppercase text-slate-400">From Station</label>
+                      <label className="text-[11px] font-bold uppercase text-[var(--muted-foreground)]">From Station</label>
                       <input
                         type="text"
                         placeholder="e.g. Vijayawada (BZA)"
                         value={fromCity}
                         onChange={(e) => setFromCity(e.target.value)}
-                        className="w-full bg-harbour-darker border border-white/15 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyanAccent-500"
+                        className="w-full bg-[var(--input)] border border-[var(--border)] rounded-xl px-3.5 py-2.5 text-xs text-[var(--foreground)] placeholder-[var(--muted-foreground)] focus:outline-none focus:border-[var(--primary)]"
                       />
                     </div>
                     <div className="space-y-1">
-                      <label className="text-[11px] font-bold uppercase text-slate-400">To Station</label>
+                      <label className="text-[11px] font-bold uppercase text-[var(--muted-foreground)]">To Station</label>
                       <input
                         type="text"
                         placeholder="e.g. Hyderabad (SC)"
                         value={toCity}
                         onChange={(e) => setToCity(e.target.value)}
-                        className="w-full bg-harbour-darker border border-white/15 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyanAccent-500"
+                        className="w-full bg-[var(--input)] border border-[var(--border)] rounded-xl px-3.5 py-2.5 text-xs text-[var(--foreground)] placeholder-[var(--muted-foreground)] focus:outline-none focus:border-[var(--primary)]"
                       />
                     </div>
                     <div className="space-y-1">
-                      <label className="text-[11px] font-bold uppercase text-slate-400">Date</label>
+                      <label className="text-[11px] font-bold uppercase text-[var(--muted-foreground)]">Date</label>
                       <input
                         type="date"
                         value={travelDate}
                         onChange={(e) => setTravelDate(e.target.value)}
-                        className="w-full bg-harbour-darker border border-white/15 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-cyanAccent-500"
+                        className="w-full bg-[var(--input)] border border-[var(--border)] rounded-xl px-3.5 py-2.5 text-xs text-[var(--foreground)] focus:outline-none focus:border-[var(--primary)]"
                       />
                     </div>
                     <div className="space-y-1">
-                      <label className="text-[11px] font-bold uppercase text-slate-400">Class</label>
+                      <label className="text-[11px] font-bold uppercase text-[var(--muted-foreground)]">Class</label>
                       <select
                         value={trainClass}
                         onChange={(e) => setTrainClass(e.target.value)}
-                        className="w-full bg-harbour-darker border border-white/15 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-cyanAccent-500"
+                        className="w-full bg-[var(--input)] border border-[var(--border)] rounded-xl px-3.5 py-2.5 text-xs text-[var(--foreground)] focus:outline-none focus:border-[var(--primary)]"
                       >
-                        <option value="All">All Classes</option>
-                        <option value="1A">First AC (1A)</option>
-                        <option value="2A">2 Tier AC (2A)</option>
-                        <option value="3A">3 Tier AC (3A)</option>
-                        <option value="SL">Sleeper (SL)</option>
+                        <option value="All" className="bg-[var(--card)] text-[var(--foreground)]">All Classes</option>
+                        <option value="1A" className="bg-[var(--card)] text-[var(--foreground)]">First AC (1A)</option>
+                        <option value="2A" className="bg-[var(--card)] text-[var(--foreground)]">2 Tier AC (2A)</option>
+                        <option value="3A" className="bg-[var(--card)] text-[var(--foreground)]">3 Tier AC (3A)</option>
+                        <option value="SL" className="bg-[var(--card)] text-[var(--foreground)]">Sleeper (SL)</option>
                       </select>
                     </div>
                   </>
                 ) : searchCategory === 'bus' ? (
                   <>
                     <div className="space-y-1">
-                      <label className="text-[11px] font-bold uppercase text-slate-400">From City</label>
+                      <label className="text-[11px] font-bold uppercase text-[var(--muted-foreground)]">From City</label>
                       <input
                         type="text"
                         placeholder="e.g. Hyderabad"
                         value={fromCity}
                         onChange={(e) => setFromCity(e.target.value)}
-                        className="w-full bg-harbour-darker border border-white/15 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyanAccent-500"
+                        className="w-full bg-[var(--input)] border border-[var(--border)] rounded-xl px-3.5 py-2.5 text-xs text-[var(--foreground)] placeholder-[var(--muted-foreground)] focus:outline-none focus:border-[var(--primary)]"
                       />
                     </div>
                     <div className="space-y-1">
-                      <label className="text-[11px] font-bold uppercase text-slate-400">To City</label>
+                      <label className="text-[11px] font-bold uppercase text-[var(--muted-foreground)]">To City</label>
                       <input
                         type="text"
                         placeholder="e.g. Bengaluru"
                         value={toCity}
                         onChange={(e) => setToCity(e.target.value)}
-                        className="w-full bg-harbour-darker border border-white/15 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyanAccent-500"
+                        className="w-full bg-[var(--input)] border border-[var(--border)] rounded-xl px-3.5 py-2.5 text-xs text-[var(--foreground)] placeholder-[var(--muted-foreground)] focus:outline-none focus:border-[var(--primary)]"
                       />
                     </div>
                     <div className="space-y-1">
-                      <label className="text-[11px] font-bold uppercase text-slate-400">Travel Date</label>
+                      <label className="text-[11px] font-bold uppercase text-[var(--muted-foreground)]">Travel Date</label>
                       <input
                         type="date"
                         value={travelDate}
                         onChange={(e) => setTravelDate(e.target.value)}
-                        className="w-full bg-harbour-darker border border-white/15 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-cyanAccent-500"
+                        className="w-full bg-[var(--input)] border border-[var(--border)] rounded-xl px-3.5 py-2.5 text-xs text-[var(--foreground)] focus:outline-none focus:border-[var(--primary)]"
                       />
                     </div>
                     <div className="flex items-end">
@@ -245,68 +245,68 @@ export default function Home() {
                 ) : searchCategory === 'flight' ? (
                   <>
                     <div className="space-y-1">
-                      <label className="text-[11px] font-bold uppercase text-slate-400">Departure Airport</label>
+                      <label className="text-[11px] font-bold uppercase text-[var(--muted-foreground)]">Departure Airport</label>
                       <input
                         type="text"
                         placeholder="e.g. DEL (Delhi)"
                         value={fromCity}
                         onChange={(e) => setFromCity(e.target.value)}
-                        className="w-full bg-harbour-darker border border-white/15 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyanAccent-500"
+                        className="w-full bg-[var(--input)] border border-[var(--border)] rounded-xl px-3.5 py-2.5 text-xs text-[var(--foreground)] placeholder-[var(--muted-foreground)] focus:outline-none focus:border-[var(--primary)]"
                       />
                     </div>
                     <div className="space-y-1">
-                      <label className="text-[11px] font-bold uppercase text-slate-400">Arrival Airport</label>
+                      <label className="text-[11px] font-bold uppercase text-[var(--muted-foreground)]">Arrival Airport</label>
                       <input
                         type="text"
                         placeholder="e.g. BOM (Mumbai)"
                         value={toCity}
                         onChange={(e) => setToCity(e.target.value)}
-                        className="w-full bg-harbour-darker border border-white/15 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyanAccent-500"
+                        className="w-full bg-[var(--input)] border border-[var(--border)] rounded-xl px-3.5 py-2.5 text-xs text-[var(--foreground)] placeholder-[var(--muted-foreground)] focus:outline-none focus:border-[var(--primary)]"
                       />
                     </div>
                     <div className="space-y-1">
-                      <label className="text-[11px] font-bold uppercase text-slate-400">Departure Date</label>
+                      <label className="text-[11px] font-bold uppercase text-[var(--muted-foreground)]">Departure Date</label>
                       <input
                         type="date"
                         value={travelDate}
                         onChange={(e) => setTravelDate(e.target.value)}
-                        className="w-full bg-harbour-darker border border-white/15 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-cyanAccent-500"
+                        className="w-full bg-[var(--input)] border border-[var(--border)] rounded-xl px-3.5 py-2.5 text-xs text-[var(--foreground)] focus:outline-none focus:border-[var(--primary)]"
                       />
                     </div>
                     <div className="space-y-1">
-                      <label className="text-[11px] font-bold uppercase text-slate-400">Passengers</label>
+                      <label className="text-[11px] font-bold uppercase text-[var(--muted-foreground)]">Passengers</label>
                       <select
                         value={travellers}
                         onChange={(e) => setTravellers(e.target.value)}
-                        className="w-full bg-harbour-darker border border-white/15 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-cyanAccent-500"
+                        className="w-full bg-[var(--input)] border border-[var(--border)] rounded-xl px-3.5 py-2.5 text-xs text-[var(--foreground)] focus:outline-none focus:border-[var(--primary)]"
                       >
-                        <option value="1">1 Passenger</option>
-                        <option value="2">2 Passengers</option>
-                        <option value="3">3 Passengers</option>
-                        <option value="4+">4+ Passengers</option>
+                        <option value="1" className="bg-[var(--card)] text-[var(--foreground)]">1 Passenger</option>
+                        <option value="2" className="bg-[var(--card)] text-[var(--foreground)]">2 Passengers</option>
+                        <option value="3" className="bg-[var(--card)] text-[var(--foreground)]">3 Passengers</option>
+                        <option value="4+" className="bg-[var(--card)] text-[var(--foreground)]">4+ Passengers</option>
                       </select>
                     </div>
                   </>
                 ) : (
                   <>
                     <div className="space-y-1 lg:col-span-2">
-                      <label className="text-[11px] font-bold uppercase text-slate-400">Search Keywords</label>
+                      <label className="text-[11px] font-bold uppercase text-[var(--muted-foreground)]">Search Keywords</label>
                       <input
                         type="text"
                         placeholder="Movie name, concert artist, match..."
                         value={keyword}
                         onChange={(e) => setKeyword(e.target.value)}
-                        className="w-full bg-harbour-darker border border-white/15 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyanAccent-500"
+                        className="w-full bg-[var(--input)] border border-[var(--border)] rounded-xl px-3.5 py-2.5 text-xs text-[var(--foreground)] placeholder-[var(--muted-foreground)] focus:outline-none focus:border-[var(--primary)]"
                       />
                     </div>
                     <div className="space-y-1">
-                      <label className="text-[11px] font-bold uppercase text-slate-400">City</label>
+                      <label className="text-[11px] font-bold uppercase text-[var(--muted-foreground)]">City</label>
                       <input
                         type="text"
                         placeholder="e.g. Mumbai"
                         value={fromCity}
                         onChange={(e) => setFromCity(e.target.value)}
-                        className="w-full bg-harbour-darker border border-white/15 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyanAccent-500"
+                        className="w-full bg-[var(--input)] border border-[var(--border)] rounded-xl px-3.5 py-2.5 text-xs text-[var(--foreground)] placeholder-[var(--muted-foreground)] focus:outline-none focus:border-[var(--primary)]"
                       />
                     </div>
                     <div className="flex items-end">
@@ -334,33 +334,33 @@ export default function Home() {
       <section className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-black text-white tracking-tight">Explore Booking Categories</h2>
-            <p className="text-xs text-slate-400">Instant reservation for entertainment, transit & travel</p>
+            <h2 className="text-2xl font-black text-[var(--foreground)] tracking-tight">Explore Booking Categories</h2>
+            <p className="text-xs text-[var(--muted-foreground)]">Instant reservation for entertainment, transit & travel</p>
           </div>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {CATEGORY_CARDS.map((cat) => (
-            <GlassCard key={cat.id} hover={true} className="flex flex-col justify-between space-y-4 group">
+            <GlassCard key={cat.id} hover={true} className="flex flex-col justify-between space-y-4 group bg-[var(--card)]">
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <span className="text-3xl">{cat.emoji}</span>
-                  <div className="p-2 rounded-xl bg-white/5 border border-white/10 group-hover:border-cyanAccent-500/40 transition-colors">
-                    <cat.icon className="w-5 h-5 text-cyanAccent-400" />
+                  <div className="p-2 rounded-xl bg-[var(--muted)] border border-[var(--border)] group-hover:border-[var(--primary)]/40 transition-colors">
+                    <cat.icon className="w-5 h-5 text-[var(--primary)]" />
                   </div>
                 </div>
 
-                <h3 className="text-lg font-black text-white group-hover:text-cyanAccent-400 transition-colors">
+                <h3 className="text-lg font-black text-[var(--foreground)] group-hover:text-[var(--primary)] transition-colors">
                   {cat.title}
                 </h3>
-                <p className="text-xs text-slate-400 leading-relaxed">
+                <p className="text-xs text-[var(--muted-foreground)] leading-relaxed">
                   {cat.desc}
                 </p>
               </div>
 
               <Link
                 to={cat.link}
-                className="flex items-center gap-2 text-xs font-bold text-cyanAccent-400 group-hover:translate-x-1 transition-transform"
+                className="flex items-center gap-2 text-xs font-bold text-[var(--primary)] group-hover:translate-x-1 transition-transform"
               >
                 <span>Book Now</span>
                 <ArrowRight className="w-4 h-4" />
@@ -374,12 +374,12 @@ export default function Home() {
       <section className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-black text-white tracking-tight">Featured & Trending Bookings</h2>
-            <p className="text-xs text-slate-400">Handpicked movies, events, sports matches & journeys</p>
+            <h2 className="text-2xl font-black text-[var(--foreground)] tracking-tight">Featured & Trending Bookings</h2>
+            <p className="text-xs text-[var(--muted-foreground)]">Handpicked movies, events, sports matches & journeys</p>
           </div>
           <Link
             to="/listings"
-            className="text-xs font-bold text-cyanAccent-400 hover:underline flex items-center gap-1"
+            className="text-xs font-bold text-[var(--primary)] hover:underline flex items-center gap-1"
           >
             <span>View All</span>
             <ArrowRight className="w-4 h-4" />
@@ -397,8 +397,8 @@ export default function Home() {
                 onClick={() => setActiveTab(tab.key)}
                 className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
                   isActive
-                    ? 'bg-gradient-to-r from-cyanAccent-500 to-indigoAccent-600 text-white shadow-md'
-                    : 'bg-white/5 text-slate-400 hover:text-white border border-white/10'
+                    ? 'bg-gradient-to-r from-[var(--primary)] to-[var(--secondary)] text-white shadow-md'
+                    : 'bg-[var(--card)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] border border-[var(--border)]'
                 }`}
               >
                 <Icon className="w-3.5 h-3.5" />
@@ -413,8 +413,8 @@ export default function Home() {
             <Skeleton className="h-64" count={6} />
           </div>
         ) : featuredListings.length === 0 ? (
-          <GlassCard className="text-center py-16">
-            <p className="text-sm text-slate-400">No listings found in this category.</p>
+          <GlassCard className="text-center py-16 bg-[var(--card)]">
+            <p className="text-sm text-[var(--muted-foreground)]">No listings found in this category.</p>
           </GlassCard>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -423,41 +423,41 @@ export default function Home() {
               const startingPrice = item.pricingTiers?.[0]?.price || 150;
 
               return (
-                <GlassCard key={item._id} className="p-0 overflow-hidden flex flex-col justify-between group">
-                  <div className="relative h-48 overflow-hidden bg-harbour-darker">
+                <GlassCard key={item._id} className="p-0 overflow-hidden flex flex-col justify-between group bg-[var(--card)]">
+                  <div className="relative h-48 overflow-hidden bg-[var(--muted)]">
                     <img
                       src={image}
                       alt={item.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
-                    <div className="absolute top-3 left-3 px-3 py-1 bg-black/75 backdrop-blur-md text-cyanAccent-400 text-[10px] font-black rounded-full uppercase tracking-wider border border-white/10">
+                    <div className="absolute top-3 left-3 px-3 py-1 bg-[var(--card)]/90 backdrop-blur-md text-[var(--primary)] text-[10px] font-black rounded-full uppercase tracking-wider border border-[var(--border)]">
                       {item.categoryType}
                     </div>
                   </div>
 
                   <div className="p-5 space-y-4 flex-1 flex flex-col justify-between">
                     <div className="space-y-2">
-                      <div className="flex items-center justify-between text-xs text-slate-400">
+                      <div className="flex items-center justify-between text-xs text-[var(--muted-foreground)]">
                         <span className="flex items-center gap-1 font-semibold">
-                          <MapPin className="w-3.5 h-3.5 text-cyanAccent-400" />
+                          <MapPin className="w-3.5 h-3.5 text-[var(--primary)]" />
                           {item.location?.city || 'All Cities'}
                         </span>
                         <RatingStars rating={item.rating} numReviews={item.numReviews} />
                       </div>
 
-                      <h3 className="font-black text-white text-base line-clamp-1 group-hover:text-cyanAccent-400 transition-colors">
+                      <h3 className="font-black text-[var(--foreground)] text-base line-clamp-1 group-hover:text-[var(--primary)] transition-colors">
                         {item.title}
                       </h3>
                       
-                      <p className="text-xs text-slate-400 line-clamp-2 leading-relaxed">
+                      <p className="text-xs text-[var(--muted-foreground)] line-clamp-2 leading-relaxed">
                         {item.description}
                       </p>
                     </div>
 
-                    <div className="pt-3 border-t border-white/10 flex items-center justify-between">
+                    <div className="pt-3 border-t border-[var(--border)] flex items-center justify-between">
                       <div>
-                        <span className="text-[10px] uppercase font-bold text-slate-400 block">Starting from</span>
-                        <span className="text-lg font-black text-white">
+                        <span className="text-[10px] uppercase font-bold text-[var(--muted-foreground)] block">Starting from</span>
+                        <span className="text-lg font-black text-[var(--foreground)]">
                           ₹{startingPrice}
                         </span>
                       </div>
@@ -479,4 +479,3 @@ export default function Home() {
     </div>
   );
 }
-

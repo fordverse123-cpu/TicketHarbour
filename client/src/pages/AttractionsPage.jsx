@@ -54,7 +54,7 @@ export default function AttractionsPage() {
   const [attractions, setAttractions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
-  const [activeCategory, setActiveCategory] = useState('ALL'); // Tourist, Theme Parks, Museums, Experiences, Adventure, Local
+  const [activeCategory, setActiveCategory] = useState('ALL');
 
   useEffect(() => {
     fetchAttractions();
@@ -84,11 +84,11 @@ export default function AttractionsPage() {
   return (
     <div className="space-y-8 pb-12">
       {/* Page Header */}
-      <div className="border-b border-white/10 pb-6 space-y-2">
-        <h1 className="text-3xl sm:text-4xl font-black text-white tracking-tight">
+      <div className="border-b border-[var(--border)] pb-6 space-y-2">
+        <h1 className="text-3xl sm:text-4xl font-black text-[var(--foreground)] tracking-tight">
           Explore Attractions
         </h1>
-        <p className="text-xs sm:text-sm text-[#B5B5B5]">
+        <p className="text-xs sm:text-sm text-[var(--muted-foreground)]">
           Theme parks, water worlds, guided studio tours, heritage museum passes, and adventure experiences.
         </p>
       </div>
@@ -100,10 +100,10 @@ export default function AttractionsPage() {
             <button
               key={cat}
               onClick={() => setActiveCategory(cat)}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
+              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
                 activeCategory === cat
-                  ? 'bg-gradient-to-r from-[#03B3C3] to-[#6750A2] text-white shadow-lg'
-                  : 'bg-white/5 text-[#A0A0A0] hover:text-white border border-white/10'
+                  ? 'bg-gradient-to-r from-[var(--primary)] to-[var(--secondary)] text-white shadow-lg'
+                  : 'bg-[var(--card)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] border border-[var(--border)]'
               }`}
             >
               {cat}
@@ -127,10 +127,10 @@ export default function AttractionsPage() {
           <Skeleton className="h-72" count={6} />
         </div>
       ) : filteredAttractions.length === 0 ? (
-        <GlassCard className="text-center py-20 space-y-3">
-          <Compass className="w-12 h-12 text-[#03B3C3] mx-auto opacity-80" />
-          <p className="text-lg font-black text-white">No attractions found</p>
-          <p className="text-xs text-[#777777]">Try adjusting your search keywords.</p>
+        <GlassCard className="text-center py-20 space-y-3 bg-[var(--card)]">
+          <Compass className="w-12 h-12 text-[var(--primary)] mx-auto opacity-80" />
+          <p className="text-lg font-black text-[var(--foreground)]">No attractions found</p>
+          <p className="text-xs text-[var(--muted-foreground)]">Try adjusting your search keywords.</p>
         </GlassCard>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -139,41 +139,41 @@ export default function AttractionsPage() {
             const price = item.pricingTiers?.[0]?.price || 1290;
 
             return (
-              <GlassCard key={item._id} className="p-0 overflow-hidden flex flex-col justify-between group">
-                <div className="relative h-52 overflow-hidden bg-black">
+              <GlassCard key={item._id} className="p-0 overflow-hidden flex flex-col justify-between group bg-[var(--card)]">
+                <div className="relative h-52 overflow-hidden bg-[var(--muted)]">
                   <img
                     src={image}
                     alt={item.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
-                  <div className="absolute top-3 left-3 px-3 py-1 bg-black/80 backdrop-blur-md text-[#03B3C3] text-[10px] font-black rounded-full uppercase tracking-wider border border-white/10">
+                  <div className="absolute top-3 left-3 px-3 py-1 bg-[var(--card)]/90 backdrop-blur-md text-[var(--primary)] text-[10px] font-black rounded-full uppercase tracking-wider border border-[var(--border)]">
                     {item.transitInfo?.category || 'Attraction'}
                   </div>
                 </div>
 
                 <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
                   <div className="space-y-2">
-                    <div className="flex items-center justify-between text-xs text-[#B5B5B5]">
+                    <div className="flex items-center justify-between text-xs text-[var(--muted-foreground)]">
                       <span className="flex items-center gap-1 font-semibold">
-                        <MapPin className="w-3.5 h-3.5 text-[#03B3C3]" />
+                        <MapPin className="w-3.5 h-3.5 text-[var(--primary)]" />
                         {item.location?.venue || item.location?.city || 'Park'}
                       </span>
                       <RatingStars rating={item.rating || 4.8} numReviews={item.numReviews || 1200} />
                     </div>
 
-                    <h3 className="font-black text-white text-lg line-clamp-1 group-hover:text-[#03B3C3] transition-colors">
+                    <h3 className="font-black text-[var(--foreground)] text-lg line-clamp-1 group-hover:text-[var(--primary)] transition-colors">
                       {item.title}
                     </h3>
 
-                    <p className="text-xs text-[#777777] line-clamp-2 leading-relaxed">
+                    <p className="text-xs text-[var(--muted-foreground)] line-clamp-2 leading-relaxed">
                       {item.description}
                     </p>
                   </div>
 
-                  <div className="pt-3 border-t border-white/10 flex items-center justify-between">
+                  <div className="pt-3 border-t border-[var(--border)] flex items-center justify-between">
                     <div>
-                      <span className="text-[10px] uppercase font-bold text-[#777777] block">Pass From</span>
-                      <span className="text-xl font-black text-white">₹{price}</span>
+                      <span className="text-[10px] uppercase font-bold text-[var(--muted-foreground)] block">Pass From</span>
+                      <span className="text-xl font-black text-[var(--foreground)]">₹{price}</span>
                     </div>
 
                     <Link to={`/listings/${item.slug || item._id}`}>

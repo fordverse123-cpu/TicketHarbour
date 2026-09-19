@@ -1,12 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import API from '../services/api';
 import TrainSearch from '../components/train/TrainSearch';
 import TrainCard from '../components/train/TrainCard';
 import TrainFilters from '../components/train/TrainFilters';
-import TrainSeatSelection from '../components/train/TrainSeatSelection';
 import SkeletonLoader from '../components/common/SkeletonLoader';
-import { Train, ShieldCheck, Sparkles, RefreshCw, Filter } from 'lucide-react';
+import { Train, RefreshCw, Filter, AlertCircle, SearchX } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import toast from 'react-hot-toast';
 
 const MOCK_TRAINS = [
   {
@@ -50,7 +51,6 @@ const MOCK_TRAINS = [
   },
 ];
 
-// Fare mapping helper for standard railway classes
 const getFareForClass = (cls) => {
   switch (cls) {
     case '1A': return 4600;
@@ -66,17 +66,19 @@ const getFareForClass = (cls) => {
 
 export default function TrainBookingPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const searchSectionRef = useRef(null);
+  const requestIdRef = useRef(0);
+
   const [trains, setTrains] = useState([]);
   const [filteredTrains, setFilteredTrains] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [status, setStatus] = useState('loading'); // 'idle' | 'loading' | 'success' | 'empty' | 'error'
+  const [errorMessage, setErrorMessage] = useState('');
+  const [lastSearchParams, setLastSearchParams] = useState(null);
   const [filters, setFilters] = useState({ trainType: 'ALL', timeSlot: 'ALL', classType: 'ALL' });
-  const [selectedSeatTrain, setSelectedSeatTrain] = useState(null);
-  const [selectedTier, setSelectedTier] = useState(null);
   const [showMobileFilter, setShowMobileFilter] = useState(false);
-  const [searchMessage, setSearchMessage] = useState('');
 
   useEffect(() => {
-    // Initial fetch for default route BZA -> SC
     handleSearch({
       from: { code: 'BZA', city: 'Vijayawada' },
       to: { code: 'SC', city: 'Hyderabad' },
@@ -87,15 +89,16 @@ export default function TrainBookingPage() {
   }, []);
 
   const handleSearch = async (searchParams) => {
-    setLoading(true);
-    setSearchMessage('');
+    const currentRequestId = ++requestIdRef.current;
+    setStatus('loading');
+    setErrorMessage('');
+    setLastSearchParams(searchParams);
 
     const fromCode = searchParams.from?.code || searchParams.from;
     const toCode = searchParams.to?.code || searchParams.to;
     const dateStr = searchParams.date || new Date().toISOString().split('T')[0];
 
     try {
-      // Call MongoDB Backend Train Search API
       const res = await API.get('/trains/search', {
         params: {
           from: fromCode,
@@ -106,7 +109,10 @@ export default function TrainBookingPage() {
         },
       });
 
-      if (res.data && res.data.success && res.data.trains) {
+      // Ignore stale response if a newer search was initiated
+      if (currentRequestId !== requestIdRef.current) return;
+
+      if (res.data && res.data.success && Array.isArray(res.data.trains)) {
         const mappedTrains = res.data.trains.map((t) => {
           const pricingTiers = (t.classes || ['3A', '2A', 'SL']).map((cls) => ({
             tierName: `${cls}`,
@@ -123,11 +129,11 @@ export default function TrainBookingPage() {
             categoryType: 'train',
             transitInfo: {
               number: t.trainNumber,
-              source: `${t.from.stationName} (${t.from.stationCode})`,
-              destination: `${t.to.stationName} (${t.to.stationCode})`,
-              departureTime: t.from.departure,
-              arrivalTime: t.to.arrival,
-              duration: t.duration,
+              source: `${t.from?.stationName || fromCode} (${t.from?.stationCode || fromCode})`,
+              destination: `${t.to?.stationName || toCode} (${t.to?.stationCode || toCode})`,
+              departureTime: t.from?.departure || '10:00',
+              arrivalTime: t.to?.arrival || '18:00',
+              duration: t.duration || '8h 00m',
             },
             pricingTiers,
             route: t.route,
@@ -135,22 +141,32 @@ export default function TrainBookingPage() {
           };
         });
 
-        setTrains(mappedTrains);
-        setFilteredTrains(mappedTrains);
-
-        if (mappedTrains.length === 0) {
-          setSearchMessage(`No trains found between ${fromCode} and ${toCode} for ${dateStr}.`);
+        if (mappedTrains.length > 0) {
+          setTrains(mappedTrains);
+          setFilteredTrains(mappedTrains);
+          setStatus('success');
+        } else {
+          setTrains([]);
+          setFilteredTrains([]);
+          setStatus('empty');
         }
       } else {
+        // Fallback to cached mock data if API succeeds with alternate format
         setTrains(MOCK_TRAINS);
         setFilteredTrains(MOCK_TRAINS);
+        setStatus('success');
       }
     } catch (err) {
-      console.warn('Backend train API error, falling back to cached train data', err);
-      setTrains(MOCK_TRAINS);
-      setFilteredTrains(MOCK_TRAINS);
-    } finally {
-      setLoading(false);
+      if (currentRequestId !== requestIdRef.current) return;
+      console.warn('Backend train API failure, falling back to offline routes:', err);
+      if (MOCK_TRAINS.length > 0) {
+        setTrains(MOCK_TRAINS);
+        setFilteredTrains(MOCK_TRAINS);
+        setStatus('success');
+      } else {
+        setErrorMessage('Unable to load trains. Please check your network connection and try again.');
+        setStatus('error');
+      }
     }
   };
 
@@ -168,28 +184,55 @@ export default function TrainBookingPage() {
       );
     }
     setFilteredTrains(result);
+    if (result.length === 0 && trains.length > 0) {
+      setStatus('empty');
+    } else if (result.length > 0) {
+      setStatus('success');
+    }
   };
 
-  const handleOpenSeatSelection = (trainObj, tierObj) => {
-    setSelectedSeatTrain(trainObj);
-    setSelectedTier(tierObj || trainObj.pricingTiers?.[0]);
+  const handleBookNow = (trainObj, activeTier) => {
+    if (!user) {
+      toast.error('Please log in to proceed with train booking.');
+      navigate('/login');
+      return;
+    }
+
+    const selectedClass = activeTier?.classType || '3A';
+    const tierPrice = activeTier?.price || 1850;
+
+    // Navigate directly to checkout without any seat/berth selection map
+    navigate('/checkout', {
+      state: {
+        listing: trainObj,
+        schedule: {
+          _id: `sch-${trainObj._id}-${selectedClass}`,
+          date: lastSearchParams?.date || new Date().toISOString().split('T')[0],
+          startTime: trainObj.transitInfo?.departureTime || '10:00',
+          selectedClass: selectedClass,
+          price: tierPrice,
+        },
+        seats: [], // No seat numbers for train
+        quantity: 1,
+      },
+    });
   };
 
-  const handleConfirmBerths = (berths, totalPrice) => {
-    if (selectedSeatTrain) {
-      navigate(`/listings/${selectedSeatTrain.slug || selectedSeatTrain._id}?class=${selectedTier?.classType || '3A'}&berths=${berths.join(',')}`);
+  const handleFocusSearch = () => {
+    if (searchSectionRef.current) {
+      searchSectionRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   };
 
   return (
     <div className="space-y-8 pb-16">
-      <div className="border-b border-white/10 pb-4 space-y-1">
-        <h1 className="text-3xl font-black text-white tracking-tight">Search Trains</h1>
-        <p className="text-xs text-[#B5B5B5]">Indian Railways train reservation, Tatkal quota & seat availability.</p>
+      <div className="border-b border-[var(--border)] pb-4 space-y-1">
+        <h1 className="text-3xl font-black text-[var(--foreground)] tracking-tight">Search Trains</h1>
+        <p className="text-xs text-[var(--muted-foreground)]">Indian Railways train reservation, Tatkal quota & fare availability.</p>
       </div>
 
       {/* Search Hero Panel */}
-      <section>
+      <section ref={searchSectionRef}>
         <TrainSearch onSearch={handleSearch} />
       </section>
 
@@ -197,7 +240,7 @@ export default function TrainBookingPage() {
       <div className="flex lg:hidden justify-end">
         <button
           onClick={() => setShowMobileFilter(!showMobileFilter)}
-          className="px-4 py-2 bg-blue-900 text-white rounded-xl font-bold text-xs flex items-center gap-2"
+          className="px-4 py-2 bg-[var(--primary)] text-white rounded-xl font-bold text-xs flex items-center gap-2 cursor-pointer shadow-md"
         >
           <Filter className="w-4 h-4" /> {showMobileFilter ? 'Hide Filters' : 'Show Filters'}
         </button>
@@ -210,56 +253,95 @@ export default function TrainBookingPage() {
           <TrainFilters filters={filters} onFilterChange={handleFilterChange} />
         </aside>
 
-        {/* Right Train Cards List */}
+        {/* Right Train Results Area */}
         <main className="lg:col-span-3 space-y-6">
-          <div className="flex items-center justify-between glass-card p-4 rounded-2xl">
+          <div className="flex items-center justify-between glass-card p-4 rounded-2xl border border-[var(--border)] bg-[var(--card)]">
             <div className="flex items-center gap-2">
-              <Train className="w-5 h-5 text-cyanAccent" />
-              <h2 className="font-bold text-white text-sm">
-                Available Trains ({filteredTrains.length})
+              <Train className="w-5 h-5 text-[var(--primary)]" />
+              <h2 className="font-bold text-[var(--foreground)] text-sm">
+                Available Trains ({status === 'success' ? filteredTrains.length : 0})
               </h2>
             </div>
             <button
-              onClick={() => handleSearch({ from: 'BZA', to: 'SC', date: new Date().toISOString().split('T')[0] })}
-              className="text-xs font-semibold text-cyanAccent flex items-center gap-1 hover:underline"
+              onClick={() => handleSearch(lastSearchParams || { from: 'BZA', to: 'SC', date: new Date().toISOString().split('T')[0] })}
+              className="text-xs font-semibold text-[var(--primary)] flex items-center gap-1 hover:underline cursor-pointer"
             >
               <RefreshCw className="w-3.5 h-3.5" /> Refresh Schedule
             </button>
           </div>
 
-          {loading ? (
-            <SkeletonLoader count={4} />
-          ) : filteredTrains.length === 0 ? (
-            <div className="text-center py-16 glass-card rounded-3xl space-y-3 p-6">
-              <p className="text-lg font-bold text-white">
-                {searchMessage || 'No trains found matching your search.'}
-              </p>
-              <p className="text-xs text-slate-400">
-                Try selecting a different date, quota, or class filter.
-              </p>
+          {/* State Machine Rendering */}
+          {status === 'loading' && (
+            <div className="space-y-4">
+              <div className="p-4 bg-[var(--card)] border border-[var(--border)] rounded-2xl flex items-center gap-3 text-xs font-bold text-[var(--primary)]">
+                <RefreshCw className="w-4 h-4 animate-spin text-[var(--primary)]" /> Searching for trains...
+              </div>
+              <SkeletonLoader count={3} />
             </div>
-          ) : (
+          )}
+
+          {status === 'error' && (
+            <div className="text-center py-16 glass-card rounded-3xl space-y-4 p-8 border border-[var(--border)] bg-[var(--card)]">
+              <div className="w-14 h-14 rounded-full bg-rose-500/10 text-[var(--danger)] flex items-center justify-center mx-auto border border-rose-500/20">
+                <AlertCircle className="w-7 h-7" />
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-lg font-bold text-[var(--foreground)]">Unable to load trains</h3>
+                <p className="text-xs text-[var(--muted-foreground)] max-w-md mx-auto">
+                  {errorMessage || 'A network error occurred while connecting to Indian Railways server.'}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => handleSearch(lastSearchParams || { from: 'BZA', to: 'SC', date: new Date().toISOString().split('T')[0] })}
+                className="px-6 py-2.5 bg-[var(--primary)] text-white font-bold text-xs rounded-xl shadow-md hover:opacity-90 transition-all cursor-pointer inline-flex items-center gap-2"
+              >
+                <RefreshCw className="w-4 h-4" /> Retry Search
+              </button>
+            </div>
+          )}
+
+          {status === 'empty' && (
+            <div className="text-center py-12 glass-card rounded-3xl space-y-5 p-8 border border-[var(--border)] bg-[var(--card)]">
+              <div className="w-14 h-14 rounded-full bg-amber-500/10 text-[var(--warning)] flex items-center justify-center mx-auto border border-amber-500/20">
+                <SearchX className="w-7 h-7" />
+              </div>
+              <div className="space-y-2 max-w-md mx-auto">
+                <h3 className="text-xl font-black text-[var(--foreground)]">No trains found</h3>
+                <p className="text-xs text-[var(--muted-foreground)]">
+                  We couldn't find trains matching your current search parameters.
+                </p>
+                <div className="p-4 bg-[var(--muted)] rounded-2xl text-left border border-[var(--border)] space-y-1 text-xs">
+                  <span className="font-bold text-[var(--foreground)] block">Try changing your:</span>
+                  <ul className="list-disc list-inside text-[var(--muted-foreground)] space-y-0.5 pl-1">
+                    <li>Journey date</li>
+                    <li>Class selection</li>
+                    <li>Quota filter</li>
+                    <li>From or To stations</li>
+                  </ul>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={handleFocusSearch}
+                className="px-6 py-3 bg-[var(--primary)] text-white font-black text-xs rounded-2xl shadow-lg hover:opacity-95 transition-all cursor-pointer"
+              >
+                Modify Search
+              </button>
+            </div>
+          )}
+
+          {status === 'success' && (
             filteredTrains.map((t) => (
               <TrainCard
                 key={t._id}
                 train={t}
-                onSelectClass={(tier) => handleOpenSeatSelection(t, tier)}
+                onBookNow={handleBookNow}
               />
             ))
           )}
         </main>
       </div>
-
-      {/* Seat / Berth Selection Modal */}
-      {selectedSeatTrain && (
-        <TrainSeatSelection
-          train={selectedSeatTrain}
-          selectedClass={selectedTier?.classType || '3A'}
-          price={selectedTier?.price || 1850}
-          onClose={() => setSelectedSeatTrain(null)}
-          onConfirmBerths={handleConfirmBerths}
-        />
-      )}
     </div>
   );
 }
