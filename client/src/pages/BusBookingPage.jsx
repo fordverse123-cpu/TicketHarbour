@@ -181,6 +181,11 @@ export default function BusBookingPage() {
 
   return (
     <div className="space-y-8 pb-16">
+      <div className="border-b border-white/10 pb-4 space-y-1">
+        <h1 className="text-3xl font-black text-white tracking-tight">Book Bus Tickets</h1>
+        <p className="text-xs text-[#B5B5B5]">Search and book intercity AC sleeper & Volvo bus tickets.</p>
+      </div>
+
       {/* Top Search Hero */}
       <section>
         <BusSearch onSearch={handleSearch} />

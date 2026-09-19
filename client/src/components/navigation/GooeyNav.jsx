@@ -14,15 +14,20 @@ export default function GooeyNav({ items, activeHref, onItemClick }) {
 
   useEffect(() => {
     if (!containerRef.current) return;
-    const navElements = containerRef.current.querySelectorAll('.gooey-item');
-    if (navElements[activeIndex]) {
-      const el = navElements[activeIndex];
-      setPillStyle({
-        left: el.offsetLeft,
-        width: el.offsetWidth,
-        opacity: 1,
-      });
-    }
+    const updatePill = () => {
+      const navElements = containerRef.current?.querySelectorAll('.gooey-item');
+      if (navElements && navElements[activeIndex]) {
+        const el = navElements[activeIndex];
+        setPillStyle({
+          left: el.offsetLeft,
+          width: el.offsetWidth,
+          opacity: 1,
+        });
+      }
+    };
+    updatePill();
+    window.addEventListener('resize', updatePill);
+    return () => window.removeEventListener('resize', updatePill);
   }, [activeIndex, items]);
 
   const handleNavClick = (e, item, idx) => {
@@ -33,12 +38,12 @@ export default function GooeyNav({ items, activeHref, onItemClick }) {
   };
 
   return (
-    <div className="relative inline-flex items-center" ref={containerRef}>
+    <div className="relative inline-flex items-center overflow-hidden max-w-full" ref={containerRef}>
       {/* SVG Filter for Gooey Blob Effect */}
       <svg className="hidden">
         <defs>
           <filter id="gooey-nav-filter">
-            <feGaussianBlur in="SourceGraphic" stdDeviation="5" result="blur" />
+            <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur" />
             <feColorMatrix
               in="blur"
               mode="matrix"
@@ -52,18 +57,18 @@ export default function GooeyNav({ items, activeHref, onItemClick }) {
 
       {/* Floating Active Gooey Pill */}
       <div
-        className="absolute top-0 bottom-0 rounded-full transition-all duration-300 ease-out pointer-events-none z-0"
+        className="absolute top-0 bottom-0 rounded-full transition-all duration-300 ease-out pointer-events-none z-0 overflow-hidden"
         style={{
           left: `${pillStyle.left}px`,
           width: `${pillStyle.width}px`,
           opacity: pillStyle.opacity,
-          background: 'linear-gradient(135deg, #19D3D3 0%, #4F46E5 100%)',
-          boxShadow: '0 0 15px rgba(25, 211, 211, 0.4), 0 0 25px rgba(79, 70, 229, 0.3)',
+          background: 'linear-gradient(135deg, #03B3C3 0%, #6750A2 100%)',
+          boxShadow: '0 0 15px rgba(3, 179, 195, 0.4), 0 0 25px rgba(103, 80, 162, 0.3)',
         }}
       >
-        {/* Particle accents floating inside active pill */}
-        <span className="absolute -top-1 left-1/4 w-1.5 h-1.5 rounded-full bg-[#19D3D3] animate-pulse opacity-75"></span>
-        <span className="absolute -bottom-1 right-1/3 w-1.5 h-1.5 rounded-full bg-[#4F46E5] animate-ping opacity-60"></span>
+        {/* Subtle internal particle accents: #03B3C3, #6750A2, #D856BF, #FFFFFF */}
+        <span className="absolute top-1 left-1/4 w-1.5 h-1.5 rounded-full bg-[#03B3C3] animate-pulse opacity-75"></span>
+        <span className="absolute bottom-1 right-1/3 w-1.5 h-1.5 rounded-full bg-[#D856BF] opacity-60"></span>
         <span className="absolute top-1/2 right-2 w-1 h-1 rounded-full bg-white opacity-80"></span>
       </div>
 
@@ -79,7 +84,7 @@ export default function GooeyNav({ items, activeHref, onItemClick }) {
               aria-current={isActive ? 'page' : undefined}
               aria-label={item.label}
               tabIndex={0}
-              className={`gooey-item relative px-3 sm:px-4 py-2 rounded-full text-xs sm:text-sm font-bold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#19D3D3]/40 whitespace-nowrap ${
+              className={`gooey-item relative px-3.5 sm:px-4 py-2 rounded-full text-xs sm:text-sm font-bold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#03B3C3]/40 whitespace-nowrap select-none ${
                 isActive
                   ? 'text-white'
                   : 'text-[#A0A0A0] hover:text-white hover:bg-white/5'
@@ -93,3 +98,4 @@ export default function GooeyNav({ items, activeHref, onItemClick }) {
     </div>
   );
 }
+

@@ -27,7 +27,8 @@ export const seedSuperAdmin = async () => {
     if (superAdmin) {
       superAdmin.name = name;
       superAdmin.email = email;
-      superAdmin.role = 'superadmin';
+      superAdmin.role = 'SUPER_ADMIN';
+      superAdmin.permissions = ['ALL'];
       superAdmin.status = 'active';
       superAdmin.isVerified = true;
       superAdmin.password = password; // Force set password so bcrypt pre-save rehashes it
@@ -41,7 +42,8 @@ export const seedSuperAdmin = async () => {
       name,
       email,
       password,
-      role: 'superadmin',
+      role: 'SUPER_ADMIN',
+      permissions: ['ALL'],
       status: 'active',
       isVerified: true,
       phone: '+1 800-SUPERADMIN',

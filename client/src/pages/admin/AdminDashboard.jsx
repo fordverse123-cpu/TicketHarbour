@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import API from '../../services/api';
+import { useAuth } from '../../context/AuthContext';
 import GlassCard from '../../components/ui/GlassCard';
 import GlassButton from '../../components/ui/GlassButton';
 import GlassModal from '../../components/ui/GlassModal';
@@ -9,15 +10,31 @@ import toast from 'react-hot-toast';
 import {
   TrendingUp,
   Ticket,
-  Users,
   Film,
   QrCode,
   ShieldCheck,
   CheckCircle,
   PlusCircle,
+  Bus,
+  Train,
+  Plane,
+  Calendar,
+  Trophy,
+  Compass,
 } from 'lucide-react';
 
+const CATEGORY_MAP = {
+  MOVIES: { label: 'Movies', icon: Film, link: '/movies' },
+  EVENTS: { label: 'Events', icon: Calendar, link: '/events' },
+  SPORTS: { label: 'Sports', icon: Trophy, link: '/sports' },
+  BUS: { label: 'Bus', icon: Bus, link: '/bus' },
+  TRAIN: { label: 'Train', icon: Train, link: '/train' },
+  FLIGHTS: { label: 'Flights', icon: Plane, link: '/flights' },
+  ATTRACTIONS: { label: 'Attractions', icon: Compass, link: '/attractions' },
+};
+
 export default function AdminDashboard() {
+  const { user } = useAuth();
   const [stats, setStats] = useState(null);
   const [categoryStats, setCategoryStats] = useState([]);
   const [recentBookings, setRecentBookings] = useState([]);
@@ -28,6 +45,13 @@ export default function AdminDashboard() {
   const [qrInput, setQrInput] = useState('');
   const [verifying, setVerifying] = useState(false);
   const [verificationResult, setVerificationResult] = useState(null);
+
+  const permissions = user?.permissions || ['MOVIES', 'EVENTS', 'SPORTS', 'BUS', 'TRAIN', 'FLIGHTS', 'ATTRACTIONS'];
+  const isSuperAdmin = user?.role?.toUpperCase() === 'SUPER_ADMIN' || permissions.includes('ALL');
+
+  const allowedCategories = isSuperAdmin
+    ? Object.keys(CATEGORY_MAP)
+    : permissions.map((p) => p.toUpperCase());
 
   useEffect(() => {
     fetchAdminStats();
@@ -73,14 +97,23 @@ export default function AdminDashboard() {
     }
   };
 
+  // Filter category stats based on allowed permissions
+  const filteredCategoryStats = categoryStats.filter((cat) =>
+    allowedCategories.includes(cat._id?.toUpperCase())
+  );
+
   return (
     <div className="space-y-8 pb-16">
       
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-black text-white tracking-tight">Admin Control Dashboard</h1>
-          <p className="text-xs text-slate-400">System revenue, booking analytics, and ticket verification</p>
+          <h1 className="text-3xl font-black text-white tracking-tight flex items-center gap-2.5">
+            <ShieldCheck className="w-8 h-8 text-[#03B3C3]" /> Admin Control Dashboard
+          </h1>
+          <p className="text-xs text-[#B5B5B5]">
+            Manage assigned booking categories: {allowedCategories.join(', ')}
+          </p>
         </div>
 
         <div className="flex items-center gap-3">
@@ -92,7 +125,7 @@ export default function AdminDashboard() {
             }}
             icon={QrCode}
           >
-            Verify / Scan Ticket QR
+            Verify Ticket QR
           </GlassButton>
           
           <Link to="/admin/listings">
@@ -103,6 +136,26 @@ export default function AdminDashboard() {
         </div>
       </div>
 
+      {/* Allowed Category Shortcut Pills */}
+      <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
+        <span className="text-xs font-bold uppercase text-[#777777] pr-2">Your Permitted Modules:</span>
+        {allowedCategories.map((catKey) => {
+          const config = CATEGORY_MAP[catKey];
+          if (!config) return null;
+          const Icon = config.icon;
+          return (
+            <Link
+              key={catKey}
+              to={config.link}
+              className="flex items-center gap-2 px-3.5 py-1.5 bg-[#03B3C3]/15 text-[#03B3C3] border border-[#03B3C3]/30 rounded-full text-xs font-bold hover:bg-[#03B3C3]/25 transition-all"
+            >
+              <Icon className="w-3.5 h-3.5" />
+              <span>{config.label}</span>
+            </Link>
+          );
+        })}
+      </div>
+
       {/* Stats Counters */}
       {loading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -111,43 +164,43 @@ export default function AdminDashboard() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           <GlassCard hover={false} className="space-y-2">
-            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Total Platform Revenue</span>
-            <p className="text-3xl font-black text-cyanAccent-400">₹{stats?.totalRevenue || 0}</p>
+            <span className="text-[10px] text-[#A0A0A0] font-bold uppercase tracking-wider">Total Revenue</span>
+            <p className="text-3xl font-black text-[#03B3C3]">₹{stats?.totalRevenue || 0}</p>
             <div className="flex items-center gap-1 text-xs text-emerald-400 font-bold">
-              <TrendingUp className="w-3.5 h-3.5" /> +100% Verified Sales
+              <TrendingUp className="w-3.5 h-3.5" /> Verified Sales
             </div>
           </GlassCard>
 
           <GlassCard hover={false} className="space-y-2">
-            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Confirmed Bookings</span>
-            <p className="text-3xl font-black text-indigoAccent-400">{stats?.confirmedBookings || 0}</p>
-            <p className="text-xs text-slate-400">Out of {stats?.totalBookings || 0} total attempts</p>
+            <span className="text-[10px] text-[#A0A0A0] font-bold uppercase tracking-wider">Confirmed Bookings</span>
+            <p className="text-3xl font-black text-[#6750A2]">{stats?.confirmedBookings || 0}</p>
+            <p className="text-xs text-[#777777]">Out of {stats?.totalBookings || 0} attempts</p>
           </GlassCard>
 
           <GlassCard hover={false} className="space-y-2">
-            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Registered Users</span>
+            <span className="text-[10px] text-[#A0A0A0] font-bold uppercase tracking-wider">Registered Users</span>
             <p className="text-3xl font-black text-white">{stats?.totalUsers || 0}</p>
-            <p className="text-xs text-slate-400">Active customer accounts</p>
+            <p className="text-xs text-[#777777]">Platform accounts</p>
           </GlassCard>
 
           <GlassCard hover={false} className="space-y-2">
-            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Active Listings</span>
-            <p className="text-3xl font-black text-amber-400">{stats?.totalListings || 0}</p>
-            <p className="text-xs text-slate-400">Across 7 ticket categories</p>
+            <span className="text-[10px] text-[#A0A0A0] font-bold uppercase tracking-wider">Active Listings</span>
+            <p className="text-3xl font-black text-[#D856BF]">{stats?.totalListings || 0}</p>
+            <p className="text-xs text-[#777777]">Permitted modules</p>
           </GlassCard>
         </div>
       )}
 
-      {/* Category Revenue Breakdown */}
+      {/* Permitted Category Breakdown */}
       <GlassCard hover={false} className="space-y-4">
-        <h2 className="text-lg font-black text-white">Category Sales Distribution</h2>
+        <h2 className="text-lg font-black text-white">Permitted Category Sales Distribution</h2>
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-          {categoryStats.map((cat) => (
-            <div key={cat._id} className="p-4 bg-harbour-darker/80 rounded-2xl border border-white/10 space-y-1">
-              <span className="text-[10px] uppercase font-bold text-cyanAccent-400">{cat._id}</span>
+          {filteredCategoryStats.map((cat) => (
+            <div key={cat._id} className="p-4 bg-[#111111] rounded-2xl border border-white/10 space-y-1">
+              <span className="text-[10px] uppercase font-bold text-[#03B3C3]">{cat._id}</span>
               <p className="text-lg font-black text-white">₹{cat.revenue}</p>
-              <p className="text-xs text-slate-400">{cat.count} ticket(s) sold</p>
+              <p className="text-xs text-[#777777]">{cat.count} ticket(s) sold</p>
             </div>
           ))}
         </div>
@@ -160,8 +213,8 @@ export default function AdminDashboard() {
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs text-slate-300">
-            <thead className="bg-harbour-darker/80 uppercase text-slate-400 font-bold border-b border-white/10">
+          <table className="w-full text-left text-xs text-[#B5B5B5]">
+            <thead className="bg-[#111111] uppercase text-[#777777] font-bold border-b border-white/10">
               <tr>
                 <th className="p-4">Ref</th>
                 <th className="p-4">Customer</th>
@@ -173,7 +226,7 @@ export default function AdminDashboard() {
             <tbody className="divide-y divide-white/10">
               {recentBookings.map((b) => (
                 <tr key={b._id} className="hover:bg-white/5 transition-colors">
-                  <td className="p-4 font-mono font-bold text-cyanAccent-400">{b.bookingReference}</td>
+                  <td className="p-4 font-mono font-bold text-[#03B3C3]">{b.bookingReference}</td>
                   <td className="p-4">{b.user?.name} ({b.user?.email})</td>
                   <td className="p-4 font-bold text-white">{b.listing?.title}</td>
                   <td className="p-4 font-black text-white">₹{b.totalAmount}</td>
@@ -202,7 +255,7 @@ export default function AdminDashboard() {
             placeholder="Scan QR string or enter TH-REF code..."
             value={qrInput}
             onChange={(e) => setQrInput(e.target.value)}
-            className="w-full p-3.5 bg-harbour-darker border border-white/15 rounded-xl text-white focus:outline-none focus:border-cyanAccent-500"
+            className="w-full p-3.5 bg-[#111111] border border-white/15 rounded-xl text-white focus:outline-none focus:border-[#03B3C3]"
           />
           <GlassButton type="submit" loading={verifying} className="w-full">
             Verify & Check-In Ticket
@@ -214,9 +267,9 @@ export default function AdminDashboard() {
             <p className="font-bold text-emerald-400 flex items-center gap-1.5">
               <CheckCircle className="w-4 h-4 text-emerald-400" /> Ticket Status: VALID
             </p>
-            <p className="text-slate-300"><strong>Customer:</strong> {verificationResult.booking?.user?.name}</p>
-            <p className="text-slate-300"><strong>Listing:</strong> {verificationResult.booking?.listing?.title}</p>
-            <p className="text-slate-300"><strong>Ref:</strong> {verificationResult.booking?.bookingReference}</p>
+            <p className="text-[#B5B5B5]"><strong>Customer:</strong> {verificationResult.booking?.user?.name}</p>
+            <p className="text-[#B5B5B5]"><strong>Listing:</strong> {verificationResult.booking?.listing?.title}</p>
+            <p className="text-[#B5B5B5]"><strong>Ref:</strong> {verificationResult.booking?.bookingReference}</p>
           </div>
         )}
       </GlassModal>
@@ -224,4 +277,3 @@ export default function AdminDashboard() {
     </div>
   );
 }
-

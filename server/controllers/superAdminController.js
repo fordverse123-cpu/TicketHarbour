@@ -61,7 +61,7 @@ export const getAdmins = async (req, res, next) => {
 // @access  Private/SuperAdmin
 export const createAdmin = async (req, res, next) => {
   try {
-    const { name, email, phone, password } = req.body;
+    const { name, email, phone, password, permissions } = req.body;
 
     if (!name || !email || !password) {
       return errorResponse(res, 400, 'Please provide name, email, and password');
@@ -77,13 +77,18 @@ export const createAdmin = async (req, res, next) => {
       return errorResponse(res, 400, 'User with this email already exists');
     }
 
-    // Force role to admin and status to active, ignoring any role overrides from frontend
+    // Assign permissions cleanly
+    const assignedPermissions = Array.isArray(permissions) && permissions.length > 0
+      ? permissions.map((p) => p.toUpperCase())
+      : ['MOVIES', 'EVENTS', 'SPORTS', 'BUS', 'TRAIN', 'FLIGHTS', 'ATTRACTIONS'];
+
     const admin = await User.create({
       name,
       email: email.toLowerCase(),
       phone: phone || '',
       password,
-      role: 'admin',
+      role: 'ADMIN',
+      permissions: assignedPermissions,
       status: 'active',
       createdBy: req.user._id,
       isVerified: true,
@@ -94,6 +99,41 @@ export const createAdmin = async (req, res, next) => {
 
     return successResponse(res, 201, 'Admin account created successfully', {
       admin: adminResponse,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Update Admin Category Permissions
+// @route   PATCH /api/v1/super-admin/admins/:id/permissions
+// @access  Private/SuperAdmin
+export const updateAdminPermissions = async (req, res, next) => {
+  try {
+    const { permissions } = req.body;
+    if (!Array.isArray(permissions)) {
+      return errorResponse(res, 400, 'Permissions must be an array of category names.');
+    }
+
+    const admin = await User.findById(req.params.id);
+    if (!admin) {
+      return errorResponse(res, 404, 'Admin account not found');
+    }
+
+    if (admin.role === 'SUPER_ADMIN' || admin.role === 'superadmin') {
+      return errorResponse(res, 403, 'Super Admin permissions cannot be restricted.');
+    }
+
+    admin.permissions = permissions.map((p) => p.toUpperCase());
+    await admin.save();
+
+    return successResponse(res, 200, 'Admin permissions updated successfully', {
+      admin: {
+        id: admin._id,
+        name: admin.name,
+        email: admin.email,
+        permissions: admin.permissions,
+      },
     });
   } catch (error) {
     next(error);

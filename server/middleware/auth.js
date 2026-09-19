@@ -41,10 +41,12 @@ export const protect = async (req, res, next) => {
   }
 };
 
-// Authorize roles ('admin', 'user')
+// Authorize roles ('USER', 'ADMIN', 'SUPER_ADMIN')
 export const authorize = (...roles) => {
+  const normalizedAllowed = roles.map((r) => r.toUpperCase());
   return (req, res, next) => {
-    if (!req.user || !roles.includes(req.user.role)) {
+    const userRole = req.user?.role ? req.user.role.toUpperCase() : '';
+    if (!req.user || (!normalizedAllowed.includes(userRole) && !normalizedAllowed.includes(req.user.role))) {
       return errorResponse(
         res,
         403,

@@ -183,6 +183,11 @@ export default function TrainBookingPage() {
 
   return (
     <div className="space-y-8 pb-16">
+      <div className="border-b border-white/10 pb-4 space-y-1">
+        <h1 className="text-3xl font-black text-white tracking-tight">Search Trains</h1>
+        <p className="text-xs text-[#B5B5B5]">Indian Railways train reservation, Tatkal quota & seat availability.</p>
+      </div>
+
       {/* Search Hero Panel */}
       <section>
         <TrainSearch onSearch={handleSearch} />

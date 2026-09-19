@@ -26,9 +26,16 @@ const userSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ['user', 'admin', 'superadmin'],
-      default: 'user',
+      enum: ['USER', 'ADMIN', 'SUPER_ADMIN', 'user', 'admin', 'superadmin'],
+      default: 'USER',
+      set: (val) => (val ? val.toUpperCase() : 'USER'),
     },
+    permissions: [
+      {
+        type: String,
+        enum: ['MOVIES', 'EVENTS', 'SPORTS', 'BUS', 'TRAIN', 'FLIGHTS', 'ATTRACTIONS', 'ALL'],
+      },
+    ],
     status: {
       type: String,
       enum: ['active', 'inactive', 'suspended'],
@@ -60,8 +67,19 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-// Encrypt password using bcrypt before saving
+// Normalize role & permissions on save
 userSchema.pre('save', async function (next) {
+  if (this.role) {
+    this.role = this.role.toUpperCase();
+  }
+  if (this.role === 'SUPER_ADMIN') {
+    this.permissions = ['ALL'];
+  } else if (this.role === 'ADMIN' && (!this.permissions || this.permissions.length === 0)) {
+    this.permissions = ['MOVIES', 'EVENTS', 'SPORTS', 'BUS', 'TRAIN', 'FLIGHTS', 'ATTRACTIONS'];
+  } else if (this.role === 'USER') {
+    this.permissions = [];
+  }
+
   if (!this.isModified('password')) {
     return next();
   }

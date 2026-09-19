@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './context/AuthContext';
 
@@ -37,24 +37,40 @@ import AdminListings from './pages/admin/AdminListings';
 import SuperAdminDashboard from './pages/admin/SuperAdminDashboard';
 import CreateAdmin from './pages/admin/CreateAdmin';
 
+import HyperspeedBackground from './components/layout/HyperspeedBackground';
+
+// Dedicated Category Pages
+import MoviesPage from './pages/MoviesPage';
+import EventsPage from './pages/EventsPage';
+import SportsPage from './pages/SportsPage';
+import AttractionsPage from './pages/AttractionsPage';
+
 function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
-        <div className="min-h-screen flex flex-col font-sans bg-[#050505] text-white transition-colors">
-          <Toaster position="top-right" toastOptions={{ duration: 4000 }} />
-          
-          <Navbar />
+        <div className="relative min-h-screen font-sans bg-[#000000] text-white overflow-x-hidden">
+          {/* Hyperspeed WebGL Background */}
+          <HyperspeedBackground />
 
-          <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {/* Dark Overlay for UI legibility */}
+          <div className="fixed inset-0 bg-black/35 pointer-events-none z-0" />
+
+          {/* Main App Canvas */}
+          <div className="relative z-10 flex flex-col min-h-screen">
+            <Toaster position="top-right" toastOptions={{ duration: 4000 }} />
+            
+            <Navbar />
+
+            <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <Routes>
               {/* Public Routes */}
               <Route path="/" element={<Home />} />
               <Route path="/listings" element={<Listings />} />
-              <Route path="/movies" element={<Listings />} />
-              <Route path="/events" element={<Listings />} />
-              <Route path="/sports" element={<Listings />} />
-              <Route path="/attractions" element={<Listings />} />
+              <Route path="/movies" element={<MoviesPage />} />
+              <Route path="/events" element={<EventsPage />} />
+              <Route path="/sports" element={<SportsPage />} />
+              <Route path="/attractions" element={<AttractionsPage />} />
               <Route path="/train" element={<TrainBookingPage />} />
               <Route path="/trains" element={<TrainBookingPage />} />
               <Route path="/bus" element={<BusBookingPage />} />
@@ -63,6 +79,7 @@ function App() {
               <Route path="/listings/:identifier" element={<ListingDetail />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
+              <Route path="/signup" element={<Navigate to="/register" replace />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/reset-password/:resetToken" element={<ResetPassword />} />
               <Route path="/verify-email/:verifyToken" element={<VerifyEmail />} />
@@ -96,6 +113,7 @@ function App() {
           </main>
 
           <Footer />
+          </div>
         </div>
       </BrowserRouter>
     </AuthProvider>

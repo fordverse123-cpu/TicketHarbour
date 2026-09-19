@@ -8,7 +8,7 @@ export const PrivateRoute = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center py-24">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600"></div>
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#03B3C3]"></div>
       </div>
     );
   }
@@ -22,16 +22,15 @@ export const AdminRoute = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center py-24">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600"></div>
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#03B3C3]"></div>
       </div>
     );
   }
 
-  return user && (user.role === 'admin' || user.role === 'superadmin') ? (
-    <Outlet />
-  ) : (
-    <Navigate to="/admin/login" replace />
-  );
+  const role = user?.role ? user.role.toUpperCase() : '';
+  const isAdmin = user && (role === 'ADMIN' || role === 'SUPER_ADMIN' || user.role === 'admin' || user.role === 'superadmin');
+
+  return isAdmin ? <Outlet /> : <Navigate to="/admin/login" replace />;
 };
 
 export const SuperAdminRoute = () => {
@@ -40,14 +39,37 @@ export const SuperAdminRoute = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center py-24">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#6750A2]"></div>
       </div>
     );
   }
 
-  return user && user.role === 'superadmin' ? (
-    <Outlet />
-  ) : (
-    <Navigate to="/super-admin/login" replace />
-  );
+  const role = user?.role ? user.role.toUpperCase() : '';
+  const isSuper = user && (role === 'SUPER_ADMIN' || user.role === 'superadmin');
+
+  return isSuper ? <Outlet /> : <Navigate to="/super-admin/login" replace />;
+};
+
+export const PermissionRoute = ({ category }) => {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center py-24">
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#03B3C3]"></div>
+      </div>
+    );
+  }
+
+  const role = user?.role ? user.role.toUpperCase() : '';
+  const permissions = user?.permissions || [];
+  const targetCategory = category.toUpperCase();
+
+  const hasAccess =
+    user &&
+    (role === 'SUPER_ADMIN' ||
+      permissions.includes('ALL') ||
+      (role === 'ADMIN' && permissions.includes(targetCategory)));
+
+  return hasAccess ? <Outlet /> : <Navigate to="/admin/dashboard" replace />;
 };

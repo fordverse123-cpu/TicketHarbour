@@ -16,29 +16,30 @@ export default function CategoryNav() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Determine active href based on current pathname / search params
   const getActiveHref = () => {
     const path = location.pathname;
     const search = location.search;
 
-    if (path.includes('/movie') || search.includes('category=movies')) return '/movies';
-    if (path.includes('/event') || search.includes('category=events')) return '/events';
-    if (path.includes('/sport') || search.includes('category=sports')) return '/sports';
-    if (path.includes('/bus')) return '/bus';
-    if (path.includes('/train')) return '/train';
-    if (path.includes('/flight')) return '/flights';
-    if (path.includes('/attraction') || search.includes('category=attractions')) return '/attractions';
+    if (path.startsWith('/movies') || search.includes('category=movies')) return '/movies';
+    if (path.startsWith('/events') || search.includes('category=events')) return '/events';
+    if (path.startsWith('/sports') || search.includes('category=sports')) return '/sports';
+    if (path.startsWith('/bus')) return '/bus';
+    if (path.startsWith('/train')) return '/train';
+    if (path.startsWith('/flight')) return '/flights';
+    if (path.startsWith('/attraction') || search.includes('category=attractions')) return '/attractions';
 
-    return '/movies'; // default
+    return '/movies';
   };
 
   const handleItemClick = (e, item) => {
     e.preventDefault();
-    navigate(item.href);
+    if (location.pathname !== item.href) {
+      navigate(item.href);
+    }
   };
 
   return (
-    <div className="w-full flex justify-center overflow-x-auto scrollbar-none py-1">
+    <div className="w-full flex justify-center items-center overflow-x-auto scrollbar-none py-1.5 px-2">
       <GooeyNav
         items={CATEGORY_ITEMS}
         activeHref={getActiveHref()}
