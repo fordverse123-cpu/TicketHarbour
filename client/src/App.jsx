@@ -12,6 +12,9 @@ import { PrivateRoute, AdminRoute, SuperAdminRoute } from './components/common/P
 import Home from './pages/Home';
 import Listings from './pages/Listings';
 import ListingDetail from './pages/ListingDetail';
+import TrainBookingPage from './pages/TrainBookingPage';
+import BusBookingPage from './pages/BusBookingPage';
+import FlightBookingPage from './pages/FlightBookingPage';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import ForgotPassword from './pages/ForgotPassword';
@@ -48,6 +51,9 @@ function App() {
               {/* Public Routes */}
               <Route path="/" element={<Home />} />
               <Route path="/listings" element={<Listings />} />
+              <Route path="/trains" element={<TrainBookingPage />} />
+              <Route path="/buses" element={<BusBookingPage />} />
+              <Route path="/flights" element={<FlightBookingPage />} />
               <Route path="/listings/:identifier" element={<ListingDetail />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />

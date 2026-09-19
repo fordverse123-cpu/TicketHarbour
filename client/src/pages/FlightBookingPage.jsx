@@ -1,0 +1,203 @@
+import React, { useState, useEffect } from 'react';
+import API from '../services/api';
+import FlightSearch from '../components/flight/FlightSearch';
+import FlightCard from '../components/flight/FlightCard';
+import FlightFilters from '../components/flight/FlightFilters';
+import SkeletonLoader from '../components/common/SkeletonLoader';
+import { Plane, RefreshCw } from 'lucide-react';
+
+const MOCK_FLIGHTS = [
+  {
+    _id: 'flight-6e-1234',
+    slug: 'indigo-vga-del-6e1234',
+    title: 'IndiGo Flight 6E 1234',
+    categoryType: 'flight',
+    rating: 4.7,
+    numReviews: 890,
+    transitInfo: {
+      operator: 'IndiGo',
+      number: '6E 1234',
+      source: 'Vijayawada (VGA)',
+      destination: 'Delhi (DEL)',
+      departureTime: '10:30',
+      arrivalTime: '13:05',
+      duration: '2h 35m',
+    },
+    pricingTiers: [
+      { tierName: 'Economy Saver', price: 5499, totalCapacity: 120 },
+      { tierName: 'Flexi Plus', price: 6899, totalCapacity: 30 },
+    ],
+  },
+  {
+    _id: 'flight-ai-505',
+    slug: 'air-india-bom-blr-ai505',
+    title: 'Air India Flight AI 505',
+    categoryType: 'flight',
+    rating: 4.6,
+    numReviews: 640,
+    transitInfo: {
+      operator: 'Air India',
+      number: 'AI 505',
+      source: 'Mumbai (BOM)',
+      destination: 'Bengaluru (BLR)',
+      departureTime: '08:15',
+      arrivalTime: '10:00',
+      duration: '1h 45m',
+    },
+    pricingTiers: [
+      { tierName: 'Economy', price: 4200, totalCapacity: 100 },
+      { tierName: 'Business Class', price: 14500, totalCapacity: 12 },
+    ],
+  },
+  {
+    _id: 'flight-qp-1102',
+    slug: 'akasa-air-del-bom-qp1102',
+    title: 'Akasa Air Flight QP 1102',
+    categoryType: 'flight',
+    rating: 4.8,
+    numReviews: 310,
+    transitInfo: {
+      operator: 'Akasa Air',
+      number: 'QP 1102',
+      source: 'Delhi (DEL)',
+      destination: 'Mumbai (BOM)',
+      departureTime: '15:40',
+      arrivalTime: '17:55',
+      duration: '2h 15m',
+    },
+    pricingTiers: [
+      { tierName: 'Saver', price: 4999, totalCapacity: 90 },
+      { tierName: 'Flexi', price: 6200, totalCapacity: 20 },
+    ],
+  },
+  {
+    _id: 'flight-sg-819',
+    slug: 'spicejet-hyd-maa-sg819',
+    title: 'SpiceJet Flight SG 819',
+    categoryType: 'flight',
+    rating: 4.3,
+    numReviews: 420,
+    transitInfo: {
+      operator: 'SpiceJet',
+      number: 'SG 819',
+      source: 'Hyderabad (HYD)',
+      destination: 'Chennai (MAA)',
+      departureTime: '19:10',
+      arrivalTime: '20:30',
+      duration: '1h 20m',
+    },
+    pricingTiers: [
+      { tierName: 'Standard', price: 3499, totalCapacity: 80 },
+    ],
+  },
+];
+
+export default function FlightBookingPage() {
+  const [flights, setFlights] = useState([]);
+  const [filteredFlights, setFilteredFlights] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [filters, setFilters] = useState({
+    stops: 'ALL',
+    airlines: [],
+    cabinClass: 'ALL',
+  });
+
+  useEffect(() => {
+    fetchFlights();
+  }, []);
+
+  const fetchFlights = async () => {
+    setLoading(true);
+    try {
+      const res = await API.get('/listings?categoryType=flight');
+      if (res.data.success && res.data.data.listings.length > 0) {
+        setFlights(res.data.data.listings);
+        setFilteredFlights(res.data.data.listings);
+      } else {
+        setFlights(MOCK_FLIGHTS);
+        setFilteredFlights(MOCK_FLIGHTS);
+      }
+    } catch (err) {
+      console.warn('Backend flight API empty, loading standard Indian Air routes', err);
+      setFlights(MOCK_FLIGHTS);
+      setFilteredFlights(MOCK_FLIGHTS);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSearch = (searchParams) => {
+    setLoading(true);
+    setTimeout(() => {
+      let result = [...flights];
+      if (searchParams.from?.code && searchParams.to?.code) {
+        result = result.filter(
+          (f) =>
+            f.transitInfo?.source?.includes(searchParams.from.code) ||
+            f.transitInfo?.destination?.includes(searchParams.to.code)
+        );
+      }
+      setFilteredFlights(result.length > 0 ? result : MOCK_FLIGHTS);
+      setLoading(false);
+    }, 400);
+  };
+
+  const handleFilterChange = (newFilters) => {
+    setFilters(newFilters);
+    let result = [...flights];
+    if (newFilters.airlines.length > 0) {
+      result = result.filter((f) => newFilters.airlines.includes(f.transitInfo?.operator));
+    }
+    setFilteredFlights(result);
+  };
+
+  return (
+    <div className="space-y-8 pb-16">
+      {/* Search Bar Panel */}
+      <section>
+        <FlightSearch onSearch={handleSearch} />
+      </section>
+
+      {/* Main Grid Layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        {/* Sidebar Filters */}
+        <aside className="lg:col-span-1">
+          <FlightFilters filters={filters} onFilterChange={handleFilterChange} />
+        </aside>
+
+        {/* Flight Cards List */}
+        <main className="lg:col-span-3 space-y-6">
+          <div className="flex items-center justify-between bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
+            <div className="flex items-center gap-2">
+              <Plane className="w-5 h-5 text-sky-600" />
+              <h2 className="font-bold text-slate-900 dark:text-white text-sm">
+                Available Flights ({filteredFlights.length})
+              </h2>
+            </div>
+            <button
+              onClick={fetchFlights}
+              className="text-xs font-semibold text-sky-600 dark:text-sky-400 flex items-center gap-1 hover:underline"
+            >
+              <RefreshCw className="w-3.5 h-3.5" /> Refresh Fares
+            </button>
+          </div>
+
+          {loading ? (
+            <SkeletonLoader count={4} />
+          ) : filteredFlights.length === 0 ? (
+            <div className="text-center py-16 bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 space-y-3">
+              <p className="text-lg font-bold text-slate-700 dark:text-slate-200">
+                No flights found matching your search.
+              </p>
+              <p className="text-xs text-slate-400">
+                Try selecting a different date or airline filter.
+              </p>
+            </div>
+          ) : (
+            filteredFlights.map((f) => <FlightCard key={f._id} flight={f} />)
+          )}
+        </main>
+      </div>
+    </div>
+  );
+}

@@ -24,9 +24,9 @@ const CATEGORIES = [
   { label: 'Movies', path: '/listings?category=movie', icon: Film },
   { label: 'Events', path: '/listings?category=event', icon: Music },
   { label: 'Sports', path: '/listings?category=sports', icon: Trophy },
-  { label: 'Bus', path: '/listings?category=bus', icon: Bus },
-  { label: 'Train', path: '/listings?category=train', icon: Train },
-  { label: 'Flights', path: '/listings?category=flight', icon: Plane },
+  { label: 'Bus', path: '/buses', icon: Bus },
+  { label: 'Train', path: '/trains', icon: Train },
+  { label: 'Flights', path: '/flights', icon: Plane },
   { label: 'Attractions', path: '/listings?category=attraction', icon: Ticket },
 ];
 
@@ -201,7 +201,7 @@ export default function Navbar() {
         <nav className="hidden md:flex items-center justify-between border-t border-slate-100 dark:border-slate-800/80 py-2.5 overflow-x-auto no-scrollbar">
           {CATEGORIES.map((cat) => {
             const Icon = cat.icon;
-            const isActive = location.search.includes(`category=${cat.path.split('=')[1]}`);
+            const isActive = location.pathname === cat.path || (cat.path.includes('?') && location.search.includes(cat.path.split('?')[1]));
             return (
               <Link
                 key={cat.label}
