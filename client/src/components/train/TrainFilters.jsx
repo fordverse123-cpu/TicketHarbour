@@ -1,5 +1,5 @@
 import React from 'react';
-import { SlidersHorizontal, Train, Clock, ShieldCheck, Filter } from 'lucide-react';
+import { SlidersHorizontal, Train, Clock, Filter } from 'lucide-react';
 
 export default function TrainFilters({
   filters = {},
@@ -48,10 +48,10 @@ export default function TrainFilters({
   };
 
   return (
-    <div className="bg-white dark:bg-slate-800 p-6 rounded-3xl border border-slate-200 dark:border-slate-700 space-y-6 shadow-sm">
-      <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-700">
-        <h3 className="font-bold text-slate-900 dark:text-white text-sm flex items-center gap-2">
-          <SlidersHorizontal className="w-4 h-4 text-blue-600" /> Train Filters
+    <div className="glass-card p-6 rounded-3xl border border-[var(--th-border)] space-y-6 shadow-sm text-[var(--th-text)]">
+      <div className="flex items-center justify-between pb-3 border-b border-[var(--th-border)]">
+        <h3 className="font-bold text-sm flex items-center gap-2 text-[var(--th-text)]">
+          <SlidersHorizontal className="w-4 h-4 text-[var(--th-accent)]" /> Train Filters
         </h3>
         {(currentClass !== 'ALL' || currentSlot !== 'ALL' || currentTrainType !== 'ALL') && (
           <button
@@ -59,7 +59,7 @@ export default function TrainFilters({
               if (onFilterChange) onFilterChange({ classType: 'ALL', timeSlot: 'ALL', trainType: 'ALL' });
               if (resetFilters) resetFilters();
             }}
-            className="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline"
+            className="text-xs font-semibold text-[var(--th-accent)] hover:underline cursor-pointer"
           >
             Reset
           </button>
@@ -68,7 +68,7 @@ export default function TrainFilters({
 
       {/* Class Filter */}
       <div className="space-y-2">
-        <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider block">
+        <label className="text-xs font-bold text-[var(--th-text-secondary)] uppercase tracking-wider block">
           Journey Class
         </label>
         <div className="grid grid-cols-3 gap-2">
@@ -79,10 +79,10 @@ export default function TrainFilters({
                 type="button"
                 key={cls}
                 onClick={() => handleClassClick(cls)}
-                className={`py-2 px-2.5 rounded-xl text-xs font-bold border transition-all ${
+                className={`py-2 px-2.5 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
                   isSelected
-                    ? 'bg-blue-900 text-white border-blue-900 shadow-md'
-                    : 'bg-slate-50 dark:bg-slate-700 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-600 hover:border-blue-600'
+                    ? 'bg-[var(--th-accent)] text-white border-[var(--th-accent)] shadow-md'
+                    : 'bg-[var(--th-surface-2)] text-[var(--th-text)] border-[var(--th-border)] hover:border-[var(--th-accent)]'
                 }`}
               >
                 {cls}
@@ -94,8 +94,8 @@ export default function TrainFilters({
 
       {/* Departure Time Slots */}
       <div className="space-y-2">
-        <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider block flex items-center gap-1">
-          <Clock className="w-3.5 h-3.5 text-blue-600" /> Departure Time
+        <label className="text-xs font-bold text-[var(--th-text-secondary)] uppercase tracking-wider block flex items-center gap-1">
+          <Clock className="w-3.5 h-3.5 text-[var(--th-accent)]" /> Departure Time
         </label>
         <div className="space-y-1.5">
           {slots.map((s) => (
@@ -103,10 +103,10 @@ export default function TrainFilters({
               type="button"
               key={s.key}
               onClick={() => handleSlotClick(s.key)}
-              className={`w-full text-left p-2.5 rounded-xl text-xs font-medium border transition-colors ${
+              className={`w-full text-left p-2.5 rounded-xl text-xs font-medium border transition-colors cursor-pointer ${
                 currentSlot === s.key
-                  ? 'bg-blue-50 dark:bg-blue-950 border-blue-600 text-blue-900 dark:text-blue-200 font-bold'
-                  : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700'
+                  ? 'bg-[var(--th-accent)]/20 border-[var(--th-accent)] text-[var(--th-accent)] font-bold'
+                  : 'border-[var(--th-border)] text-[var(--th-text-secondary)] hover:bg-[var(--th-surface-2)]'
               }`}
             >
               {s.label}
@@ -117,8 +117,8 @@ export default function TrainFilters({
 
       {/* Train Type Filter */}
       <div className="space-y-2">
-        <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider block flex items-center gap-1">
-          <Train className="w-3.5 h-3.5 text-blue-600" /> Train Type
+        <label className="text-xs font-bold text-[var(--th-text-secondary)] uppercase tracking-wider block flex items-center gap-1">
+          <Train className="w-3.5 h-3.5 text-[var(--th-accent)]" /> Train Type
         </label>
         <div className="space-y-1.5">
           {trainTypes.map((t) => (
@@ -126,10 +126,10 @@ export default function TrainFilters({
               type="button"
               key={t.key}
               onClick={() => handleTypeClick(t.key)}
-              className={`w-full text-left p-2.5 rounded-xl text-xs font-medium border transition-colors ${
+              className={`w-full text-left p-2.5 rounded-xl text-xs font-medium border transition-colors cursor-pointer ${
                 currentTrainType === t.key
-                  ? 'bg-blue-50 dark:bg-blue-950 border-blue-600 text-blue-900 dark:text-blue-200 font-bold'
-                  : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700'
+                  ? 'bg-[var(--th-accent)]/20 border-[var(--th-accent)] text-[var(--th-accent)] font-bold'
+                  : 'border-[var(--th-border)] text-[var(--th-text-secondary)] hover:bg-[var(--th-surface-2)]'
               }`}
             >
               {t.label}

@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import { Bus, Star, MapPin, Clock, ChevronDown, ChevronUp, ShieldCheck, Sparkles } from 'lucide-react';
 import BusSeatSelection from './BusSeatSelection';
-import PixelCardWrapper from '../ui/PixelCardWrapper';
+import BorderGlow from '../ui/BorderGlow';
+import { useTheme } from '../../context/ThemeContext';
 
 export default function BusCard({ bus, onBookSeat }) {
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
   const [showSeatView, setShowSeatView] = useState(false);
 
   const {
@@ -30,8 +33,13 @@ export default function BusCard({ bus, onBookSeat }) {
   );
 
   return (
-    <PixelCardWrapper category="bus" className="rounded-3xl">
-      <div className="glass-card rounded-3xl border border-white/10 overflow-hidden space-y-0">
+    <BorderGlow
+      borderRadius={24}
+      className="w-full h-full"
+      backgroundColor={isDark ? '#111111' : '#FFFFFF'}
+      glowIntensity={isDark ? 0.65 : 0.45}
+    >
+      <div className="glass-card rounded-3xl overflow-hidden space-y-0">
       {/* Top Main Bus Info Card */}
       <div className="p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
         {/* Left Operator & Spec Info */}
@@ -119,6 +127,6 @@ export default function BusCard({ bus, onBookSeat }) {
         </div>
       )}
     </div>
-    </PixelCardWrapper>
+    </BorderGlow>
   );
 }

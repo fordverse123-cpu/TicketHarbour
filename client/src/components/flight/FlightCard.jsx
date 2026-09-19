@@ -2,9 +2,12 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Plane, Clock, ArrowRight, Info, ShieldCheck, Luggage, CheckCircle2 } from 'lucide-react';
 import FlightDetails from './FlightDetails';
-import PixelCardWrapper from '../ui/PixelCardWrapper';
+import BorderGlow from '../ui/BorderGlow';
+import { useTheme } from '../../context/ThemeContext';
 
 export default function FlightCard({ flight, onSelect }) {
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
   const [showDetailsModal, setShowDetailsModal] = useState(false);
 
   const {
@@ -39,8 +42,13 @@ export default function FlightCard({ flight, onSelect }) {
   };
 
   return (
-    <PixelCardWrapper category="flights" className="rounded-3xl">
-      <div className="glass-card rounded-3xl border border-white/10 overflow-hidden space-y-0">
+    <BorderGlow
+      borderRadius={24}
+      className="w-full h-full"
+      backgroundColor={isDark ? '#111111' : '#FFFFFF'}
+      glowIntensity={isDark ? 0.65 : 0.45}
+    >
+      <div className="glass-card rounded-3xl overflow-hidden space-y-0">
         <div className="p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           {/* Airline Logo & Name */}
           <div className="flex items-center gap-3.5 max-w-sm">
@@ -133,6 +141,6 @@ export default function FlightCard({ flight, onSelect }) {
           />
         )}
       </div>
-    </PixelCardWrapper>
+    </BorderGlow>
   );
 }

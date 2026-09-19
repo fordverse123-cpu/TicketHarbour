@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './context/AuthContext';
+import { ThemeProvider } from './context/ThemeContext';
 
 // Layout & Common Components
 import Navbar from './components/layout/Navbar';
@@ -47,17 +48,18 @@ import AttractionsPage from './pages/AttractionsPage';
 
 function App() {
   return (
-    <AuthProvider>
-      <BrowserRouter>
-        <div className="relative min-h-screen font-sans bg-[#000000] text-white overflow-x-hidden">
-          {/* Hyperspeed WebGL Background */}
-          <HyperspeedBackground />
+    <ThemeProvider>
+      <AuthProvider>
+        <BrowserRouter>
+          <div className="relative min-h-screen font-sans bg-[var(--th-page)] text-[var(--th-text)] overflow-x-hidden transition-colors duration-200">
+            {/* Hyperspeed WebGL Background */}
+            <HyperspeedBackground />
 
-          {/* Dark Overlay for UI legibility */}
-          <div className="fixed inset-0 bg-black/35 pointer-events-none z-0" />
+            {/* Dark/Light Overlay for UI legibility */}
+            <div className="fixed inset-0 bg-black/30 dark:bg-black/40 light:bg-white/70 pointer-events-none z-0" />
 
-          {/* Main App Canvas */}
-          <div className="relative z-10 flex flex-col min-h-screen">
+            {/* Main App Canvas */}
+            <div className="relative z-10 flex flex-col min-h-screen">
             <Toaster position="top-right" toastOptions={{ duration: 4000 }} />
             
             <Navbar />
@@ -117,6 +119,7 @@ function App() {
         </div>
       </BrowserRouter>
     </AuthProvider>
+    </ThemeProvider>
   );
 }
 

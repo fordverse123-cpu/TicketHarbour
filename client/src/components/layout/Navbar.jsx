@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { Search, User, Heart, LogOut, ShieldAlert, Menu, Ticket } from 'lucide-react';
+import { useTheme } from '../../context/ThemeContext';
+import { Search, User, Heart, LogOut, ShieldAlert, Menu, Ticket, Sun, Moon } from 'lucide-react';
 import MobileMenu from './MobileMenu';
 import CategoryNav from '../navigation/CategoryNav';
 
 export default function Navbar() {
   const { user, logout, isAdmin } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -21,18 +23,18 @@ export default function Navbar() {
 
   return (
     <>
-      <header className="sticky top-0 z-40 bg-[#050505]/85 backdrop-blur-xl border-b border-white/10 shadow-2xl">
+      <header className="sticky top-0 z-40 bg-[var(--th-card)]/90 backdrop-blur-xl border-b border-[var(--th-border)] shadow-2xl transition-colors duration-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Top Row: Logo, Global Search, Auth Controls */}
           <div className="flex items-center justify-between h-16 sm:h-18 py-3 gap-3 md:gap-6">
             
             {/* Logo */}
             <Link to="/" className="flex items-center gap-2.5 shrink-0 group">
-              <div className="h-9 w-9 rounded-xl bg-gradient-to-tr from-[#19D3D3] to-[#4F46E5] flex items-center justify-center text-white font-black text-lg shadow-lg group-hover:scale-105 transition-transform">
+              <div className="h-9 w-9 rounded-xl bg-gradient-to-tr from-[#03B3C3] to-[#6750A2] flex items-center justify-center text-white font-black text-lg shadow-lg group-hover:scale-105 transition-transform">
                 TH
               </div>
-              <span className="text-xl sm:text-2xl font-black tracking-tight text-white">
-                Ticket<span className="text-transparent bg-clip-text bg-gradient-to-r from-[#19D3D3] to-[#4F46E5]">Harbour</span>
+              <span className="text-xl sm:text-2xl font-black tracking-tight text-[var(--th-text)]">
+                Ticket<span className="text-transparent bg-clip-text bg-gradient-to-r from-[#03B3C3] to-[#6750A2]">Harbour</span>
               </span>
             </Link>
 
@@ -43,13 +45,27 @@ export default function Navbar() {
                 placeholder="Search movies, concerts, buses, flights..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 text-xs lg:text-sm bg-[#111111] border border-white/10 rounded-full text-white placeholder-[#777777] focus:outline-none focus:border-[#19D3D3] focus:ring-2 focus:ring-[#19D3D3]/20 transition-all shadow-inner"
+                className="w-full pl-10 pr-4 py-2 text-xs lg:text-sm bg-[var(--th-surface-2)] border border-[var(--th-border)] rounded-full text-[var(--th-text)] placeholder-[var(--th-muted)] focus:outline-none focus:border-[var(--th-accent)] focus:ring-2 focus:ring-[var(--th-accent)]/20 transition-all shadow-inner"
               />
-              <Search className="w-4 h-4 text-[#19D3D3] absolute left-3.5 top-2.5 pointer-events-none" />
+              <Search className="w-4 h-4 text-[var(--th-accent)] absolute left-3.5 top-2.5 pointer-events-none" />
             </form>
 
             {/* Right Side Actions */}
             <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+              {/* Sun / Moon Theme Toggle */}
+              <button
+                type="button"
+                onClick={toggleTheme}
+                aria-label="Toggle Light and Dark Theme"
+                title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Mode`}
+                className="p-2 rounded-xl bg-[var(--th-surface-2)] border border-[var(--th-border)] text-[var(--th-text)] hover:text-[var(--th-accent)] transition-all flex items-center justify-center cursor-pointer shadow-sm hover:scale-105"
+              >
+                {theme === 'dark' ? (
+                  <Sun className="w-4 h-4 text-amber-400 fill-amber-400/20" />
+                ) : (
+                  <Moon className="w-4 h-4 text-indigo-600 fill-indigo-600/20" />
+                )}
+              </button>
               {user ? (
                 <div className="relative">
                   <button

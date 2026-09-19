@@ -1,41 +1,52 @@
 import React from 'react';
-import PixelCardWrapper from './PixelCardWrapper';
+import BorderGlow from './BorderGlow';
+import { useTheme } from '../../context/ThemeContext';
 
 export default function GlassCard({
   children,
   className = '',
   hover = true,
   category = 'default',
-  variant,
-  enablePixel = true,
   onClick,
+  borderRadius = 16,
   ...props
 }) {
-  const cardContent = (
-    <div
-      onClick={onClick}
-      className={`
-        bg-harbour-card/75 backdrop-blur-xl border border-white/10 rounded-2xl p-6
-        box-shadow-card-glow text-white transition-all duration-300 relative overflow-hidden
-        ${hover ? 'hover:-translate-y-1 hover:border-white/20 hover:shadow-card-glow' : ''}
-        ${onClick ? 'cursor-pointer' : ''}
-        ${className}
-      `}
-      {...props}
+  const { theme } = useTheme();
+
+  const isDark = theme === 'dark';
+
+  const glowProps = {
+    backgroundColor: isDark ? '#111111' : '#FFFFFF',
+    colors: isDark
+      ? ['#03B3C3', '#6750A2', '#D856BF']
+      : ['#0891B2', '#5B4FD6', '#C026A3'],
+    glowColor: isDark ? '185 80 65' : '200 65 50',
+    glowRadius: isDark ? 25 : 20,
+    glowIntensity: isDark ? 0.65 : 0.45,
+    edgeSensitivity: 30,
+    coneSpread: 25,
+    animated: false,
+  };
+
+  return (
+    <BorderGlow
+      borderRadius={borderRadius}
+      className={`h-full w-full ${onClick ? 'cursor-pointer' : ''}`}
+      {...glowProps}
     >
-      {/* Glossy top edge highlight */}
-      <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none z-10" />
-      <div className="relative z-10">{children}</div>
-    </div>
+      <div
+        onClick={onClick}
+        className={`
+          glass-card p-6 h-full w-full transition-all duration-300 relative overflow-hidden
+          ${hover ? 'hover:-translate-y-0.5' : ''}
+          ${className}
+        `}
+        {...props}
+      >
+        {/* Glossy top edge highlight */}
+        <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-current opacity-15 to-transparent pointer-events-none z-10" />
+        <div className="relative z-10">{children}</div>
+      </div>
+    </BorderGlow>
   );
-
-  if (enablePixel) {
-    return (
-      <PixelCardWrapper category={category} variant={variant} className="rounded-2xl h-full">
-        {cardContent}
-      </PixelCardWrapper>
-    );
-  }
-
-  return cardContent;
 }
