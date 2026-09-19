@@ -54,16 +54,17 @@ export const setTokenCookies = (res, accessToken, refreshToken) => {
 
 // Clear Token Cookies on logout
 export const clearTokenCookies = (res) => {
+  const isProduction = process.env.NODE_ENV === 'production';
   res.cookie('accessToken', '', {
     httpOnly: true,
-    secure: true,
-    sameSite: 'none',
+    secure: isProduction,
+    sameSite: isProduction ? 'none' : 'lax',
     expires: new Date(0),
   });
   res.cookie('refreshToken', '', {
     httpOnly: true,
-    secure: true,
-    sameSite: 'none',
+    secure: isProduction,
+    sameSite: isProduction ? 'none' : 'lax',
     expires: new Date(0),
   });
 };

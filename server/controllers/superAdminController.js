@@ -6,10 +6,10 @@ import { successResponse, errorResponse } from '../utils/apiResponse.js';
 // @access  Private/SuperAdmin
 export const getSuperAdminStats = async (req, res, next) => {
   try {
-    const totalAdmins = await User.countDocuments({ role: 'admin' });
-    const activeAdmins = await User.countDocuments({ role: 'admin', status: 'active' });
-    const inactiveAdmins = await User.countDocuments({ role: 'admin', status: { $ne: 'active' } });
-    const totalUsers = await User.countDocuments({ role: 'user' });
+    const totalAdmins = await User.countDocuments({ role: { $in: ['ADMIN', 'admin'] } });
+    const activeAdmins = await User.countDocuments({ role: { $in: ['ADMIN', 'admin'] }, status: 'active' });
+    const inactiveAdmins = await User.countDocuments({ role: { $in: ['ADMIN', 'admin'] }, status: { $ne: 'active' } });
+    const totalUsers = await User.countDocuments({ role: { $in: ['USER', 'user'] } });
 
     return successResponse(res, 200, 'Super Admin Statistics', {
       stats: {
@@ -31,7 +31,7 @@ export const getAdmins = async (req, res, next) => {
   try {
     const { search, status } = req.query;
 
-    const query = { role: 'admin' };
+    const query = { role: { $in: ['ADMIN', 'admin'] } };
 
     if (status && status !== 'all') {
       query.status = status;
@@ -155,7 +155,7 @@ export const updateAdminStatus = async (req, res, next) => {
       return errorResponse(res, 404, 'Admin account not found');
     }
 
-    if (admin.role === 'superadmin') {
+    if (admin.role === 'SUPER_ADMIN' || admin.role === 'superadmin') {
       return errorResponse(res, 403, 'Super Admin status cannot be altered');
     }
 
@@ -190,7 +190,7 @@ export const resetAdminPassword = async (req, res, next) => {
       return errorResponse(res, 404, 'Admin account not found');
     }
 
-    if (admin.role === 'superadmin') {
+    if (admin.role === 'SUPER_ADMIN' || admin.role === 'superadmin') {
       return errorResponse(res, 403, 'Cannot reset Super Admin password via this endpoint');
     }
 
@@ -215,7 +215,7 @@ export const updateAdmin = async (req, res, next) => {
       return errorResponse(res, 404, 'Admin account not found');
     }
 
-    if (admin.role === 'superadmin') {
+    if (admin.role === 'SUPER_ADMIN' || admin.role === 'superadmin') {
       return errorResponse(res, 403, 'Super Admin account cannot be modified via this endpoint');
     }
 
@@ -250,7 +250,7 @@ export const deleteAdmin = async (req, res, next) => {
       return errorResponse(res, 404, 'Admin account not found');
     }
 
-    if (admin.role === 'superadmin') {
+    if (admin.role === 'SUPER_ADMIN' || admin.role === 'superadmin') {
       return errorResponse(res, 403, 'Cannot delete Super Admin account');
     }
 

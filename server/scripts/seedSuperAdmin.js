@@ -21,7 +21,7 @@ export const seedSuperAdmin = async () => {
 
     if (!superAdmin) {
       // If superadmin with another email exists, promote/update this target email user
-      superAdmin = await User.findOne({ role: 'superadmin' }).select('+password');
+      superAdmin = await User.findOne({ role: { $in: ['SUPER_ADMIN', 'superadmin'] } }).select('+password');
     }
 
     if (superAdmin) {

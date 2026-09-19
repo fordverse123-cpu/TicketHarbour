@@ -28,7 +28,7 @@ const seedData = async () => {
       name: 'TicketHarbor Admin',
       email: 'admin@ticketharbor.com',
       password: 'admin123',
-      role: 'admin',
+      role: 'ADMIN',
       isVerified: true,
       phone: '+1 800 555 0199',
     });
@@ -37,7 +37,7 @@ const seedData = async () => {
       name: 'John Harbor',
       email: 'user@ticketharbor.com',
       password: 'user123',
-      role: 'user',
+      role: 'USER',
       isVerified: true,
       phone: '+1 800 555 0188',
     });

@@ -34,7 +34,13 @@ const PORT = process.env.PORT || 5000;
 
 // Connect to MongoDB Database & Seed initial Super Admin
 connectDB().then(async () => {
-  await seedSuperAdmin();
+  try {
+    await seedSuperAdmin();
+  } catch (seedErr) {
+    console.warn('[Server Startup Warning] Seed SuperAdmin skipped:', seedErr.message);
+  }
+}).catch((err) => {
+  console.error('[TicketHarbor DB] Database connection error:', err.message);
 });
 
 // Security Middleware

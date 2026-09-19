@@ -13,8 +13,8 @@ export default function SuperAdminLogin() {
       const res = await login(email, password);
       if (!res || !res.success) return;
 
-      const loggedUser = res.user;
-      if (loggedUser?.role !== 'superadmin') {
+      const userRole = loggedUser?.role ? loggedUser.role.toUpperCase() : '';
+      if (userRole !== 'SUPER_ADMIN') {
         toast.error('Access Denied: Super Admin privileges required.');
         return;
       }

@@ -101,7 +101,7 @@ export const AuthProvider = ({ children }) => {
         logout,
         updateProfile,
         checkUser,
-        isAdmin: user?.role === 'admin',
+        isAdmin: user?.role?.toUpperCase() === 'ADMIN' || user?.role?.toUpperCase() === 'SUPER_ADMIN',
       }}
     >
       {children}

@@ -13,8 +13,8 @@ export default function AdminLogin() {
       const res = await login(email, password);
       if (!res || !res.success) return;
 
-      const loggedUser = res.user;
-      if (loggedUser?.role !== 'admin' && loggedUser?.role !== 'superadmin') {
+      const userRole = loggedUser?.role ? loggedUser.role.toUpperCase() : '';
+      if (userRole !== 'ADMIN' && userRole !== 'SUPER_ADMIN') {
         toast.error('Access Denied: Admin privileges required.');
         return;
       }

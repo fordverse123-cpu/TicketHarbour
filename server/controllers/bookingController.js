@@ -285,7 +285,8 @@ export const getBookingById = async (req, res, next) => {
       return errorResponse(res, 404, 'Booking not found');
     }
 
-    if (booking.user._id.toString() !== req.user.id && req.user.role !== 'admin') {
+    const userRole = req.user.role ? req.user.role.toUpperCase() : '';
+    if (booking.user._id.toString() !== req.user.id && userRole !== 'ADMIN' && userRole !== 'SUPER_ADMIN') {
       return errorResponse(res, 403, 'Not authorized to view this booking');
     }
 
@@ -306,7 +307,8 @@ export const cancelBooking = async (req, res, next) => {
       return errorResponse(res, 404, 'Booking not found');
     }
 
-    if (booking.user.toString() !== req.user.id && req.user.role !== 'admin') {
+    const userRole = req.user.role ? req.user.role.toUpperCase() : '';
+    if (booking.user.toString() !== req.user.id && userRole !== 'ADMIN' && userRole !== 'SUPER_ADMIN') {
       return errorResponse(res, 403, 'Not authorized to cancel this booking');
     }
 
@@ -350,7 +352,8 @@ export const downloadPDFTicket = async (req, res, next) => {
       return errorResponse(res, 404, 'Booking not found');
     }
 
-    if (booking.user._id.toString() !== req.user.id && req.user.role !== 'admin') {
+    const userRole = req.user.role ? req.user.role.toUpperCase() : '';
+    if (booking.user._id.toString() !== req.user.id && userRole !== 'ADMIN' && userRole !== 'SUPER_ADMIN') {
       return errorResponse(res, 403, 'Not authorized to download this ticket');
     }
 

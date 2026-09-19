@@ -10,7 +10,7 @@ import { successResponse, errorResponse } from '../utils/apiResponse.js';
 // @access  Private/Admin
 export const getAdminStats = async (req, res, next) => {
   try {
-    const totalUsers = await User.countDocuments({ role: 'user' });
+    const totalUsers = await User.countDocuments({ role: { $in: ['USER', 'user'] } });
     const totalListings = await Listing.countDocuments();
     const totalBookings = await Booking.countDocuments();
     const confirmedBookings = await Booking.countDocuments({ status: 'confirmed' });
