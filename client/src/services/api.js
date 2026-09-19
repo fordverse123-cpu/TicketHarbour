@@ -1,7 +1,13 @@
 import axios from 'axios';
 
+const defaultBaseURL =
+  typeof window !== 'undefined' &&
+  (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+    ? 'http://localhost:5000/api/v1'
+    : 'https://ticketharbour-1.onrender.com/api/v1';
+
 const API = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'https://ticketharbour-1.onrender.com/api/v1',
+  baseURL: import.meta.env.VITE_API_URL || defaultBaseURL,
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
