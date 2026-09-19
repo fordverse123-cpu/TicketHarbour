@@ -10,6 +10,7 @@
     "seed": "node scripts/seed.js",
     "seed:clean": "node scripts/seedClean.js",
     "seed:superadmin": "node scripts/seedSuperAdmin.js",
+    "import:trains": "node scripts/importTrains.js",
     "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --testTimeout=15000 --detectOpenHandles --forceExit"
   },
   "dependencies": {

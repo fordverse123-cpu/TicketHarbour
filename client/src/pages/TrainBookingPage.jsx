@@ -48,63 +48,21 @@ const MOCK_TRAINS = [
       { tierName: 'AC 1st Class (1A)', price: 5890, classType: '1A', totalCapacity: 12, status: 'AVAILABLE 5' },
     ],
   },
-  {
-    _id: 'train-12007',
-    slug: 'shatabdi-express-12007',
-    title: '12007 Chennai Shatabdi Express',
-    categoryType: 'train',
-    transitInfo: {
-      number: '12007',
-      source: 'Chennai Central (MAS)',
-      destination: 'Bengaluru (SBC)',
-      departureTime: '06:00',
-      arrivalTime: '11:00',
-      duration: '5h 00m',
-    },
-    pricingTiers: [
-      { tierName: 'AC Chair Car (CC)', price: 890, classType: 'CC', totalCapacity: 80, status: 'AVAILABLE 55' },
-      { tierName: 'Executive Chair (EC)', price: 1650, classType: 'EC', totalCapacity: 20, status: 'AVAILABLE 11' },
-    ],
-  },
-  {
-    _id: 'train-12267',
-    slug: 'duronto-express-12267',
-    title: '12267 Ahmedabad Duronto Express',
-    categoryType: 'train',
-    transitInfo: {
-      number: '12267',
-      source: 'Mumbai Central (MMCT)',
-      destination: 'Ahmedabad (ADI)',
-      departureTime: '23:25',
-      arrivalTime: '05:55',
-      duration: '6h 30m',
-    },
-    pricingTiers: [
-      { tierName: 'AC 3 Tier (3A)', price: 1120, classType: '3A', totalCapacity: 60, status: 'AVAILABLE 39' },
-      { tierName: 'AC 2 Tier (2A)', price: 1680, classType: '2A', totalCapacity: 30, status: 'RAC 8' },
-      { tierName: 'AC 1st Class (1A)', price: 2840, classType: '1A', totalCapacity: 10, status: 'AVAILABLE 3' },
-    ],
-  },
-  {
-    _id: 'train-22691',
-    slug: 'rajdhani-express-22691',
-    title: '22691 KSR Bengaluru Rajdhani',
-    categoryType: 'train',
-    transitInfo: {
-      number: '22691',
-      source: 'Bengaluru (SBC)',
-      destination: 'Hazrat Nizamuddin (NZM)',
-      departureTime: '20:00',
-      arrivalTime: '05:30',
-      duration: '33h 30m',
-    },
-    pricingTiers: [
-      { tierName: 'AC 3 Tier (3A)', price: 2950, classType: '3A', totalCapacity: 45, status: 'AVAILABLE 19' },
-      { tierName: 'AC 2 Tier (2A)', price: 4200, classType: '2A', totalCapacity: 25, status: 'WL 14' },
-      { tierName: 'AC 1st Class (1A)', price: 6700, classType: '1A', totalCapacity: 8, status: 'AVAILABLE 1' },
-    ],
-  },
 ];
+
+// Fare mapping helper for standard railway classes
+const getFareForClass = (cls) => {
+  switch (cls) {
+    case '1A': return 4600;
+    case '2A': return 2750;
+    case '3A': return 1850;
+    case 'SL': return 780;
+    case 'CC': return 890;
+    case 'EC': return 1650;
+    case '2S': return 320;
+    default: return 950;
+  }
+};
 
 export default function TrainBookingPage() {
   const navigate = useNavigate();
@@ -115,51 +73,85 @@ export default function TrainBookingPage() {
   const [selectedSeatTrain, setSelectedSeatTrain] = useState(null);
   const [selectedTier, setSelectedTier] = useState(null);
   const [showMobileFilter, setShowMobileFilter] = useState(false);
+  const [searchMessage, setSearchMessage] = useState('');
 
   useEffect(() => {
-    fetchTrains();
+    // Initial fetch for default route BZA -> SC
+    handleSearch({
+      from: { code: 'BZA', city: 'Vijayawada' },
+      to: { code: 'SC', city: 'Hyderabad' },
+      date: new Date().toISOString().split('T')[0],
+      trainClass: 'ALL',
+      quota: 'GN',
+    });
   }, []);
 
-  const fetchTrains = async () => {
+  const handleSearch = async (searchParams) => {
     setLoading(true);
+    setSearchMessage('');
+
+    const fromCode = searchParams.from?.code || searchParams.from;
+    const toCode = searchParams.to?.code || searchParams.to;
+    const dateStr = searchParams.date || new Date().toISOString().split('T')[0];
+
     try {
-      const res = await API.get('/listings?categoryType=train');
-      if (res.data.success && res.data.data.listings.length > 0) {
-        setTrains(res.data.data.listings);
-        setFilteredTrains(res.data.data.listings);
+      // Call MongoDB Backend Train Search API
+      const res = await API.get('/trains/search', {
+        params: {
+          from: fromCode,
+          to: toCode,
+          date: dateStr,
+          class: searchParams.trainClass !== 'ALL' ? searchParams.trainClass : undefined,
+          quota: searchParams.quota,
+        },
+      });
+
+      if (res.data && res.data.success && res.data.trains) {
+        const mappedTrains = res.data.trains.map((t) => {
+          const pricingTiers = (t.classes || ['3A', '2A', 'SL']).map((cls) => ({
+            tierName: `${cls}`,
+            classType: cls,
+            price: getFareForClass(cls),
+            totalCapacity: 50,
+            status: 'AVAILABLE ' + (Math.floor(Math.random() * 40) + 10),
+          }));
+
+          return {
+            _id: t._id,
+            slug: `train-${t.trainNumber}`,
+            title: `${t.trainNumber} ${t.trainName}`,
+            categoryType: 'train',
+            transitInfo: {
+              number: t.trainNumber,
+              source: `${t.from.stationName} (${t.from.stationCode})`,
+              destination: `${t.to.stationName} (${t.to.stationCode})`,
+              departureTime: t.from.departure,
+              arrivalTime: t.to.arrival,
+              duration: t.duration,
+            },
+            pricingTiers,
+            route: t.route,
+            amenities: t.amenities,
+          };
+        });
+
+        setTrains(mappedTrains);
+        setFilteredTrains(mappedTrains);
+
+        if (mappedTrains.length === 0) {
+          setSearchMessage(`No trains found between ${fromCode} and ${toCode} for ${dateStr}.`);
+        }
       } else {
         setTrains(MOCK_TRAINS);
         setFilteredTrains(MOCK_TRAINS);
       }
     } catch (err) {
-      console.warn('Backend train API empty, loading standard Indian Rail routes', err);
+      console.warn('Backend train API error, falling back to cached train data', err);
       setTrains(MOCK_TRAINS);
       setFilteredTrains(MOCK_TRAINS);
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleSearch = (searchParams) => {
-    setLoading(true);
-    setTimeout(() => {
-      let result = [...trains];
-      if (searchParams.from?.code && searchParams.to?.code) {
-        result = result.filter(
-          (t) =>
-            t.transitInfo?.source?.includes(searchParams.from.code) ||
-            t.transitInfo?.destination?.includes(searchParams.to.code) ||
-            t.transitInfo?.source?.toLowerCase().includes(searchParams.from.city.toLowerCase())
-        );
-      }
-      if (searchParams.trainClass && searchParams.trainClass !== 'ALL') {
-        result = result.filter((t) =>
-          t.pricingTiers?.some((tier) => tier.classType === searchParams.trainClass)
-        );
-      }
-      setFilteredTrains(result.length > 0 ? result : MOCK_TRAINS);
-      setLoading(false);
-    }, 400);
   };
 
   const handleFilterChange = (newFilters) => {
@@ -223,19 +215,19 @@ export default function TrainBookingPage() {
               </h2>
             </div>
             <button
-              onClick={fetchTrains}
+              onClick={() => handleSearch({ from: 'BZA', to: 'SC', date: new Date().toISOString().split('T')[0] })}
               className="text-xs font-semibold text-blue-600 dark:text-blue-400 flex items-center gap-1 hover:underline"
             >
-              <RefreshCw className="w-3.5 h-3.5" /> Refresh Status
+              <RefreshCw className="w-3.5 h-3.5" /> Refresh Schedule
             </button>
           </div>
 
           {loading ? (
             <SkeletonLoader count={4} />
           ) : filteredTrains.length === 0 ? (
-            <div className="text-center py-16 bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 space-y-3">
+            <div className="text-center py-16 bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 space-y-3 p-6">
               <p className="text-lg font-bold text-slate-700 dark:text-slate-200">
-                No trains found matching your search.
+                {searchMessage || 'No trains found matching your search.'}
               </p>
               <p className="text-xs text-slate-400">
                 Try selecting a different date, quota, or class filter.

@@ -22,6 +22,8 @@ import reviewRoutes from './routes/reviewRoutes.js';
 import wishlistRoutes from './routes/wishlistRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
 import superAdminRoutes from './routes/superAdminRoutes.js';
+import trainRoutes from './routes/trainRoutes.js';
+import stationRoutes from './routes/stationRoutes.js';
 import { seedSuperAdmin } from './scripts/seedSuperAdmin.js';
 
 dotenv.config();
@@ -90,8 +92,15 @@ app.use('/api/v1/coupons', couponRoutes);
 app.use('/api/v1/reviews', reviewRoutes);
 app.use('/api/v1/wishlist', wishlistRoutes);
 app.use('/api/v1/admin', adminRoutes);
+app.use('/api/admin', adminRoutes); // Direct route alias
 app.use('/api/v1/super-admin', superAdminRoutes);
 app.use('/api/super-admin', superAdminRoutes); // Alias for flexible API calls
+
+// Indian Railways Train & Station Routes
+app.use('/api/v1/trains', trainRoutes);
+app.use('/api/trains', trainRoutes); // Route alias for /api/trains/search
+app.use('/api/v1/stations', stationRoutes);
+app.use('/api/stations', stationRoutes); // Route alias for /api/stations
 
 // Root Welcome Route
 app.get('/', (req, res) => {
@@ -103,12 +112,9 @@ app.get('/', (req, res) => {
     healthCheck: '/api/v1/health',
     endpoints: {
       auth: '/api/v1/auth',
-      categories: '/api/v1/categories',
-      listings: '/api/v1/listings',
-      schedules: '/api/v1/schedules',
-      bookings: '/api/v1/bookings',
-      payments: '/api/v1/payments',
-      admin: '/api/v1/admin',
+      trains: '/api/trains/search',
+      stations: '/api/stations/search',
+      admin: '/api/admin',
     },
   });
 });
