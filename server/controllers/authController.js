@@ -35,7 +35,7 @@ export const register = async (req, res, next) => {
     await user.save();
 
     // Verification URL
-    const verifyUrl = `${process.env.CLIENT_URL || 'http://localhost:5173'}/verify-email/${verificationToken}`;
+    const verifyUrl = `${process.env.CLIENT_URL || 'https://ticket-harbour.vercel.app'}/verify-email/${verificationToken}`;
 
     const message = `Welcome to TicketHarbor! Please verify your email by clicking the link: \n\n ${verifyUrl}`;
     const html = `
@@ -228,7 +228,7 @@ export const forgotPassword = async (req, res, next) => {
     const resetToken = user.getResetPasswordToken();
     await user.save({ validateBeforeSave: false });
 
-    const resetUrl = `${process.env.CLIENT_URL || 'http://localhost:5173'}/reset-password/${resetToken}`;
+    const resetUrl = `${process.env.CLIENT_URL || 'https://ticket-harbour.vercel.app'}/reset-password/${resetToken}`;
 
     const message = `You requested a password reset on TicketHarbor. Please use the following link to reset your password:\n\n${resetUrl}`;
     const html = `

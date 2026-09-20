@@ -18,6 +18,8 @@ import {
   MessageSquare,
 } from 'lucide-react';
 
+import { addRecentlyViewed } from '../utils/recentlyViewed';
+
 export default function ListingDetail() {
   const { identifier } = useParams();
   const navigate = useNavigate();
@@ -48,6 +50,7 @@ export default function ListingDetail() {
       if (res.data.success) {
         const item = res.data.data.listing;
         setListing(item);
+        addRecentlyViewed(item);
 
         // Fetch schedules for listing
         const schRes = await API.get(`/schedules?listing=${item._id}`);

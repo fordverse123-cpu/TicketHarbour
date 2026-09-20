@@ -53,6 +53,8 @@ export default function AdminDashboard() {
     ? Object.keys(CATEGORY_MAP)
     : permissions.map((p) => p.toUpperCase());
 
+  const [searchAnalytics, setSearchAnalytics] = useState(null);
+
   useEffect(() => {
     fetchAdminStats();
   }, []);
@@ -60,11 +62,19 @@ export default function AdminDashboard() {
   const fetchAdminStats = async () => {
     setLoading(true);
     try {
-      const res = await API.get('/admin/stats');
-      if (res.data.success) {
+      const [res, searchRes] = await Promise.all([
+        API.get('/admin/stats'),
+        API.get('/searches/analytics').catch(() => null),
+      ]);
+
+      if (res.data?.success) {
         setStats(res.data.data.stats);
         setCategoryStats(res.data.data.categoryStats);
         setRecentBookings(res.data.data.recentBookings);
+      }
+
+      if (searchRes?.data?.success) {
+        setSearchAnalytics(searchRes.data.data);
       }
     } catch (err) {
       toast.error('Failed to load admin stats');
@@ -205,6 +215,52 @@ export default function AdminDashboard() {
           ))}
         </div>
       </GlassCard>
+
+      {/* Search Analytics Card */}
+      {searchAnalytics && (
+        <GlassCard hover={false} className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-black text-white">Search Analytics & Trending Routes</h2>
+            <span className="text-xs font-bold text-[#03B3C3] bg-[#03B3C3]/15 px-3 py-1 rounded-full border border-[#03B3C3]/30">
+              Total Queries: {searchAnalytics.totalSearches || 0}
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <h3 className="text-xs font-bold uppercase text-slate-400">Popular Search Routes</h3>
+              {searchAnalytics.topRoutes && searchAnalytics.topRoutes.length > 0 ? (
+                <div className="space-y-2">
+                  {searchAnalytics.topRoutes.map((route, idx) => (
+                    <div key={idx} className="flex items-center justify-between p-3 bg-[#111111] rounded-xl border border-white/10 text-xs">
+                      <span className="font-bold text-white uppercase">{route.category}: {route.from} → {route.to}</span>
+                      <span className="font-black text-[#03B3C3]">{route.count} search(es)</span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-xs text-slate-500 py-4">No route analytics recorded yet.</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <h3 className="text-xs font-bold uppercase text-slate-400">Searches by Category</h3>
+              {searchAnalytics.searchesByCategory && searchAnalytics.searchesByCategory.length > 0 ? (
+                <div className="grid grid-cols-2 gap-3">
+                  {searchAnalytics.searchesByCategory.map((cat, idx) => (
+                    <div key={idx} className="p-3 bg-[#111111] rounded-xl border border-white/10 text-xs space-y-1">
+                      <span className="text-[10px] uppercase font-bold text-[#03B3C3]">{cat._id}</span>
+                      <p className="text-base font-black text-white">{cat.count} queries</p>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-xs text-slate-500 py-4">No search activity recorded.</p>
+              )}
+            </div>
+          </div>
+        </GlassCard>
+      )}
 
       {/* Recent Bookings Table */}
       <GlassCard hover={false} className="space-y-4 p-0 overflow-hidden">

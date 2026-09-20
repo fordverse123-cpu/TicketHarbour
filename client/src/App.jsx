@@ -46,6 +46,10 @@ import EventsPage from './pages/EventsPage';
 import SportsPage from './pages/SportsPage';
 import AttractionsPage from './pages/AttractionsPage';
 
+import MobileBottomNav from './components/layout/MobileBottomNav';
+import TicketHarbourAIWidget from './components/ai/TicketHarbourAIWidget';
+import NotFound from './pages/NotFound';
+
 function App() {
   return (
     <ThemeProvider>
@@ -56,7 +60,7 @@ function App() {
             <AeroShardsBackground />
 
             {/* Main App Canvas */}
-            <div className="relative z-10 flex flex-col min-h-screen">
+            <div className="relative z-10 flex flex-col min-h-screen pb-14 lg:pb-0">
             <Toaster position="top-right" toastOptions={{ duration: 4000 }} />
             
             <Navbar />
@@ -112,10 +116,15 @@ function App() {
                 <Route path="/super-admin/admins/create" element={<CreateAdmin />} />
                 <Route path="/super-admin/create" element={<CreateAdmin />} />
               </Route>
+
+              {/* Catch-all 404 Route */}
+              <Route path="*" element={<NotFound />} />
             </Routes>
           </main>
 
+          <TicketHarbourAIWidget />
           <Footer />
+          <MobileBottomNav />
           </div>
         </div>
       </BrowserRouter>

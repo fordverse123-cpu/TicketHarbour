@@ -4,7 +4,6 @@ import API from '../services/api';
 import GlassCard from '../components/ui/GlassCard';
 import GlassButton from '../components/ui/GlassButton';
 import RatingStars from '../components/common/RatingStars';
-import Skeleton from '../components/ui/Skeleton';
 import { CardSkeletonGrid, EventCardSkeleton } from '../components/loading';
 import {
   Film,
@@ -20,7 +19,12 @@ import {
   ArrowRight,
   ShieldCheck,
   Zap,
+  Clock,
+  Globe,
+  Layers,
+  CheckCircle,
 } from 'lucide-react';
+import { getRecentlyViewed } from '../utils/recentlyViewed';
 
 const CATEGORY_TABS = [
   { key: 'all', label: 'All', icon: Sparkles },
@@ -43,12 +47,44 @@ const CATEGORY_CARDS = [
   { id: 'attractions', title: 'Attractions', icon: Ticket, emoji: '🎟️', desc: 'Amusement parks, water parks & city passes', link: '/attractions' },
 ];
 
+const WHY_US_CARDS = [
+  {
+    title: 'Secure Booking',
+    desc: 'Encrypted checkout, instant ticket confirmation & 100% verified gate entry QR codes.',
+    icon: ShieldCheck,
+    color: 'from-cyanAccent-500/20 to-cyanAccent-600/10 text-cyanAccent-400 border-cyanAccent-500/30',
+  },
+  {
+    title: 'Fast Booking',
+    desc: 'Reserve tickets in under 30 seconds with 1-click seating, coupons & instant PDF downloads.',
+    icon: Zap,
+    color: 'from-amber-500/20 to-amber-600/10 text-amber-400 border-amber-500/30',
+  },
+  {
+    title: 'Multiple Ticket Categories',
+    desc: 'Access Movies, Events, Sports, Trains, Buses & Flights seamlessly on a single platform.',
+    icon: Layers,
+    color: 'from-indigoAccent-500/20 to-indigoAccent-600/10 text-indigoAccent-400 border-indigoAccent-500/30',
+  },
+  {
+    title: 'Book Anywhere',
+    desc: 'Fully mobile-optimized web app accessible anytime from your phone, tablet, or laptop.',
+    icon: Globe,
+    color: 'from-emerald-500/20 to-emerald-600/10 text-emerald-400 border-emerald-500/30',
+  },
+];
+
 export default function Home() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('all');
   const [searchCategory, setSearchCategory] = useState('movies');
   const [featuredListings, setFeaturedListings] = useState([]);
+  const [recentlyViewedItems, setRecentlyViewedItems] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    setRecentlyViewedItems(getRecentlyViewed());
+  }, []);
 
   // Search Fields State
   const [keyword, setKeyword] = useState('');
@@ -478,6 +514,92 @@ export default function Home() {
             })}
           </div>
         )}
+      </section>
+
+      {/* RECENTLY VIEWED LISTINGS (IF ANY) */}
+      {recentlyViewedItems.length > 0 && (
+        <section className="space-y-6">
+          <div className="flex items-center justify-between">
+            <div className="space-y-1">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigoAccent-500/15 text-[#03B3C3] border border-indigoAccent-500/30 text-[10px] font-black uppercase tracking-wider">
+                <Clock className="w-3 h-3" /> Quick Access
+              </span>
+              <h2 className="text-2xl font-black text-white tracking-tight">Recently Viewed Tickets</h2>
+            </div>
+            <button
+              onClick={() => {
+                localStorage.removeItem('ticketharbour_recently_viewed');
+                setRecentlyViewedItems([]);
+              }}
+              className="text-xs font-bold text-slate-400 hover:text-rose-400 hover:underline"
+            >
+              Clear History
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {recentlyViewedItems.map((item) => (
+              <GlassCard key={item._id} className="p-0 overflow-hidden flex flex-col justify-between group bg-[#151515]">
+                <div className="relative h-44 overflow-hidden bg-harbour-darker">
+                  <img src={item.bannerImage} alt={item.title} className="w-full h-full object-cover" />
+                  <div className="absolute top-3 left-3 px-3 py-1 bg-black/75 backdrop-blur-md text-[#03B3C3] text-[10px] font-black rounded-full uppercase border border-white/10">
+                    {item.categoryType}
+                  </div>
+                </div>
+
+                <div className="p-4 space-y-3 flex-1 flex flex-col justify-between">
+                  <div className="space-y-1">
+                    <h3 className="font-black text-white text-sm line-clamp-1 group-hover:text-[#03B3C3] transition-colors">
+                      {item.title}
+                    </h3>
+                    <p className="text-xs text-slate-400 flex items-center gap-1">
+                      <MapPin className="w-3.5 h-3.5 text-[#03B3C3]" /> {item.city}
+                    </p>
+                  </div>
+
+                  <div className="pt-2 border-t border-white/10 flex items-center justify-between">
+                    <span className="text-sm font-black text-white">₹{item.price}</span>
+                    <Link to={`/listings/${item.slug || item._id}`}>
+                      <GlassButton size="sm" variant="gradient">
+                        Book Again
+                      </GlassButton>
+                    </Link>
+                  </div>
+                </div>
+              </GlassCard>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* WHY TICKETHARBOUR? FEATURE CARDS */}
+      <section className="space-y-6">
+        <div className="text-center max-w-2xl mx-auto space-y-2">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#03B3C3]/15 text-[#03B3C3] border border-[#03B3C3]/30 text-[10px] font-black uppercase tracking-wider">
+            <CheckCircle className="w-3 h-3" /> Trusted Ticket Platform
+          </span>
+          <h2 className="text-3xl font-black text-white tracking-tight">Why TicketHarbour?</h2>
+          <p className="text-xs sm:text-sm text-slate-400">
+            Engineered for high-speed ticket reservation, transparent pricing, and instant entry verification.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {WHY_US_CARDS.map((card, idx) => {
+            const Icon = card.icon;
+            return (
+              <GlassCard key={idx} hover={true} className="p-6 space-y-4 text-left border border-white/10 flex flex-col justify-between">
+                <div className="space-y-3">
+                  <div className={`p-3 rounded-2xl bg-gradient-to-br ${card.color} w-fit border`}>
+                    <Icon className="w-6 h-6" />
+                  </div>
+                  <h3 className="text-lg font-black text-white">{card.title}</h3>
+                  <p className="text-xs text-slate-400 leading-relaxed">{card.desc}</p>
+                </div>
+              </GlassCard>
+            );
+          })}
+        </div>
       </section>
 
     </div>

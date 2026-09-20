@@ -25,6 +25,7 @@ import superAdminRoutes from './routes/superAdminRoutes.js';
 import trainRoutes from './routes/trainRoutes.js';
 import stationRoutes from './routes/stationRoutes.js';
 import searchLogRoutes from './routes/searchLogRoutes.js';
+import aiRoutes from './routes/aiRoutes.js';
 import { seedSuperAdmin } from './scripts/seedSuperAdmin.js';
 
 dotenv.config();
@@ -113,6 +114,10 @@ app.use('/api/stations', stationRoutes); // Route alias for /api/stations
 app.use('/api/v1/searches', searchLogRoutes);
 app.use('/api/searches', searchLogRoutes);
 
+// TicketHarbour AI Module Routes
+app.use('/api/v1/ai', aiRoutes);
+app.use('/api/ai', aiRoutes);
+
 // Root Welcome Route
 app.get('/', (req, res) => {
   return successResponse(res, 200, 'Welcome to TicketHarbor API', {
@@ -131,7 +136,15 @@ app.get('/', (req, res) => {
   });
 });
 
-// Health Check Route
+// Health Check Routes
+app.get('/health', (req, res) => {
+  return res.status(200).json({
+    status: 'ok',
+    service: 'TicketHarbour API',
+    timestamp: new Date().toISOString()
+  });
+});
+
 app.get('/api/v1/health', (req, res) => {
   return successResponse(res, 200, 'TicketHarbor API Server is running', {
     app: 'TicketHarbor',
@@ -143,7 +156,9 @@ app.get('/api/v1/health', (req, res) => {
 // Centralized Error Handling Middleware
 app.use(errorHandler);
 
-if (process.env.NODE_ENV !== 'test') {
+const isDirectExecution = process.argv[1] && (process.argv[1].endsWith('server.js') || process.argv[1].endsWith('server'));
+
+if (process.env.NODE_ENV !== 'test' && !process.env.NO_LISTEN && isDirectExecution) {
   app.listen(PORT, () => {
     console.log(`[TicketHarbor Server] Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
   });
