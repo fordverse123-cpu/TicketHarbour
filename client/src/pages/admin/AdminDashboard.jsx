@@ -21,6 +21,7 @@ import {
   Calendar,
   Trophy,
   Compass,
+  DollarSign,
 } from 'lucide-react';
 
 const CATEGORY_MAP = {
@@ -138,6 +139,12 @@ export default function AdminDashboard() {
             Verify Ticket QR
           </GlassButton>
           
+          <Link to="/admin/revenue">
+            <GlassButton variant="gradient" icon={DollarSign}>
+              Revenue Analytics
+            </GlassButton>
+          </Link>
+
           <Link to="/admin/listings">
             <GlassButton variant="secondary" icon={PlusCircle}>
               Manage Listings

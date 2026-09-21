@@ -153,7 +153,10 @@ export const createListing = async (req, res, next) => {
   try {
     const { scheduleDate, startTime, endTime, ...listingData } = req.body;
 
-    const listing = await Listing.create(listingData);
+    const listing = await Listing.create({
+      ...listingData,
+      createdBy: req.user._id,
+    });
 
     // If initial schedule parameters are provided, automatically create schedule
     if (scheduleDate && startTime) {
@@ -187,14 +190,24 @@ export const createListing = async (req, res, next) => {
 // @access  Private/Admin
 export const updateListing = async (req, res, next) => {
   try {
+    const existingListing = await Listing.findById(req.params.id);
+    if (!existingListing) {
+      return errorResponse(res, 404, 'Listing not found');
+    }
+
+    const isSuperAdmin = req.user.role?.toUpperCase() === 'SUPER_ADMIN';
+    if (
+      existingListing.createdBy &&
+      existingListing.createdBy.toString() !== req.user._id.toString() &&
+      !isSuperAdmin
+    ) {
+      return errorResponse(res, 403, 'Not authorized to modify another admin\'s listing');
+    }
+
     const listing = await Listing.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
       runValidators: true,
     });
-
-    if (!listing) {
-      return errorResponse(res, 404, 'Listing not found');
-    }
 
     return successResponse(res, 200, 'Listing updated successfully', { listing });
   } catch (error) {
@@ -207,11 +220,21 @@ export const updateListing = async (req, res, next) => {
 // @access  Private/Admin
 export const deleteListing = async (req, res, next) => {
   try {
-    const listing = await Listing.findByIdAndDelete(req.params.id);
-
-    if (!listing) {
+    const existingListing = await Listing.findById(req.params.id);
+    if (!existingListing) {
       return errorResponse(res, 404, 'Listing not found');
     }
+
+    const isSuperAdmin = req.user.role?.toUpperCase() === 'SUPER_ADMIN';
+    if (
+      existingListing.createdBy &&
+      existingListing.createdBy.toString() !== req.user._id.toString() &&
+      !isSuperAdmin
+    ) {
+      return errorResponse(res, 403, 'Not authorized to delete another admin\'s listing');
+    }
+
+    await Listing.findByIdAndDelete(req.params.id);
 
     return successResponse(res, 200, 'Listing deleted successfully');
   } catch (error) {

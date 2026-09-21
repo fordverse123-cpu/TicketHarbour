@@ -9,6 +9,10 @@ import {
   updateAdmin,
   deleteAdmin,
 } from '../controllers/superAdminController.js';
+import {
+  getGlobalRevenueSummary,
+  getAdminWiseRevenueBreakdown,
+} from '../controllers/superAdminRevenueController.js';
 import { protect, authorize } from '../middleware/auth.js';
 
 const router = express.Router();
@@ -17,6 +21,8 @@ const router = express.Router();
 router.use(protect, authorize('superadmin', 'SUPER_ADMIN'));
 
 router.get('/stats', getSuperAdminStats);
+router.get('/revenue/summary', getGlobalRevenueSummary);
+router.get('/revenue/breakdown', getAdminWiseRevenueBreakdown);
 router.get('/admins', getAdmins);
 router.post('/admins', createAdmin);
 router.put('/admins/:id/status', updateAdminStatus);

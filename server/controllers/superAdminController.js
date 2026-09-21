@@ -63,8 +63,20 @@ export const createAdmin = async (req, res, next) => {
   try {
     const { name, email, phone, password, permissions } = req.body;
 
-    if (!name || !email || !password) {
+    if (!name || !name.trim() || !email || !email.trim() || !password) {
       return errorResponse(res, 400, 'Please provide name, email, and password');
+    }
+
+    const cleanName = name.trim();
+    const cleanEmail = email.toLowerCase().trim();
+
+    if (cleanName.length > 50) {
+      return errorResponse(res, 400, 'Name cannot exceed 50 characters');
+    }
+
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!emailRegex.test(cleanEmail)) {
+      return errorResponse(res, 400, 'Please provide a valid email address');
     }
 
     if (password.length < 8) {
@@ -72,20 +84,27 @@ export const createAdmin = async (req, res, next) => {
     }
 
     // Check duplicate email
-    const existingUser = await User.findOne({ email: email.toLowerCase() });
+    const existingUser = await User.findOne({ email: cleanEmail });
     if (existingUser) {
       return errorResponse(res, 400, 'User with this email already exists');
     }
 
-    // Assign permissions cleanly
+    // Assign permissions cleanly (filtering valid categories)
+    const VALID_PERMISSIONS = ['MOVIES', 'EVENTS', 'SPORTS', 'BUS', 'TRAIN', 'FLIGHTS', 'ATTRACTIONS'];
     const assignedPermissions = Array.isArray(permissions) && permissions.length > 0
-      ? permissions.map((p) => p.toUpperCase())
-      : ['MOVIES', 'EVENTS', 'SPORTS', 'BUS', 'TRAIN', 'FLIGHTS', 'ATTRACTIONS'];
+      ? permissions
+          .map((p) => String(p).toUpperCase().trim())
+          .filter((p) => VALID_PERMISSIONS.includes(p) || p === 'ALL')
+      : VALID_PERMISSIONS;
+
+    if (assignedPermissions.length === 0) {
+      return errorResponse(res, 400, 'At least one valid category permission must be assigned.');
+    }
 
     const admin = await User.create({
-      name,
-      email: email.toLowerCase(),
-      phone: phone || '',
+      name: cleanName,
+      email: cleanEmail,
+      phone: phone ? String(phone).trim() : '',
       password,
       role: 'ADMIN',
       permissions: assignedPermissions,

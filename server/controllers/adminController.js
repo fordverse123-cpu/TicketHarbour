@@ -10,26 +10,30 @@ import { successResponse, errorResponse } from '../utils/apiResponse.js';
 // @access  Private/Admin
 export const getAdminStats = async (req, res, next) => {
   try {
+    const isSuperAdmin = req.user.role?.toUpperCase() === 'SUPER_ADMIN';
+    const adminQuery = isSuperAdmin ? {} : { adminId: req.user._id };
+    const listingQuery = isSuperAdmin ? {} : { createdBy: req.user._id };
+
     const totalUsers = await User.countDocuments({ role: { $in: ['USER', 'user'] } });
-    const totalListings = await Listing.countDocuments();
-    const totalBookings = await Booking.countDocuments();
-    const confirmedBookings = await Booking.countDocuments({ status: 'confirmed' });
+    const totalListings = await Listing.countDocuments(listingQuery);
+    const totalBookings = await Booking.countDocuments(adminQuery);
+    const confirmedBookings = await Booking.countDocuments({ ...adminQuery, status: 'confirmed' });
 
     // Calculate Total Revenue
     const revenueResult = await Booking.aggregate([
-      { $match: { paymentStatus: 'paid' } },
+      { $match: { ...adminQuery, paymentStatus: 'paid' } },
       { $group: { _id: null, totalRevenue: { $sum: '$totalAmount' } } },
     ]);
     const totalRevenue = revenueResult[0]?.totalRevenue || 0;
 
     // Category breakdown
     const categoryStats = await Booking.aggregate([
-      { $match: { paymentStatus: 'paid' } },
+      { $match: { ...adminQuery, paymentStatus: 'paid' } },
       { $group: { _id: '$categoryType', count: { $sum: 1 }, revenue: { $sum: '$totalAmount' } } },
     ]);
 
     // Recent 10 Bookings
-    const recentBookings = await Booking.find()
+    const recentBookings = await Booking.find(adminQuery)
       .populate('user', 'name email')
       .populate('listing', 'title categoryType')
       .sort('-createdAt')
@@ -56,7 +60,10 @@ export const getAdminStats = async (req, res, next) => {
 // @access  Private/Admin
 export const getAllAdminBookings = async (req, res, next) => {
   try {
-    const bookings = await Booking.find()
+    const isSuperAdmin = req.user.role?.toUpperCase() === 'SUPER_ADMIN';
+    const adminQuery = isSuperAdmin ? {} : { adminId: req.user._id };
+
+    const bookings = await Booking.find(adminQuery)
       .populate('user', 'name email phone')
       .populate('listing', 'title categoryType')
       .populate('schedule', 'date startTime')

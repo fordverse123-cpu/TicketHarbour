@@ -20,13 +20,17 @@ import {
   Shield,
   CheckCircle,
   UserPlus,
+  DollarSign,
+  Users,
 } from 'lucide-react';
 
 import PageLoader from '../../components/common/PageLoader';
+import SuperAdminRevenueTab from './SuperAdminRevenueTab';
 
 const CATEGORIES = ['MOVIES', 'EVENTS', 'SPORTS', 'BUS', 'TRAIN', 'FLIGHTS', 'ATTRACTIONS'];
 
 export default function SuperAdminDashboard() {
+  const [activeTab, setActiveTab] = useState('admins');
   const [stats, setStats] = useState(null);
   const [admins, setAdmins] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -124,7 +128,10 @@ export default function SuperAdminDashboard() {
         fetchSuperAdminData();
       }
     } catch (err) {
-      const msg = err.response?.data?.message || 'Failed to create Admin account.';
+      const serverErrors = err.response?.data?.errors;
+      const msg = Array.isArray(serverErrors) && serverErrors.length > 0
+        ? serverErrors.join(', ')
+        : err.response?.data?.message || 'Failed to create Admin account.';
       toast.error(msg);
     } finally {
       setCreatingAdmin(false);
@@ -327,6 +334,36 @@ export default function SuperAdminDashboard() {
           </Link>
         </div>
       </div>
+
+      {/* Super Admin Section Tab Navigation */}
+      <div className="flex items-center gap-3 border-b border-white/10 pb-3">
+        <button
+          onClick={() => setActiveTab('admins')}
+          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+            activeTab === 'admins'
+              ? 'bg-[#03B3C3] text-black shadow-lg font-black'
+              : 'bg-white/5 text-[#A0A0A0] hover:text-white border border-white/10'
+          }`}
+        >
+          <Users className="w-4 h-4" /> Admin Account Governance
+        </button>
+
+        <button
+          onClick={() => setActiveTab('revenue')}
+          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+            activeTab === 'revenue'
+              ? 'bg-[#03B3C3] text-black shadow-lg font-black'
+              : 'bg-white/5 text-[#A0A0A0] hover:text-white border border-white/10'
+          }`}
+        >
+          <DollarSign className="w-4 h-4" /> Global Platform Revenue Overview
+        </button>
+      </div>
+
+      {activeTab === 'revenue' ? (
+        <SuperAdminRevenueTab />
+      ) : (
+        <>
 
       {/* Two Prominent Action Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -699,6 +736,8 @@ export default function SuperAdminDashboard() {
           </GlassButton>
         </form>
       </GlassModal>
+      </>
+      )}
     </div>
   );
 }

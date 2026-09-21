@@ -79,7 +79,10 @@ export default function CreateAdmin() {
         navigate('/admin/super');
       }
     } catch (err) {
-      const msg = err.response?.data?.message || 'Failed to create Admin account.';
+      const serverErrors = err.response?.data?.errors;
+      const msg = Array.isArray(serverErrors) && serverErrors.length > 0
+        ? serverErrors.join(', ')
+        : err.response?.data?.message || 'Failed to create Admin account.';
       toast.error(msg);
     } finally {
       setSubmitting(false);

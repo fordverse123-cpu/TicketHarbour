@@ -15,14 +15,15 @@ export const errorHandler = (err, req, res, next) => {
   if (err.code === 11000) {
     statusCode = 400;
     const field = Object.keys(err.keyValue || {})[0] || 'field';
-    message = `Duplicate value entered for ${field}. Please use another value.`;
+    message = `An account with this ${field} already exists.`;
+    errors = [message];
   }
 
   // Mongoose Validation Error
   if (err.name === 'ValidationError') {
     statusCode = 400;
-    message = 'Validation error';
     errors = Object.values(err.errors).map(val => val.message);
+    message = errors.length > 0 ? errors.join(', ') : 'Validation error';
   }
 
   // JWT Errors

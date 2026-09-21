@@ -22,11 +22,13 @@ import reviewRoutes from './routes/reviewRoutes.js';
 import wishlistRoutes from './routes/wishlistRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
 import superAdminRoutes from './routes/superAdminRoutes.js';
+import adminRevenueRoutes from './routes/adminRevenueRoutes.js';
 import trainRoutes from './routes/trainRoutes.js';
 import stationRoutes from './routes/stationRoutes.js';
 import searchLogRoutes from './routes/searchLogRoutes.js';
 import aiRoutes from './routes/aiRoutes.js';
 import { seedSuperAdmin } from './scripts/seedSuperAdmin.js';
+import { runRevenueMigration } from './services/migrationService.js';
 
 dotenv.config();
 
@@ -37,8 +39,9 @@ const PORT = process.env.PORT || 5000;
 connectDB().then(async () => {
   try {
     await seedSuperAdmin();
+    await runRevenueMigration();
   } catch (seedErr) {
-    console.warn('[Server Startup Warning] Seed SuperAdmin skipped:', seedErr.message);
+    console.warn('[Server Startup Warning] Seed SuperAdmin/Migration skipped:', seedErr.message);
   }
 }).catch((err) => {
   console.error('[TicketHarbor DB] Database connection error:', err.message);
@@ -99,6 +102,8 @@ app.use('/api/v1/payments', paymentRoutes);
 app.use('/api/v1/coupons', couponRoutes);
 app.use('/api/v1/reviews', reviewRoutes);
 app.use('/api/v1/wishlist', wishlistRoutes);
+app.use('/api/v1/admin/revenue', adminRevenueRoutes);
+app.use('/api/admin/revenue', adminRevenueRoutes);
 app.use('/api/v1/admin', adminRoutes);
 app.use('/api/admin', adminRoutes); // Direct route alias
 app.use('/api/v1/super-admin', superAdminRoutes);

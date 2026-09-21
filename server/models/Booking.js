@@ -82,6 +82,11 @@ const bookingSchema = new mongoose.Schema(
       default: false,
     },
     checkedInAt: Date,
+    adminId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      index: true,
+    },
   },
   {
     timestamps: true,

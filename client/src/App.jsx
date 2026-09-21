@@ -35,6 +35,7 @@ import WishlistPage from './pages/WishlistPage';
 // Admin & Super Admin Pages
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminListings from './pages/admin/AdminListings';
+import AdminRevenuePage from './pages/admin/AdminRevenuePage';
 import SuperAdminDashboard from './pages/admin/SuperAdminDashboard';
 import CreateAdmin from './pages/admin/CreateAdmin';
 
@@ -104,6 +105,7 @@ function App() {
                 <Route path="/admin" element={<AdminDashboard />} />
                 <Route path="/admin/dashboard" element={<AdminDashboard />} />
                 <Route path="/admin/listings" element={<AdminListings />} />
+                <Route path="/admin/revenue" element={<AdminRevenuePage />} />
               </Route>
 
               {/* Super Admin Protected Routes */}

@@ -7,6 +7,7 @@ import User from '../models/User.js';
 import { successResponse, errorResponse } from '../utils/apiResponse.js';
 import { generatePDFTicket } from '../utils/pdfGenerator.js';
 import { sendEmail } from '../utils/sendEmail.js';
+import { syncBookingTransaction, resolveAdminId } from '../services/revenueService.js';
 
 // @desc    Lock seats temporarily for 5 minutes to prevent double booking
 // @route   POST /api/v1/bookings/lock-seats
@@ -145,6 +146,9 @@ export const createBooking = async (req, res, next) => {
     const bookingReference = 'TH-' + Date.now().toString(36).toUpperCase() + '-' + crypto.randomBytes(2).toString('hex').toUpperCase();
     const qrCodeData = `TICKETHARBOR:REF=${bookingReference}:USER=${req.user.id}:DATE=${schedule.date}`;
 
+    // Resolve admin ownership for this booking
+    const adminId = await resolveAdminId(listing.createdBy);
+
     const booking = await Booking.create({
       bookingReference,
       user: req.user.id,
@@ -161,7 +165,11 @@ export const createBooking = async (req, res, next) => {
       status: 'pending',
       paymentStatus: 'pending',
       qrCodeData,
+      adminId,
     });
+
+    // Create initial pending transaction snapshot
+    await syncBookingTransaction(booking, listing, 'pending');
 
     return successResponse(res, 201, 'Booking created', { booking });
   } catch (error) {
@@ -188,6 +196,9 @@ export const confirmBooking = async (req, res, next) => {
     booking.paymentStatus = 'paid';
     if (paymentIntentId) booking.paymentIntentId = paymentIntentId;
     await booking.save();
+
+    // Sync paid transaction
+    await syncBookingTransaction(booking, booking.listing, 'paid');
 
     // Mark seats as permanently booked on the schedule
     const schedule = await Schedule.findById(booking.schedule._id);
@@ -319,6 +330,12 @@ export const cancelBooking = async (req, res, next) => {
     booking.status = 'cancelled';
     booking.paymentStatus = 'refunded';
     await booking.save();
+
+    // Sync refunded transaction
+    const listingObj = await Listing.findById(booking.listing);
+    if (listingObj) {
+      await syncBookingTransaction(booking, listingObj, 'refunded');
+    }
 
     // Release seats on schedule
     const schedule = await Schedule.findById(booking.schedule);
