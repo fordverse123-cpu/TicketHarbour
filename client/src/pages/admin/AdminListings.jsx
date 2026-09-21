@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import API from '../../services/api';
 import toast from 'react-hot-toast';
+import { useAuth } from '../../context/AuthContext';
 import {
   Plus,
   Trash2,
@@ -27,6 +28,7 @@ import {
   Building,
   Layers,
   Star,
+  User,
 } from 'lucide-react';
 
 const CATEGORY_CONFIGS = [
@@ -120,6 +122,9 @@ const CATEGORY_CONFIGS = [
 ];
 
 export default function AdminListings() {
+  const { user } = useAuth();
+  const isSuperAdmin = user?.role?.toUpperCase() === 'SUPER_ADMIN' || user?.role === 'superadmin';
+
   const [listings, setListings] = useState([]);
   const [categories, setCategories] = useState([]);
   const [venues, setVenues] = useState([]);
@@ -187,7 +192,7 @@ export default function AdminListings() {
     setLoading(true);
     try {
       const [listRes, catRes, venRes] = await Promise.all([
-        API.get('/listings?limit=100'),
+        API.get('/listings/admin'),
         API.get('/categories'),
         API.get('/venues'),
       ]);
@@ -575,10 +580,15 @@ export default function AdminListings() {
                             <p className="font-bold text-slate-900 dark:text-white text-sm line-clamp-1">
                               {l.title}
                             </p>
-                            <div className="flex items-center gap-2 mt-0.5">
+                            <div className="flex flex-wrap items-center gap-2 mt-0.5">
                               {l.isFeatured && (
                                 <span className="px-2 py-0.5 bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300 font-bold text-[10px] rounded-md flex items-center gap-1">
                                   <Star className="w-2.5 h-2.5 fill-amber-500 text-amber-500" /> Featured
+                                </span>
+                              )}
+                              {l.createdBy?.name && (
+                                <span className="px-2 py-0.5 bg-teal-100/80 text-teal-800 dark:bg-teal-950 dark:text-teal-300 font-bold text-[10px] rounded-md flex items-center gap-1">
+                                  <User className="w-2.5 h-2.5" /> Owner: {l.createdBy.name}
                                 </span>
                               )}
                               <span className="text-[11px] text-slate-400 font-mono">
@@ -664,20 +674,26 @@ export default function AdminListings() {
 
                       {/* Actions */}
                       <td className="p-4 text-right space-x-1">
-                        <button
-                          onClick={() => openEditModal(l)}
-                          className="p-2 text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-950/50 rounded-xl transition-colors"
-                          title="Edit Listing"
-                        >
-                          <Edit2 className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(l._id)}
-                          className="p-2 text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/50 rounded-xl transition-colors"
-                          title="Delete Listing"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
+                        {(isSuperAdmin || (l.createdBy?._id ? l.createdBy._id === user?._id : l.createdBy === user?._id)) ? (
+                          <>
+                            <button
+                              onClick={() => openEditModal(l)}
+                              className="p-2 text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-950/50 rounded-xl transition-colors"
+                              title="Edit Listing"
+                            >
+                              <Edit2 className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => handleDelete(l._id)}
+                              className="p-2 text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/50 rounded-xl transition-colors"
+                              title="Delete Listing"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </>
+                        ) : (
+                          <span className="text-[10px] text-slate-400 font-semibold italic">View Only</span>
+                        )}
                       </td>
                     </tr>
                   );

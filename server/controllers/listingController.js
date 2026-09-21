@@ -146,12 +146,57 @@ export const getListingByIdentifier = async (req, res, next) => {
   }
 };
 
+// @desc    Get admin's owned listings (Normal Admin = owned only, Super Admin = all or filtered by admin)
+// @route   GET /api/v1/listings/admin
+// @access  Private/Admin
+export const getAdminListings = async (req, res, next) => {
+  try {
+    const isSuperAdmin = req.user.role?.toUpperCase() === 'SUPER_ADMIN' || req.user.role === 'superadmin';
+    const { categoryType, search, createdBy } = req.query;
+
+    const query = {};
+
+    if (!isSuperAdmin) {
+      // Normal admins are strictly restricted to their own created listings
+      query.createdBy = req.user._id;
+    } else if (createdBy) {
+      // Super Admin can filter by specific creator admin ID if requested
+      query.createdBy = createdBy;
+    }
+
+    if (categoryType) {
+      query.categoryType = categoryType;
+    }
+
+    if (search) {
+      query.$or = [
+        { title: { $regex: search, $options: 'i' } },
+        { description: { $regex: search, $options: 'i' } },
+        { 'location.city': { $regex: search, $options: 'i' } },
+      ];
+    }
+
+    const listings = await Listing.find(query)
+      .populate('category', 'name type icon')
+      .populate('venue', 'name city state address')
+      .populate('createdBy', 'name email role')
+      .sort('-createdAt');
+
+    return successResponse(res, 200, 'Admin listings retrieved', { listings });
+  } catch (error) {
+    next(error);
+  }
+};
+
 // @desc    Create new listing (Admin)
 // @route   POST /api/v1/listings
 // @access  Private/Admin
 export const createListing = async (req, res, next) => {
   try {
     const { scheduleDate, startTime, endTime, ...listingData } = req.body;
+
+    // Never accept createdBy from body; assign directly from authenticated user
+    delete listingData.createdBy;
 
     const listing = await Listing.create({
       ...listingData,
@@ -190,24 +235,28 @@ export const createListing = async (req, res, next) => {
 // @access  Private/Admin
 export const updateListing = async (req, res, next) => {
   try {
-    const existingListing = await Listing.findById(req.params.id);
+    const existingListing = req.targetListing || (await Listing.findById(req.params.id));
     if (!existingListing) {
       return errorResponse(res, 404, 'Listing not found');
     }
 
-    const isSuperAdmin = req.user.role?.toUpperCase() === 'SUPER_ADMIN';
+    const isSuperAdmin = req.user.role?.toUpperCase() === 'SUPER_ADMIN' || req.user.role === 'superadmin';
     if (
       existingListing.createdBy &&
       existingListing.createdBy.toString() !== req.user._id.toString() &&
       !isSuperAdmin
     ) {
-      return errorResponse(res, 403, 'Not authorized to modify another admin\'s listing');
+      return errorResponse(res, 403, 'You are not authorized to modify this listing');
     }
 
-    const listing = await Listing.findByIdAndUpdate(req.params.id, req.body, {
+    // Strip createdBy from update payload to prevent ownership transfer tampering
+    const updateData = { ...req.body };
+    delete updateData.createdBy;
+
+    const listing = await Listing.findByIdAndUpdate(req.params.id, updateData, {
       new: true,
       runValidators: true,
-    });
+    }).populate('createdBy', 'name email role');
 
     return successResponse(res, 200, 'Listing updated successfully', { listing });
   } catch (error) {
@@ -220,18 +269,18 @@ export const updateListing = async (req, res, next) => {
 // @access  Private/Admin
 export const deleteListing = async (req, res, next) => {
   try {
-    const existingListing = await Listing.findById(req.params.id);
+    const existingListing = req.targetListing || (await Listing.findById(req.params.id));
     if (!existingListing) {
       return errorResponse(res, 404, 'Listing not found');
     }
 
-    const isSuperAdmin = req.user.role?.toUpperCase() === 'SUPER_ADMIN';
+    const isSuperAdmin = req.user.role?.toUpperCase() === 'SUPER_ADMIN' || req.user.role === 'superadmin';
     if (
       existingListing.createdBy &&
       existingListing.createdBy.toString() !== req.user._id.toString() &&
       !isSuperAdmin
     ) {
-      return errorResponse(res, 403, 'Not authorized to delete another admin\'s listing');
+      return errorResponse(res, 403, 'You are not authorized to delete this listing');
     }
 
     await Listing.findByIdAndDelete(req.params.id);

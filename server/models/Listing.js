@@ -92,6 +92,7 @@ const listingSchema = new mongoose.Schema(
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
+      required: [true, 'Creator admin ID is required'],
       index: true,
     },
   },
