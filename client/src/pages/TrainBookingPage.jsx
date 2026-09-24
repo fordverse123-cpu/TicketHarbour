@@ -161,8 +161,15 @@ export default function TrainBookingPage() {
       }
     } catch (err) {
       if (currentRequestId !== requestIdRef.current) return;
-      console.warn('Backend train API failure, falling back to offline routes:', err);
-      if (MOCK_TRAINS.length > 0) {
+      console.warn('Backend train API failure:', err);
+      if (err.response?.status === 429) {
+        const msg = err.response?.data?.message || 'Daily search limit of 42 searches per day reached. Please try again tomorrow.';
+        toast.error(msg);
+        setErrorMessage(msg);
+        setStatus('error');
+        setTrains([]);
+        setFilteredTrains([]);
+      } else if (MOCK_TRAINS.length > 0) {
         setTrains(MOCK_TRAINS);
         setFilteredTrains(MOCK_TRAINS);
         setStatus('success');

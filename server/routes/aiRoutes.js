@@ -9,6 +9,7 @@ import {
   handleAIAdminInsights,
 } from '../controllers/aiController.js';
 import { protect, authorize } from '../middleware/auth.js';
+import { searchDailyLimiter } from '../middleware/searchRateLimiter.js';
 import User from '../models/User.js';
 
 const router = express.Router();
@@ -48,8 +49,8 @@ const optionalAuth = async (req, res, next) => {
 };
 
 // Endpoints
-router.post('/chat', optionalAuth, handleAIChat);
-router.post('/search', optionalAuth, handleAISearch);
+router.post('/chat', optionalAuth, searchDailyLimiter, handleAIChat);
+router.post('/search', optionalAuth, searchDailyLimiter, handleAISearch);
 router.post('/support', handleAISupport);
 
 // Private User Auth Required

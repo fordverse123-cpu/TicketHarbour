@@ -7,11 +7,12 @@ import {
   deleteTrain,
 } from '../controllers/trainController.js';
 import { protect, authorize } from '../middleware/auth.js';
+import { searchDailyLimiter } from '../middleware/searchRateLimiter.js';
 
 const router = express.Router();
 
 // Public routes
-router.get('/search', searchTrains);
+router.get('/search', searchDailyLimiter, searchTrains);
 router.get('/:trainNumber', getTrainByNumber);
 
 // Admin Protected routes
