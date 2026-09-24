@@ -1,4 +1,4 @@
-import React, { useState, useCallback, lazy, Suspense, useSyncExternalStore } from 'react';
+import React, { useState, useEffect, useCallback, lazy, Suspense, useSyncExternalStore } from 'react';
 import { useLocation } from 'react-router-dom';
 
 const AeroShards = lazy(() => import('../ui/AeroShards'));
@@ -106,15 +106,40 @@ function useOverlayOpacity() {
   return isDataDense ? 0.55 : 0.35;
 }
 
-const hasWebGPUSupport = () => {
-  return typeof navigator !== 'undefined' && 'gpu' in navigator && !!navigator.gpu;
-};
-
 const AeroShardsBackground = React.memo(function AeroShardsBackground() {
   const [failed, setFailed] = useState(false);
+  const [canUseWebGPU, setCanUseWebGPU] = useState(false);
   const isCompact = useIsCompact();
   const overlayOpacity = useOverlayOpacity();
-  const canUseWebGPU = hasWebGPUSupport();
+
+  useEffect(() => {
+    let active = true;
+    try {
+      if (typeof navigator !== 'undefined' && 'gpu' in navigator && navigator.gpu) {
+        navigator.gpu
+          .requestAdapter()
+          .then((adapter) => {
+            if (active) {
+              if (adapter) {
+                setCanUseWebGPU(true);
+              } else {
+                setFailed(true);
+              }
+            }
+          })
+          .catch(() => {
+            if (active) setFailed(true);
+          });
+      } else {
+        if (active) setFailed(true);
+      }
+    } catch (e) {
+      if (active) setFailed(true);
+    }
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const handleError = useCallback(() => {
     setFailed(true);
