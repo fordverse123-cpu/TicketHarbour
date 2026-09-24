@@ -1,7 +1,12 @@
 import React, { useState, useEffect, useCallback, lazy, Suspense, useSyncExternalStore } from 'react';
 import { useLocation } from 'react-router-dom';
 
-const AeroShards = lazy(() => import('../ui/AeroShards'));
+const AeroShards = lazy(() =>
+  import('../ui/AeroShards').catch((err) => {
+    console.warn('[TicketHarbour] AeroShards module fallback:', err);
+    return { default: () => null };
+  })
+);
 
 const DESKTOP_PROPS = {
   backgroundColor: '#050505',
@@ -115,7 +120,13 @@ const AeroShardsBackground = React.memo(function AeroShardsBackground() {
   useEffect(() => {
     let active = true;
     try {
-      if (typeof navigator !== 'undefined' && 'gpu' in navigator && navigator.gpu) {
+      if (
+        typeof window !== 'undefined' &&
+        typeof navigator !== 'undefined' &&
+        'gpu' in navigator &&
+        navigator.gpu &&
+        typeof navigator.gpu.requestAdapter === 'function'
+      ) {
         navigator.gpu
           .requestAdapter()
           .then((adapter) => {
