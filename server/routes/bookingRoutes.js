@@ -5,6 +5,10 @@ import {
   createBooking,
   confirmBooking,
   getMyBookings,
+  getUpcomingBookings,
+  getCompletedBookings,
+  getCancelledBookings,
+  getUpcomingCount,
   getBookingById,
   cancelBooking,
   downloadPDFTicket,
@@ -20,7 +24,13 @@ router.post('/lock-seats', lockSeats);
 router.post('/unlock-seats', unlockSeats);
 router.post('/', createBooking);
 router.post('/:id/confirm', confirmBooking);
+
 router.get('/my-bookings', getMyBookings);
+router.get('/upcoming', getUpcomingBookings);
+router.get('/completed', getCompletedBookings);
+router.get('/cancelled', getCancelledBookings);
+router.get('/upcoming-count', getUpcomingCount);
+
 router.get('/:id', getBookingById);
 router.post('/:id/cancel', cancelBooking);
 router.get('/:id/ticket-pdf', downloadPDFTicket);

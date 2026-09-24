@@ -313,17 +313,156 @@ export const confirmBooking = async (req, res, next) => {
   }
 };
 
-// @desc    Get user's bookings (Upcoming & Past)
+/**
+ * Helper to compute departure date & time for a booking
+ */
+export const getDepartureDateTime = (booking) => {
+  const scheduleDate = booking.schedule?.date ? new Date(booking.schedule.date) : new Date(booking.createdAt);
+  const timeStr = booking.schedule?.startTime || booking.listing?.transitInfo?.departureTime || '00:00';
+
+  const year = scheduleDate.getFullYear();
+  const month = String(scheduleDate.getMonth() + 1).padStart(2, '0');
+  const day = String(scheduleDate.getDate()).padStart(2, '0');
+
+  let hours = 0;
+  let minutes = 0;
+  const match12 = timeStr.match(/(\d{1,2}):(\d{2})\s*(AM|PM)?/i);
+  if (match12) {
+    hours = parseInt(match12[1], 10);
+    minutes = parseInt(match12[2], 10);
+    const ampm = match12[3];
+    if (ampm) {
+      if (ampm.toUpperCase() === 'PM' && hours < 12) hours += 12;
+      if (ampm.toUpperCase() === 'AM' && hours === 12) hours = 0;
+    }
+  }
+
+  return new Date(`${year}-${month}-${day}T${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:00`);
+};
+
+/**
+ * Automatically determine and persist booking lifecycle status
+ */
+export const syncBookingLifecycleStatus = async (booking) => {
+  if (booking.status === 'cancelled') return 'CANCELLED';
+  if (booking.status === 'failed') return 'FAILED';
+
+  const departureDateTime = getDepartureDateTime(booking);
+  const now = new Date();
+
+  if (now > departureDateTime) {
+    if (booking.status !== 'completed' && booking.status !== 'cancelled') {
+      booking.status = 'completed';
+      try {
+        await booking.save();
+      } catch (err) {}
+    }
+    return 'COMPLETED';
+  } else {
+    if (booking.status === 'confirmed' || booking.status === 'pending') {
+      return 'UPCOMING';
+    }
+    return (booking.status || 'UPCOMING').toUpperCase();
+  }
+};
+
+// @desc    Get user's bookings with optional filtering (Upcoming, Completed, Cancelled)
 // @route   GET /api/v1/bookings/my-bookings
 // @access  Private
 export const getMyBookings = async (req, res, next) => {
   try {
+    const { status, categoryType } = req.query;
+
     const bookings = await Booking.find({ user: req.user.id })
       .populate('listing', 'title categoryType images bannerImage location transitInfo attractionInfo')
       .populate('schedule', 'date startTime endTime venue')
       .sort('-createdAt');
 
-    return successResponse(res, 200, 'User bookings retrieved', { bookings });
+    const updatedBookings = await Promise.all(
+      bookings.map(async (b) => {
+        const computedStatus = await syncBookingLifecycleStatus(b);
+        const bObj = b.toObject();
+        bObj.computedStatus = computedStatus;
+        return bObj;
+      })
+    );
+
+    let filtered = updatedBookings;
+
+    if (status) {
+      const s = status.toLowerCase();
+      if (s === 'upcoming') {
+        filtered = filtered.filter((b) => b.computedStatus === 'UPCOMING' || b.computedStatus === 'CONFIRMED');
+      } else if (s === 'completed') {
+        filtered = filtered.filter((b) => b.computedStatus === 'COMPLETED');
+      } else if (s === 'cancelled') {
+        filtered = filtered.filter((b) => b.computedStatus === 'CANCELLED');
+      }
+    }
+
+    if (categoryType) {
+      filtered = filtered.filter((b) => (b.categoryType || '').toLowerCase() === categoryType.toLowerCase());
+    }
+
+    const upcomingCount = updatedBookings.filter(
+      (b) => b.computedStatus === 'UPCOMING' || b.computedStatus === 'CONFIRMED'
+    ).length;
+    const completedCount = updatedBookings.filter((b) => b.computedStatus === 'COMPLETED').length;
+    const cancelledCount = updatedBookings.filter((b) => b.computedStatus === 'CANCELLED').length;
+
+    return successResponse(res, 200, 'User bookings retrieved', {
+      bookings: filtered,
+      allBookings: updatedBookings,
+      counts: {
+        total: updatedBookings.length,
+        upcoming: upcomingCount,
+        completed: completedCount,
+        cancelled: cancelledCount,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getUpcomingBookings = async (req, res, next) => {
+  req.query.status = 'upcoming';
+  return getMyBookings(req, res, next);
+};
+
+export const getCompletedBookings = async (req, res, next) => {
+  req.query.status = 'completed';
+  return getMyBookings(req, res, next);
+};
+
+export const getCancelledBookings = async (req, res, next) => {
+  req.query.status = 'cancelled';
+  return getMyBookings(req, res, next);
+};
+
+export const getUpcomingCount = async (req, res, next) => {
+  try {
+    const bookings = await Booking.find({ user: req.user.id })
+      .populate('listing', 'transitInfo')
+      .populate('schedule', 'date startTime');
+
+    let count = 0;
+    const now = new Date();
+
+    for (const b of bookings) {
+      if (b.status === 'cancelled' || b.status === 'failed') continue;
+      const depDate = getDepartureDateTime(b);
+      if (now <= depDate) {
+        count++;
+      } else if (b.status !== 'completed') {
+        b.status = 'completed';
+        try {
+          await b.save();
+        } catch (e) {}
+      }
+    }
+
+    return successResponse(res, 200, 'Upcoming count retrieved', { upcomingCount: count });
   } catch (error) {
     next(error);
   }

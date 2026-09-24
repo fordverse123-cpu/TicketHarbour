@@ -11,6 +11,24 @@ export default function Navbar() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [upcomingCount, setUpcomingCount] = useState(0);
+
+  useEffect(() => {
+    if (user) {
+      fetchUpcomingCount();
+    } else {
+      setUpcomingCount(0);
+    }
+  }, [user]);
+
+  const fetchUpcomingCount = async () => {
+    try {
+      const res = await API.get('/bookings/upcoming-count');
+      if (res.data.success) {
+        setUpcomingCount(res.data.data.upcomingCount || 0);
+      }
+    } catch (err) {}
+  };
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
@@ -54,7 +72,7 @@ export default function Navbar() {
                 <div className="relative">
                   <button
                     onClick={() => setDropdownOpen(!dropdownOpen)}
-                    className="flex items-center gap-2 p-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 transition-colors cursor-pointer"
+                    className="flex items-center gap-2 p-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 transition-colors cursor-pointer relative"
                   >
                     <div className="h-8 w-8 rounded-full bg-gradient-to-tr from-[#03B3C3] to-[#6750A2] text-white flex items-center justify-center font-black text-sm shadow-md">
                       {user.name?.charAt(0).toUpperCase() || 'U'}
@@ -62,6 +80,11 @@ export default function Navbar() {
                     <span className="hidden sm:inline font-bold text-xs text-white pr-2">
                       {user.name?.split(' ')[0]}
                     </span>
+                    {upcomingCount > 0 && (
+                      <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-[#03B3C3] text-[10px] font-black text-white ring-2 ring-[#050505] shadow-lg animate-pulse">
+                        {upcomingCount}
+                      </span>
+                    )}
                   </button>
 
                   {/* Dropdown Menu */}
@@ -86,25 +109,39 @@ export default function Navbar() {
                           </Link>
                         )}
                         <Link
-                          to="/my-bookings"
-                          onClick={() => setDropdownOpen(false)}
-                          className="flex items-center gap-2.5 px-4 py-2 text-xs font-semibold text-[#B8B8B8] hover:text-white hover:bg-white/5"
-                        >
-                          <Ticket className="w-4 h-4 text-[#19D3D3]" /> My Bookings
-                        </Link>
-                        <Link
-                          to="/wishlist"
-                          onClick={() => setDropdownOpen(false)}
-                          className="flex items-center gap-2.5 px-4 py-2 text-xs font-semibold text-[#B8B8B8] hover:text-white hover:bg-white/5"
-                        >
-                          <Heart className="w-4 h-4 text-rose-400" /> Wishlist
-                        </Link>
-                        <Link
                           to="/profile"
                           onClick={() => setDropdownOpen(false)}
                           className="flex items-center gap-2.5 px-4 py-2 text-xs font-semibold text-[#B8B8B8] hover:text-white hover:bg-white/5"
                         >
-                          <User className="w-4 h-4 text-[#4F46E5]" /> Profile Settings
+                          <User className="w-4 h-4 text-[#03B3C3]" /> Profile Dashboard
+                        </Link>
+                        <Link
+                          to="/profile?tab=upcoming"
+                          onClick={() => setDropdownOpen(false)}
+                          className="flex items-center gap-2.5 px-4 py-2 text-xs font-semibold text-[#B8B8B8] hover:text-white hover:bg-white/5 justify-between"
+                        >
+                          <span className="flex items-center gap-2.5">
+                            <Ticket className="w-4 h-4 text-[#03B3C3]" /> Upcoming Trips
+                          </span>
+                          {upcomingCount > 0 && (
+                            <span className="px-2 py-0.5 bg-[#03B3C3]/20 text-[#03B3C3] font-bold text-[10px] rounded-full border border-[#03B3C3]/30">
+                              {upcomingCount}
+                            </span>
+                          )}
+                        </Link>
+                        <Link
+                          to="/profile?tab=completed"
+                          onClick={() => setDropdownOpen(false)}
+                          className="flex items-center gap-2.5 px-4 py-2 text-xs font-semibold text-[#B8B8B8] hover:text-white hover:bg-white/5"
+                        >
+                          <Ticket className="w-4 h-4 text-emerald-400" /> Completed Trips
+                        </Link>
+                        <Link
+                          to="/profile?tab=settings"
+                          onClick={() => setDropdownOpen(false)}
+                          className="flex items-center gap-2.5 px-4 py-2 text-xs font-semibold text-[#B8B8B8] hover:text-white hover:bg-white/5"
+                        >
+                          <User className="w-4 h-4 text-indigo-400" /> Account Settings
                         </Link>
                       </div>
 
