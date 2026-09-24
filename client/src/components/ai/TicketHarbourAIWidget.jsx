@@ -14,6 +14,7 @@ import {
   Calendar,
   Train,
   Bus,
+  Plane,
   Film,
   Ticket,
   HelpCircle,
@@ -25,9 +26,9 @@ import {
 
 const QUICK_PROMPTS = [
   { label: '🎬 Find a movie near me', query: 'Find a movie near me' },
-  { label: '🚆 Trains from Hyderabad', query: 'Find trains from Hyderabad to Vijayawada' },
-  { label: '🎵 Events this weekend', query: 'Show events this weekend' },
-  { label: '🚌 Buses to Vijayawada', query: 'Find buses to Vijayawada' },
+  { label: '🚆 Trains Vijayawada to Hyderabad', query: 'Find trains from Vijayawada to Hyderabad' },
+  { label: '🚌 Buses Vijayawada to Hyderabad', query: 'Buses from Vijayawada to Hyderabad' },
+  { label: '✈️ Flights Hyderabad to Delhi', query: 'Flights from Hyderabad to Delhi' },
   { label: '🎟️ Show my bookings', query: 'Show my bookings' },
 ];
 
@@ -49,6 +50,32 @@ export default function TicketHarbourAIWidget() {
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     },
   ]);
+
+  // Handle AI Route Selection click
+  const handleAISearchSelection = (routeData, targetUrlFallback) => {
+    const fromName = routeData?.source?.name || routeData?.from || routeData?.filters?.from;
+    const toName = routeData?.destination?.name || routeData?.to || routeData?.filters?.to;
+    const dateVal = routeData?.date || routeData?.filters?.date || new Date().toISOString().split('T')[0];
+    const transportType = routeData?.transportType || routeData?.category || 'bus';
+
+    if (!fromName || !toName) return;
+
+    let targetPath = `/bus?from=${encodeURIComponent(fromName)}&to=${encodeURIComponent(toName)}&date=${encodeURIComponent(dateVal)}`;
+    if (transportType === 'train') {
+      targetPath = `/train?from=${encodeURIComponent(fromName)}&to=${encodeURIComponent(toName)}&date=${encodeURIComponent(dateVal)}`;
+    } else if (transportType === 'flight') {
+      targetPath = `/flights?from=${encodeURIComponent(fromName)}&to=${encodeURIComponent(toName)}&date=${encodeURIComponent(dateVal)}`;
+    } else if (targetUrlFallback) {
+      targetPath = targetUrlFallback;
+    }
+
+    setIsOpen(false);
+    navigate(targetPath);
+
+    setTimeout(() => {
+      window.scrollTo({ top: 100, behavior: 'smooth' });
+    }, 100);
+  };
 
   // Scroll to bottom on new message
   useEffect(() => {
@@ -107,7 +134,7 @@ export default function TicketHarbourAIWidget() {
 
       const data = res.data?.data || {};
 
-      let responseContent = data.summary || 'I processed your request.';
+      let responseContent = data.message || data.summary || 'I processed your request.';
       if (data.clarificationQuestion) {
         responseContent = data.clarificationQuestion;
       }
@@ -115,6 +142,8 @@ export default function TicketHarbourAIWidget() {
       const assistantMsg = {
         id: `assistant-${Date.now()}`,
         role: 'assistant',
+        type: data.type,
+        route: data.route,
         content: responseContent,
         intent: data.intent,
         category: data.category,
@@ -126,13 +155,6 @@ export default function TicketHarbourAIWidget() {
       };
 
       setMessages((prev) => [...prev, assistantMsg]);
-
-      // Auto-navigate if unambiguous SEARCH with direct URL
-      if (data.intent === 'SEARCH' && data.targetUrl && data.filters?.from && data.filters?.to) {
-        setTimeout(() => {
-          navigate(data.targetUrl);
-        }, 1200);
-      }
     } catch (err) {
       console.error('AI chat error:', err);
       const fallbackMsg = {
@@ -233,38 +255,43 @@ export default function TicketHarbourAIWidget() {
                       >
                         <p className="whitespace-pre-wrap">{m.content}</p>
 
-                        {/* Search Confirmation Chip & Direct Action Button */}
-                        {!isUser && m.intent === 'SEARCH' && (
+                        {/* Structured Route Suggestion Card */}
+                        {!isUser && (m.type === 'route_search' || m.route || (m.intent === 'SEARCH' && (m.filters?.from && m.filters?.to))) && (
                           <div className="mt-3 pt-3 border-t border-white/10 space-y-2">
-                            <div className="p-2.5 bg-[#03B3C3]/15 rounded-xl border border-[#03B3C3]/30 text-[#03B3C3] font-bold text-[11px] flex items-center justify-between">
-                              <span>
-                                {m.category === 'train' && '🚆'}
-                                {m.category === 'bus' && '🚌'}
-                                {m.category === 'flight' && '✈️'}
-                                {m.category === 'movie' && '🎬'}
-                                {m.category === 'event' && '🎵'}
-                                {m.category === 'sports' && '🏆'}
-                                {' '}
-                                {m.filters?.from && m.filters?.to
-                                  ? `${m.filters.from} → ${m.filters.to}`
-                                  : m.filters?.city || 'Search Filters'}
-                                {m.filters?.date ? ` · ${m.filters.date}` : ''}
-                                {m.filters?.maxPrice ? ` · Under ₹${m.filters.maxPrice}` : ''}
-                              </span>
+                            <div
+                              onClick={() => handleAISearchSelection(m.route || m.filters || m, m.targetUrl)}
+                              className="p-3 bg-gradient-to-r from-[#03B3C3]/20 via-[#6750A2]/20 to-black/40 rounded-2xl border border-[#03B3C3]/40 cursor-pointer hover:border-[#03B3C3] transition-all group shadow-lg"
+                            >
+                              <div className="flex items-center justify-between mb-1.5">
+                                <span className="px-2 py-0.5 bg-[#03B3C3]/30 text-[#03B3C3] font-bold text-[10px] uppercase rounded-md flex items-center gap-1">
+                                  {(m.route?.transportType || m.category) === 'train' && <Train className="w-3 h-3" />}
+                                  {(m.route?.transportType || m.category) === 'bus' && <Bus className="w-3 h-3" />}
+                                  {(m.route?.transportType || m.category) === 'flight' && <Plane className="w-3 h-3 text-[#03B3C3]" />}
+                                  {((m.route?.transportType || m.category) || 'bus').toUpperCase()} ROUTE
+                                </span>
+                                {(m.route?.date || m.filters?.date) && (
+                                  <span className="text-[10px] font-mono text-slate-300 flex items-center gap-1">
+                                    <Calendar className="w-3 h-3 text-[#03B3C3]" />
+                                    {m.route?.date || m.filters?.date}
+                                  </span>
+                                )}
+                              </div>
+
+                              <div className="flex items-center gap-2 text-white font-black text-sm group-hover:text-[#03B3C3] transition-colors">
+                                <span>{m.route?.source?.name || m.filters?.from}</span>
+                                <ArrowRight className="w-4 h-4 text-[#03B3C3] shrink-0" />
+                                <span>{m.route?.destination?.name || m.filters?.to}</span>
+                              </div>
                             </div>
 
-                            {m.targetUrl && (
-                              <button
-                                onClick={() => {
-                                  navigate(m.targetUrl);
-                                  setIsOpen(false);
-                                }}
-                                className="w-full py-2.5 bg-gradient-to-r from-[#03B3C3] to-[#6750A2] text-white font-bold text-xs rounded-xl shadow-md hover:opacity-90 flex items-center justify-center gap-2 cursor-pointer"
-                              >
-                                <Search className="w-3.5 h-3.5" />
-                                Search {m.category ? m.category.toUpperCase() : 'TICKETS'} Now
-                              </button>
-                            )}
+                            <button
+                              type="button"
+                              onClick={() => handleAISearchSelection(m.route || m.filters || m, m.targetUrl)}
+                              className="w-full py-2.5 bg-gradient-to-r from-[#03B3C3] to-[#6750A2] hover:opacity-95 text-white font-black text-xs rounded-xl shadow-md flex items-center justify-center gap-2 cursor-pointer transition-transform active:scale-95"
+                            >
+                              <Search className="w-3.5 h-3.5 text-cyan-200" />
+                              Search This Route
+                            </button>
                           </div>
                         )}
 

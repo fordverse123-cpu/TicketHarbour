@@ -6,8 +6,9 @@ import BusFilters from '../components/bus/BusFilters';
 import PageLoader from '../components/common/PageLoader';
 import { CardSkeletonGrid, BusCardSkeleton } from '../components/loading';
 import { Bus, Filter, ArrowUpDown } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { findBusCityByInput } from '../data/locationData';
 import toast from 'react-hot-toast';
 
 const MOCK_BUSES = [
@@ -145,44 +146,67 @@ export default function BusBookingPage() {
     });
   };
 
+  const [searchParams] = useSearchParams();
+
+  const urlFrom = searchParams.get('from');
+  const urlTo = searchParams.get('to');
+  const urlDate = searchParams.get('date');
+
   useEffect(() => {
     fetchBuses();
-  }, []);
+  }, [urlFrom, urlTo, urlDate]);
 
   const fetchBuses = async () => {
     setLoading(true);
+    let baseBuses = MOCK_BUSES;
     try {
       const res = await API.get('/listings?categoryType=bus');
       if (res.data.success && res.data.data.listings.length > 0) {
-        setBuses(res.data.data.listings);
-        setFilteredBuses(res.data.data.listings);
-      } else {
-        setBuses(MOCK_BUSES);
-        setFilteredBuses(MOCK_BUSES);
+        baseBuses = res.data.data.listings;
       }
     } catch (err) {
       console.warn('Backend bus API empty, loading standard Indian Bus routes', err);
-      setBuses(MOCK_BUSES);
-      setFilteredBuses(MOCK_BUSES);
-    } finally {
+    }
+
+    setBuses(baseBuses);
+
+    if (urlFrom || urlTo) {
+      const fromCityObj = findBusCityByInput(urlFrom || 'Mumbai');
+      const toCityObj = findBusCityByInput(urlTo || 'Goa');
+      const dateVal = urlDate || new Date().toISOString().split('T')[0];
+      handleSearchInternal(baseBuses, { from: fromCityObj, to: toCityObj, date: dateVal });
+    } else {
+      setFilteredBuses(baseBuses);
       setLoading(false);
     }
   };
 
-  const handleSearch = (searchParams) => {
+  const handleSearchInternal = (busList, searchParams) => {
     setLoading(true);
+    setLastSearchParams(searchParams);
+    const fromName = (searchParams.from?.city || searchParams.from || '').toLowerCase();
+    const toName = (searchParams.to?.city || searchParams.to || '').toLowerCase();
+
     setTimeout(() => {
-      let result = [...buses];
-      if (searchParams.from?.city && searchParams.to?.city) {
-        result = result.filter(
-          (b) =>
-            b.transitInfo?.source?.toLowerCase().includes(searchParams.from.city.toLowerCase()) ||
-            b.transitInfo?.destination?.toLowerCase().includes(searchParams.to.city.toLowerCase())
-        );
+      let result = [...busList];
+      if (fromName || toName) {
+        result = result.filter((b) => {
+          const src = (b.transitInfo?.source || '').toLowerCase();
+          const dest = (b.transitInfo?.destination || '').toLowerCase();
+          const title = (b.title || '').toLowerCase();
+          return (
+            (fromName && (src.includes(fromName) || title.includes(fromName))) ||
+            (toName && (dest.includes(toName) || title.includes(toName)))
+          );
+        });
       }
       setFilteredBuses(result.length > 0 ? result : MOCK_BUSES);
       setLoading(false);
-    }, 300);
+    }, 200);
+  };
+
+  const handleSearch = (searchParams) => {
+    handleSearchInternal(buses.length > 0 ? buses : MOCK_BUSES, searchParams);
   };
 
   const handleFilterChange = (newFilters) => {
@@ -225,7 +249,12 @@ export default function BusBookingPage() {
 
       {/* Top Search Hero */}
       <section>
-        <BusSearch onSearch={handleSearch} />
+        <BusSearch
+          onSearch={handleSearch}
+          initialFrom={urlFrom || 'Mumbai'}
+          initialTo={urlTo || 'Goa'}
+          initialDate={urlDate}
+        />
       </section>
 
       {/* Mobile Filter Toggle Button */}

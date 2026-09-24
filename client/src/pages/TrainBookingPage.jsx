@@ -8,8 +8,9 @@ import PageLoader from '../components/common/PageLoader';
 import AppLoader from '../components/AppLoader';
 import { CardSkeletonGrid, TrainCardSkeleton } from '../components/loading';
 import { Train, RefreshCw, Filter, AlertCircle, SearchX } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { findStationByInput } from '../data/locationData';
 import toast from 'react-hot-toast';
 
 const MOCK_TRAINS = [
@@ -81,15 +82,25 @@ export default function TrainBookingPage() {
   const [filters, setFilters] = useState({ trainType: 'ALL', timeSlot: 'ALL', classType: 'ALL' });
   const [showMobileFilter, setShowMobileFilter] = useState(false);
 
+  const [searchParams] = useSearchParams();
+
+  const urlFrom = searchParams.get('from');
+  const urlTo = searchParams.get('to');
+  const urlDate = searchParams.get('date');
+
   useEffect(() => {
+    const fromObj = findStationByInput(urlFrom) || { code: 'BZA', city: 'Vijayawada', name: 'Vijayawada Junction' };
+    const toObj = findStationByInput(urlTo) || { code: 'SC', city: 'Hyderabad', name: 'Secunderabad Junction' };
+    const dateVal = urlDate || new Date().toISOString().split('T')[0];
+
     handleSearch({
-      from: { code: 'BZA', city: 'Vijayawada' },
-      to: { code: 'SC', city: 'Hyderabad' },
-      date: new Date().toISOString().split('T')[0],
+      from: fromObj,
+      to: toObj,
+      date: dateVal,
       trainClass: 'ALL',
       quota: 'GN',
     });
-  }, []);
+  }, [urlFrom, urlTo, urlDate]);
 
   const handleSearch = async (searchParams) => {
     const currentRequestId = ++requestIdRef.current;
@@ -243,7 +254,12 @@ export default function TrainBookingPage() {
 
       {/* Search Hero Panel */}
       <section ref={searchSectionRef}>
-        <TrainSearch onSearch={handleSearch} />
+        <TrainSearch
+          onSearch={handleSearch}
+          initialFrom={urlFrom || 'BZA'}
+          initialTo={urlTo || 'SC'}
+          initialDate={urlDate}
+        />
       </section>
 
       {/* Mobile Filter Toggle */}

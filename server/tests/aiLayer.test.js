@@ -4,10 +4,15 @@ process.env.NO_LISTEN = 'true';
 import request from 'supertest';
 import app from '../server.js';
 import mongoose from 'mongoose';
+import { connectDB } from '../config/db.js';
 import { parseStructuredIntent, processAIChat } from '../services/aiService.js';
 import { executeAiTool } from '../services/aiTools.js';
 
 describe('TicketHarbour AI Production Layer Tests', () => {
+  beforeAll(async () => {
+    await connectDB();
+  });
+
   afterAll(async () => {
     if (mongoose.connection.readyState !== 0) {
       await mongoose.connection.close();

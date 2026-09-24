@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ArrowLeftRight, Calendar, Search, Train, ShieldCheck, MapPin, Check } from 'lucide-react';
-import { TRAIN_STATIONS } from '../../data/locationData';
+import { TRAIN_STATIONS, findStationByInput } from '../../data/locationData';
 
 const TRAIN_CLASSES = [
   { code: 'ALL', label: 'All Classes' },
@@ -21,14 +21,15 @@ const QUOTAS = [
   { code: 'SS', label: 'Senior Citizen' },
 ];
 
-export default function TrainSearch({ onSearch, initialFrom = 'SBC', initialTo = 'NDLS' }) {
+export default function TrainSearch({ onSearch, initialFrom = 'BZA', initialTo = 'SC', initialDate = '' }) {
   const [fromStation, setFromStation] = useState(
-    TRAIN_STATIONS.find((s) => s.code === initialFrom) || TRAIN_STATIONS[0]
+    findStationByInput(initialFrom) || TRAIN_STATIONS[0]
   );
   const [toStation, setToStation] = useState(
-    TRAIN_STATIONS.find((s) => s.code === initialTo) || TRAIN_STATIONS[1]
+    findStationByInput(initialTo) || TRAIN_STATIONS[1]
   );
   const [travelDate, setTravelDate] = useState(() => {
+    if (initialDate) return initialDate;
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
     return tomorrow.toISOString().split('T')[0];
@@ -36,6 +37,18 @@ export default function TrainSearch({ onSearch, initialFrom = 'SBC', initialTo =
   const [quickDateState, setQuickDateState] = useState(1); // 0 = Today, 1 = Tomorrow
   const [selectedClass, setSelectedClass] = useState('ALL');
   const [selectedQuota, setSelectedQuota] = useState('GN');
+
+  useEffect(() => {
+    if (initialFrom) {
+      setFromStation(findStationByInput(initialFrom) || TRAIN_STATIONS[0]);
+    }
+    if (initialTo) {
+      setToStation(findStationByInput(initialTo) || TRAIN_STATIONS[1]);
+    }
+    if (initialDate) {
+      setTravelDate(initialDate);
+    }
+  }, [initialFrom, initialTo, initialDate]);
 
   // Autocomplete dropdown toggles & search text
   const [showFromDropdown, setShowFromDropdown] = useState(false);

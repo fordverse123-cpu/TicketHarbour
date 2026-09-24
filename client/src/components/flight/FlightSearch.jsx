@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ArrowLeftRight, Calendar, Search, Plane, Users, ShieldCheck, Check, Info } from 'lucide-react';
-import { AIRPORTS } from '../../data/locationData';
+import { AIRPORTS, findAirportByInput } from '../../data/locationData';
 
 const CABIN_CLASSES = [
   { key: 'Economy', label: 'Economy Class' },
@@ -9,15 +9,16 @@ const CABIN_CLASSES = [
   { key: 'First Class', label: 'First Class' },
 ];
 
-export default function FlightSearch({ onSearch, initialFrom = 'VGA', initialTo = 'DEL' }) {
+export default function FlightSearch({ onSearch, initialFrom = 'VGA', initialTo = 'DEL', initialDate = '' }) {
   const [tripType, setTripType] = useState('oneWay'); // 'oneWay', 'roundTrip', 'multiCity'
   const [fromAirport, setFromAirport] = useState(
-    AIRPORTS.find((a) => a.code === initialFrom) || AIRPORTS[0]
+    findAirportByInput(initialFrom) || AIRPORTS[0]
   );
   const [toAirport, setToAirport] = useState(
-    AIRPORTS.find((a) => a.code === initialTo) || AIRPORTS[1]
+    findAirportByInput(initialTo) || AIRPORTS[1]
   );
   const [departureDate, setDepartureDate] = useState(() => {
+    if (initialDate) return initialDate;
     const d = new Date();
     d.setDate(d.getDate() + 1);
     return d.toISOString().split('T')[0];
@@ -27,6 +28,18 @@ export default function FlightSearch({ onSearch, initialFrom = 'VGA', initialTo 
   const [childrenCount, setChildrenCount] = useState(0);
   const [infants, setInfants] = useState(0);
   const [cabinClass, setCabinClass] = useState('Economy');
+
+  useEffect(() => {
+    if (initialFrom) {
+      setFromAirport(findAirportByInput(initialFrom) || AIRPORTS[0]);
+    }
+    if (initialTo) {
+      setToAirport(findAirportByInput(initialTo) || AIRPORTS[1]);
+    }
+    if (initialDate) {
+      setDepartureDate(initialDate);
+    }
+  }, [initialFrom, initialTo, initialDate]);
 
   // Autocomplete & popover toggles
   const [showFromDropdown, setShowFromDropdown] = useState(false);

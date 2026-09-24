@@ -1,20 +1,33 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ArrowLeftRight, Calendar, Search, Bus, MapPin, Star, Check, Users } from 'lucide-react';
-import { BUS_CITIES, POPULAR_BUS_ROUTES } from '../../data/locationData';
+import { BUS_CITIES, POPULAR_BUS_ROUTES, findBusCityByInput } from '../../data/locationData';
 
-export default function BusSearch({ onSearch, initialFrom = 'Mumbai', initialTo = 'Goa' }) {
+export default function BusSearch({ onSearch, initialFrom = 'Mumbai', initialTo = 'Goa', initialDate = '' }) {
   const [fromCity, setFromCity] = useState(
-    BUS_CITIES.find((c) => c.city === initialFrom) || BUS_CITIES[0]
+    findBusCityByInput(initialFrom) || BUS_CITIES[0]
   );
   const [toCity, setToCity] = useState(
-    BUS_CITIES.find((c) => c.city === initialTo) || BUS_CITIES[1]
+    findBusCityByInput(initialTo) || BUS_CITIES[1]
   );
   const [travelDate, setTravelDate] = useState(() => {
+    if (initialDate) return initialDate;
     const d = new Date();
     d.setDate(d.getDate() + 1);
     return d.toISOString().split('T')[0];
   });
   const [passengers, setPassengers] = useState(1);
+
+  useEffect(() => {
+    if (initialFrom) {
+      setFromCity(findBusCityByInput(initialFrom) || BUS_CITIES[0]);
+    }
+    if (initialTo) {
+      setToCity(findBusCityByInput(initialTo) || BUS_CITIES[1]);
+    }
+    if (initialDate) {
+      setTravelDate(initialDate);
+    }
+  }, [initialFrom, initialTo, initialDate]);
 
   // Dropdown toggles
   const [showFromDropdown, setShowFromDropdown] = useState(false);

@@ -49,11 +49,37 @@ const intentSchema = z.object({
 });
 
 /**
- * Helper to resolve relative date expressions against current server date
+ * Helper to resolve relative date expressions or month names against current server date
  */
 export const resolveRelativeDate = (text = '') => {
+  if (!text) return new Date().toISOString().split('T')[0];
   const lower = text.toLowerCase();
   const today = new Date();
+
+  // Check explicit YYYY-MM-DD
+  const isoMatch = text.match(/\b(202\d-[01]\d-[0-3]\d)\b/);
+  if (isoMatch) return isoMatch[1];
+
+  // Check month name formats (e.g., "October 5", "Oct 5", "5th Oct", "on October 5")
+  const monthMatch = lower.match(/(january|february|march|april|may|june|july|august|september|october|november|december|jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\s+(\d{1,2})|(?:on\s+)?(\d{1,2})(?:st|nd|rd|th)?\s+(january|february|march|april|may|june|july|august|september|october|november|december|jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)/i);
+
+  if (monthMatch) {
+    const monthStr = monthMatch[1] || monthMatch[4];
+    const dayNum = parseInt(monthMatch[2] || monthMatch[3], 10);
+    const months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+    const monthIdx = months.findIndex((m) => monthStr.toLowerCase().startsWith(m));
+    if (monthIdx !== -1 && !isNaN(dayNum)) {
+      const year = today.getFullYear();
+      const targetDate = new Date(year, monthIdx, dayNum);
+      if (targetDate < today) {
+        targetDate.setFullYear(year + 1);
+      }
+      const yyyy = targetDate.getFullYear();
+      const mm = String(targetDate.getMonth() + 1).padStart(2, '0');
+      const dd = String(targetDate.getDate()).padStart(2, '0');
+      return `${yyyy}-${mm}-${dd}`;
+    }
+  }
 
   if (lower.includes('today')) {
     return today.toISOString().split('T')[0];
@@ -76,8 +102,10 @@ export const resolveRelativeDate = (text = '') => {
     return nextWeek.toISOString().split('T')[0];
   }
 
-  // Fallback default: today
-  return today.toISOString().split('T')[0];
+  // Default fallback: tomorrow for search convenience
+  const tomorrow = new Date(today);
+  tomorrow.setDate(today.getDate() + 1);
+  return tomorrow.toISOString().split('T')[0];
 };
 
 /**
@@ -126,96 +154,89 @@ export const parseStructuredIntentFallback = (userMessage, history = []) => {
     };
   }
 
-  // Check 3: Search Train Intent
+  // Check 3: Universal Route Intent Matching (Bus, Train, Flight)
+  // Example queries:
+  // "buses from Vijayawada to Hyderabad"
+  // "I want to travel from Guntur to Bangalore"
+  // "Find trains from Chennai to Hyderabad tomorrow"
+  // "Show buses from Vijayawada to Visakhapatnam"
+  // "I need a bus from Hyderabad to Vijayawada on October 5"
+  // "flights from Hyderabad to Delhi"
+  const routeRegex = /(?:from|between|travel\s+from|bus\s+from|buses\s+from|train\s+from|trains\s+from|flight\s+from|flights\s+from|go\s+from|need\s+(?:a\s+)?(?:bus|train|flight)?\s*from|show\s+(?:buses|trains|flights)?\s*from)\s+([a-zA-Z\s]+?)\s+(?:to|and)\s+([a-zA-Z\s]+?)(?:\s+on\s+|\s+tomorrow|\s+today|\s+this|\s+under|\s+below|\s*$)/i;
+  const simpleToRegex = /([a-zA-Z\s]+?)\s+to\s+([a-zA-Z\s]+?)(?:\s+on\s+|\s+tomorrow|\s+today|\s+this|\s+under|\s+below|\s*$)/i;
+
+  const routeMatch = msg.match(routeRegex) || msg.match(simpleToRegex);
+  const maxPriceMatch = msg.match(/(?:under|<|below|rs|₹)\s*(\d+)/i);
+
+  let category = 'bus';
   if (msg.includes('train') || msg.includes('railway') || msg.includes('express')) {
-    const fromMatch = msg.match(/(?:from|between)\s+([a-z\s]+?)\s+(?:to|and)\s+([a-z\s]+?)(?:\s+tomorrow|\s+today|\s+morning|\s+under|$)/i);
+    category = 'train';
+  } else if (msg.includes('flight') || msg.includes('airline') || msg.includes('plane') || msg.includes('fly')) {
+    category = 'flight';
+  } else if (msg.includes('bus') || msg.includes('volvo') || msg.includes('sleeper')) {
+    category = 'bus';
+  }
+
+  let timeFrom, timeTo;
+  if (msg.includes('morning')) {
+    timeFrom = '06:00';
+    timeTo = '12:00';
+  } else if (msg.includes('evening')) {
+    timeFrom = '17:00';
+    timeTo = '21:00';
+  }
+
+  if (routeMatch) {
+    const rawFrom = routeMatch[1]
+      .replace(/\b(?:buses|bus|trains|train|flights|flight|show|find|need|a|i|want|to|go|travel|between)\b/gi, '')
+      .trim();
+    const rawTo = routeMatch[2]
+      .replace(/\b(?:on|tomorrow|today|this|under|below)\b/gi, '')
+      .trim();
+
+    const capitalize = (str) =>
+      str ? str.charAt(0).toUpperCase() + str.slice(1).toLowerCase() : '';
+
+    const from = capitalize(rawFrom);
+    const to = capitalize(rawTo);
     const dateResolved = resolveRelativeDate(msg);
-    let timeFrom, timeTo;
+    const maxPrice = maxPriceMatch ? Number(maxPriceMatch[1]) : undefined;
 
-    if (msg.includes('morning')) {
-      timeFrom = '06:00';
-      timeTo = '12:00';
-    } else if (msg.includes('evening')) {
-      timeFrom = '17:00';
-      timeTo = '21:00';
-    }
-
-    if (fromMatch) {
-      const from = fromMatch[1].trim();
-      const to = fromMatch[2].trim();
+    if (from && to && from.toLowerCase() !== to.toLowerCase()) {
       return {
         intent: 'SEARCH',
-        category: 'train',
-        filters: { from, to, date: dateResolved, timeFrom, timeTo },
-        summary: `Found trains from ${from} to ${to} for ${dateResolved}.`,
+        category,
+        filters: { from, to, date: dateResolved, timeFrom, timeTo, maxPrice },
+        summary: `Found ${category} options from ${from} to ${to}.`,
       };
-    } else {
-      // Check if context has prior route
-      const lastContext = history.slice(-4).join(' ').toLowerCase();
-      const contextFromMatch = lastContext.match(/from\s+([a-z\s]+?)\s+to\s+([a-z\s]+?)(?:\s+|$)/i);
-      if (contextFromMatch) {
+    }
+  }
+
+  // Handle incomplete travel requests (e.g., "I want to travel" or "buses to Hyderabad")
+  if (msg.includes('travel') || msg.includes('bus') || msg.includes('train') || msg.includes('flight') || msg.includes('schedule')) {
+    const toOnlyMatch = msg.match(/\bto\b\s+([a-zA-Z\s]+?)(?:\s+on|\s+tomorrow|\s+today|\s*$)/i);
+    if (toOnlyMatch) {
+      const toName = toOnlyMatch[1].replace(/\b(?:travel|go|see|view|find|search)\b/gi, '').trim();
+      if (toName) {
+        const capTo = toName.charAt(0).toUpperCase() + toName.slice(1).toLowerCase();
         return {
-          intent: 'SEARCH',
-          category: 'train',
-          filters: { from: contextFromMatch[1].trim(), to: contextFromMatch[2].trim(), date: dateResolved },
-          summary: `Searching trains for ${dateResolved}.`,
+          intent: 'CLARIFICATION_REQUIRED',
+          category,
+          clarificationQuestion: `I understood that you want to travel to ${capTo}, but I couldn't identify your origin location. Please specify where you are traveling from.`,
+          summary: `Please specify your origin location for travel to ${capTo}.`,
         };
       }
-
-      return {
-        intent: 'CLARIFICATION_REQUIRED',
-        category: 'train',
-        clarificationQuestion: 'Where are you traveling from and to?',
-        summary: 'Please specify your origin and destination stations.',
-      };
     }
+
+    return {
+      intent: 'CLARIFICATION_REQUIRED',
+      category,
+      clarificationQuestion: "Where are you traveling from and to? I couldn't identify the destination. Please select your destination.",
+      summary: "I understood that you want to travel, but I couldn't identify the destination. Please select your destination.",
+    };
   }
 
-  // Check 4: Search Bus Intent
-  if (msg.includes('bus') || msg.includes('volvo') || msg.includes('sleeper')) {
-    const fromMatch = msg.match(/([a-z\s]+?)\s+to\s+([a-z\s]+?)(?:\s+under|\s+tomorrow|\s+today|$)/i);
-    const maxPriceMatch = msg.match(/(?:under|<|below|rs|₹)\s*(\d+)/i);
-    const dateResolved = resolveRelativeDate(msg);
-
-    if (fromMatch) {
-      const from = fromMatch[1].replace(/buses|bus/gi, '').trim();
-      const to = fromMatch[2].trim();
-      return {
-        intent: 'SEARCH',
-        category: 'bus',
-        filters: {
-          from,
-          to,
-          date: dateResolved,
-          maxPrice: maxPriceMatch ? Number(maxPriceMatch[1]) : undefined,
-        },
-        summary: `Found buses from ${from} to ${to}.`,
-      };
-    }
-  }
-
-  // Check 5: Search Flight Intent
-  if (msg.includes('flight') || msg.includes('airline') || msg.includes('plane') || msg.includes('fly')) {
-    const fromMatch = msg.match(/([a-z\s]+?)\s+to\s+([a-z\s]+?)(?:\s+under|\s+tomorrow|\s+today|$)/i);
-    const maxPriceMatch = msg.match(/(?:under|<|below|rs|₹)\s*(\d+)/i);
-    const dateResolved = resolveRelativeDate(msg);
-
-    if (fromMatch) {
-      return {
-        intent: 'SEARCH',
-        category: 'flight',
-        filters: {
-          from: fromMatch[1].replace(/flights|flight/gi, '').trim(),
-          to: fromMatch[2].trim(),
-          date: dateResolved,
-          maxPrice: maxPriceMatch ? Number(maxPriceMatch[1]) : undefined,
-        },
-        summary: `Found flight options.`,
-      };
-    }
-  }
-
-  // Check 6: Search Events / Sports / Movies
+  // Check Events / Sports / Movies
   if (msg.includes('event') || msg.includes('concert') || msg.includes('comedy') || msg.includes('standup')) {
     const cityMatch = msg.match(/in\s+([a-z\s]+?)(?:\s+this|\s+today|\s+tomorrow|$)/i);
     return {
@@ -334,10 +355,26 @@ export const processAIChat = async ({ userMessage, history = [], user = null }) 
   // Execute Tool Logic based on validated intent
   let toolResults = null;
   let targetUrl = null;
+  let routeObj = null;
+  let responseType = 'general';
 
   if (parsedIntent.intent === 'SEARCH') {
-    const cat = parsedIntent.category || 'all';
+    const cat = parsedIntent.category || 'bus';
     const filters = parsedIntent.filters || {};
+
+    if (filters.from && filters.to) {
+      responseType = 'route_search';
+      routeObj = {
+        source: {
+          name: filters.from,
+        },
+        destination: {
+          name: filters.to,
+        },
+        date: filters.date || resolveRelativeDate(cleanMessage),
+        transportType: cat,
+      };
+    }
 
     if (cat === 'train') {
       if (filters.from && filters.to) {
@@ -377,6 +414,7 @@ export const processAIChat = async ({ userMessage, history = [], user = null }) 
     if (!user) {
       return {
         success: true,
+        type: 'general',
         intent: 'BOOKING_STATUS',
         requiresAuth: true,
         message: 'Please log in to view your bookings and ticket reservations.',
@@ -386,12 +424,17 @@ export const processAIChat = async ({ userMessage, history = [], user = null }) 
     toolResults = await toolGetUserBookings({ userId: user._id.toString() });
   }
 
+  const finalSummary = parsedIntent.clarificationQuestion || parsedIntent.summary || `I found ${parsedIntent.category || 'ticket'} options.`;
+
   return {
     success: true,
+    type: responseType,
     intent: parsedIntent.intent,
     category: parsedIntent.category,
     filters: parsedIntent.filters,
-    summary: parsedIntent.summary || 'Processed successfully',
+    message: finalSummary,
+    summary: finalSummary,
+    route: routeObj,
     clarificationQuestion: parsedIntent.clarificationQuestion,
     results: toolResults,
     targetUrl,

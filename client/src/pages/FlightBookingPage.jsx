@@ -6,8 +6,9 @@ import FlightFilters from '../components/flight/FlightFilters';
 import SkeletonLoader from '../components/common/SkeletonLoader';
 import { CardSkeletonGrid, FlightCardSkeleton } from '../components/loading';
 import { Plane, RefreshCw, Filter, ArrowUpDown } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { findAirportByInput } from '../data/locationData';
 import toast from 'react-hot-toast';
 
 const MOCK_FLIGHTS = [
@@ -109,45 +110,69 @@ export default function FlightBookingPage() {
     cabinClass: 'ALL',
   });
 
+  const [searchParams] = useSearchParams();
+
+  const urlFrom = searchParams.get('from');
+  const urlTo = searchParams.get('to');
+  const urlDate = searchParams.get('date');
+
   useEffect(() => {
     fetchFlights();
-  }, []);
+  }, [urlFrom, urlTo, urlDate]);
 
   const fetchFlights = async () => {
     setLoading(true);
+    let baseFlights = MOCK_FLIGHTS;
     try {
       const res = await API.get('/listings?categoryType=flight');
       if (res.data.success && res.data.data.listings.length > 0) {
-        setFlights(res.data.data.listings);
-        setFilteredFlights(res.data.data.listings);
-      } else {
-        setFlights(MOCK_FLIGHTS);
-        setFilteredFlights(MOCK_FLIGHTS);
+        baseFlights = res.data.data.listings;
       }
     } catch (err) {
       console.warn('Backend flight API empty, loading standard Indian Air routes', err);
-      setFlights(MOCK_FLIGHTS);
-      setFilteredFlights(MOCK_FLIGHTS);
-    } finally {
+    }
+
+    setFlights(baseFlights);
+
+    if (urlFrom || urlTo) {
+      const fromAirportObj = findAirportByInput(urlFrom || 'VGA');
+      const toAirportObj = findAirportByInput(urlTo || 'DEL');
+      const dateVal = urlDate || new Date().toISOString().split('T')[0];
+      handleSearchInternal(baseFlights, { from: fromAirportObj, to: toAirportObj, departureDate: dateVal });
+    } else {
+      setFilteredFlights(baseFlights);
       setLoading(false);
     }
   };
 
-  const handleSearch = (searchParams) => {
+  const handleSearchInternal = (flightList, searchParams) => {
     setLoading(true);
+    const fromCode = searchParams.from?.code || '';
+    const fromCity = (searchParams.from?.city || searchParams.from || '').toLowerCase();
+    const toCode = searchParams.to?.code || '';
+    const toCity = (searchParams.to?.city || searchParams.to || '').toLowerCase();
+
     setTimeout(() => {
-      let result = [...flights];
-      if (searchParams.from?.code && searchParams.to?.code) {
-        result = result.filter(
-          (f) =>
-            f.transitInfo?.source?.includes(searchParams.from.code) ||
-            f.transitInfo?.destination?.includes(searchParams.to.code) ||
-            f.transitInfo?.source?.toLowerCase().includes(searchParams.from.city.toLowerCase())
-        );
+      let result = [...flightList];
+      if (fromCode || fromCity || toCode || toCity) {
+        result = result.filter((f) => {
+          const src = (f.transitInfo?.source || '').toLowerCase();
+          const dest = (f.transitInfo?.destination || '').toLowerCase();
+          const title = (f.title || '').toLowerCase();
+
+          const matchFrom = fromCode ? (src.includes(fromCode.toLowerCase()) || src.includes(fromCity) || title.includes(fromCity)) : true;
+          const matchTo = toCode ? (dest.includes(toCode.toLowerCase()) || dest.includes(toCity) || title.includes(toCity)) : true;
+
+          return matchFrom || matchTo;
+        });
       }
       setFilteredFlights(result.length > 0 ? result : MOCK_FLIGHTS);
       setLoading(false);
-    }, 400);
+    }, 200);
+  };
+
+  const handleSearch = (searchParams) => {
+    handleSearchInternal(flights.length > 0 ? flights : MOCK_FLIGHTS, searchParams);
   };
 
   const handleFilterChange = (newFilters) => {
@@ -184,7 +209,7 @@ export default function FlightBookingPage() {
         listing: flightObj,
         schedule: {
           _id: `sch-${flightObj._id}-flight`,
-          date: new Date().toISOString().split('T')[0],
+          date: urlDate || new Date().toISOString().split('T')[0],
           startTime: flightObj.transitInfo?.departureTime || '10:30',
           price,
         },
@@ -203,7 +228,12 @@ export default function FlightBookingPage() {
 
       {/* Search Bar Panel */}
       <section>
-        <FlightSearch onSearch={handleSearch} />
+        <FlightSearch
+          onSearch={handleSearch}
+          initialFrom={urlFrom || 'VGA'}
+          initialTo={urlTo || 'DEL'}
+          initialDate={urlDate}
+        />
       </section>
 
       {/* Mobile Filter Toggle */}
