@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { Search, User, Heart, LogOut, ShieldAlert, Menu, Ticket } from 'lucide-react';
 import MobileMenu from './MobileMenu';
 import CategoryNav from '../navigation/CategoryNav';
+import API from '../../services/api';
 
 export default function Navbar() {
   const { user, logout, isAdmin } = useAuth();

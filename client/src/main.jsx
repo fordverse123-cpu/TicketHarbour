@@ -14,6 +14,10 @@ class GlobalErrorBoundary extends React.Component {
     console.error('Global Error Boundary caught an exception:', error, errorInfo);
   }
 
+  handleRetry = () => {
+    this.setState({ hasError: false, error: null });
+  };
+
   render() {
     if (this.state.hasError) {
       return (
@@ -24,7 +28,7 @@ class GlobalErrorBoundary extends React.Component {
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          justifyIn: 'center',
+          justifyContent: 'center',
           padding: '24px',
           fontFamily: 'sans-serif',
           textAlign: 'center',
@@ -44,21 +48,38 @@ class GlobalErrorBoundary extends React.Component {
             <p style={{ fontSize: '14px', color: '#9CA3AF', marginBottom: '24px' }}>
               The application encountered a temporary initialization error.
             </p>
-            <button
-              onClick={() => window.location.reload()}
-              style={{
-                background: 'linear-gradient(to right, #03B3C3, #6750A2)',
-                color: '#ffffff',
-                border: 'none',
-                padding: '12px 24px',
-                borderRadius: '16px',
-                fontWeight: 'bold',
-                fontSize: '14px',
-                cursor: 'pointer',
-              }}
-            >
-              Reload Platform
-            </button>
+            <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
+              <button
+                onClick={this.handleRetry}
+                style={{
+                  background: 'rgba(255, 255, 255, 0.1)',
+                  color: '#ffffff',
+                  border: '1px solid rgba(255, 255, 255, 0.2)',
+                  padding: '12px 20px',
+                  borderRadius: '16px',
+                  fontWeight: 'bold',
+                  fontSize: '14px',
+                  cursor: 'pointer',
+                }}
+              >
+                Retry Application
+              </button>
+              <button
+                onClick={() => window.location.reload()}
+                style={{
+                  background: 'linear-gradient(to right, #03B3C3, #6750A2)',
+                  color: '#ffffff',
+                  border: 'none',
+                  padding: '12px 24px',
+                  borderRadius: '16px',
+                  fontWeight: 'bold',
+                  fontSize: '14px',
+                  cursor: 'pointer',
+                }}
+              >
+                Reload Platform
+              </button>
+            </div>
           </div>
         </div>
       );

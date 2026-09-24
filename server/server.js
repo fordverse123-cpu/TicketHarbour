@@ -150,6 +150,14 @@ app.get('/health', (req, res) => {
   });
 });
 
+app.get('/api/health', (req, res) => {
+  return res.status(200).json({
+    status: 'ok',
+    service: 'TicketHarbour API',
+    timestamp: new Date().toISOString()
+  });
+});
+
 app.get('/api/v1/health', (req, res) => {
   return successResponse(res, 200, 'TicketHarbor API Server is running', {
     app: 'TicketHarbor',
