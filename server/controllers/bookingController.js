@@ -1,9 +1,11 @@
 import crypto from 'crypto';
+import mongoose from 'mongoose';
 import Booking from '../models/Booking.js';
 import Schedule from '../models/Schedule.js';
 import Listing from '../models/Listing.js';
 import Coupon from '../models/Coupon.js';
 import User from '../models/User.js';
+import Category from '../models/Category.js';
 import { successResponse, errorResponse } from '../utils/apiResponse.js';
 import { generatePDFTicket } from '../utils/pdfGenerator.js';
 import { sendEmail } from '../utils/sendEmail.js';
@@ -101,14 +103,58 @@ export const unlockSeats = async (req, res, next) => {
 // @access  Private
 export const createBooking = async (req, res, next) => {
   try {
-    const { scheduleId, seats, quantity = 1, couponCode } = req.body;
+    const { scheduleId, listingId, seats, quantity = 1, couponCode, passengerInfo, customPrice } = req.body;
 
-    const schedule = await Schedule.findById(scheduleId).populate('listing');
-    if (!schedule) {
-      return errorResponse(res, 404, 'Schedule not found');
+    let schedule = null;
+
+    if (scheduleId && mongoose.Types.ObjectId.isValid(scheduleId)) {
+      schedule = await Schedule.findById(scheduleId).populate('listing');
     }
 
-    schedule.cleanExpiredLocks();
+    // Fallback: If synthetic ID or schedule not found in DB, resolve or create real Listing & Schedule
+    if (!schedule) {
+      let listingDoc = null;
+      if (listingId && mongoose.Types.ObjectId.isValid(listingId)) {
+        listingDoc = await Listing.findById(listingId);
+      }
+      if (!listingDoc) {
+        // Try finding existing Flight/Transit listing or create standard default
+        listingDoc = await Listing.findOne({ categoryType: 'flight' });
+      }
+      if (!listingDoc) {
+        let cat = await Category.findOne({ type: 'flight' });
+        if (!cat) {
+          cat = await Category.create({ name: 'Flights', type: 'flight', slug: 'flight', icon: 'Plane', description: 'Domestic & International Flights' });
+        }
+        listingDoc = await Listing.create({
+          title: 'Direct Flight Ticket',
+          slug: 'direct-flight-ticket-' + Date.now(),
+          category: cat._id,
+          categoryType: 'flight',
+          description: 'Standard Flight Reservation',
+          images: ['https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=800&q=80'],
+          pricingTiers: [{ tierName: 'Economy Standard', price: customPrice || 5499, totalCapacity: 100 }],
+        });
+      }
+
+      // Find or create dynamic schedule
+      schedule = await Schedule.findOne({ listing: listingDoc._id, status: { $ne: 'cancelled' } }).populate('listing');
+
+      if (!schedule) {
+        schedule = await Schedule.create({
+          listing: listingDoc._id,
+          date: new Date(),
+          startTime: '10:30',
+          pricing: listingDoc.pricingTiers,
+          seatMap: { bookedSeats: [], lockedSeats: [] },
+        });
+        schedule = await Schedule.findById(schedule._id).populate('listing');
+      }
+    }
+
+    if (schedule.cleanExpiredLocks) {
+      schedule.cleanExpiredLocks();
+    }
 
     const listing = schedule.listing;
     let baseAmount = 0;
@@ -119,8 +165,8 @@ export const createBooking = async (req, res, next) => {
       seatItems = seats;
       baseAmount = seats.reduce((sum, item) => sum + item.price, 0);
     } else {
-      // Quantity-based booking (Attractions, Train class, General admission)
-      const defaultPrice = schedule.pricing[0]?.price || listing.pricingTiers[0]?.price || 100;
+      // Quantity-based booking (Attractions, Flight, Train class, General admission)
+      const defaultPrice = customPrice || schedule.pricing?.[0]?.price || listing.pricingTiers?.[0]?.price || 5499;
       baseAmount = defaultPrice * quantity;
     }
 
@@ -165,6 +211,7 @@ export const createBooking = async (req, res, next) => {
       status: 'pending',
       paymentStatus: 'pending',
       qrCodeData,
+      passengerInfo: passengerInfo || {},
       adminId,
     });
 

@@ -82,6 +82,15 @@ const bookingSchema = new mongoose.Schema(
       default: false,
     },
     checkedInAt: Date,
+    passengerInfo: {
+      firstName: { type: String, default: '' },
+      lastName: { type: String, default: '' },
+      gender: { type: String, default: '' },
+      dob: { type: String, default: '' },
+      email: { type: String, default: '' },
+      phone: { type: String, default: '' },
+      idNumber: { type: String, default: '' },
+    },
     adminId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',

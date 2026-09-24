@@ -118,16 +118,16 @@ export default function FlightCard({ flight, onSelect }) {
                 <button
                   type="button"
                   onClick={() => onSelect(flight, pricingTiers[0])}
-                  className="px-5 py-3 bg-gradient-to-r from-[#03B3C3] to-[#6750A2] hover:opacity-90 text-white font-bold text-xs rounded-2xl shadow-lg flex items-center gap-1.5 transition-all cursor-pointer"
+                  className="px-5 py-3 bg-gradient-to-r from-[#03B3C3] to-[#6750A2] hover:opacity-90 text-white font-bold text-xs rounded-2xl shadow-lg flex items-center gap-1.5 transition-all cursor-pointer relative z-10"
                 >
-                  Select Flight <ArrowRight className="w-4 h-4" />
+                  Book Ticket <ArrowRight className="w-4 h-4" />
                 </button>
               ) : (
                 <Link
                   to={`/listings/${slug || _id}`}
-                  className="px-5 py-3 bg-gradient-to-r from-[#03B3C3] to-[#6750A2] hover:opacity-90 text-white font-bold text-xs rounded-2xl shadow-lg flex items-center gap-1.5 transition-all"
+                  className="px-5 py-3 bg-gradient-to-r from-[#03B3C3] to-[#6750A2] hover:opacity-90 text-white font-bold text-xs rounded-2xl shadow-lg flex items-center gap-1.5 transition-all relative z-10"
                 >
-                  Select Flight <ArrowRight className="w-4 h-4" />
+                  Book Ticket <ArrowRight className="w-4 h-4" />
                 </Link>
               )}
             </div>
